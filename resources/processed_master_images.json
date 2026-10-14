@@ -1,0 +1,450 @@
+[
+  {
+    "code": "INDUS-001",
+    "name": "ABOLA",
+    "slug": "indus-abola",
+    "source_file": "ABOLA.jpg",
+    "dest_file": "indus-abola.png",
+    "resolution": "1204x1600"
+  },
+  {
+    "code": "INDUS-002",
+    "name": "ANUCART GR",
+    "slug": "indus-anucart-gr",
+    "source_file": "ANUCART GR.jpg",
+    "dest_file": "indus-anucart-gr.png",
+    "resolution": "1120x1600"
+  },
+  {
+    "code": "INDUS-003",
+    "name": "ANUCART-SP",
+    "slug": "indus-anucart-sp",
+    "source_file": "ANUCART SP.jpg",
+    "dest_file": "indus-anucart-sp.png",
+    "resolution": "1213x1600"
+  },
+  {
+    "code": "INDUS-004",
+    "name": "BUILDOX",
+    "slug": "indus-buildox",
+    "source_file": "BUILDOX.jpg",
+    "dest_file": "indus-buildox.png",
+    "resolution": "863x1600"
+  },
+  {
+    "code": "INDUS-005",
+    "name": "CHLORDIN",
+    "slug": "indus-chlordin",
+    "source_file": "CHLORDIN.jpg",
+    "dest_file": "indus-chlordin.png",
+    "resolution": "1333x1600"
+  },
+  {
+    "code": "INDUS-006",
+    "name": "CROMA",
+    "slug": "indus-croma",
+    "source_file": "CROMA.jpg",
+    "dest_file": "indus-croma.png",
+    "resolution": "1309x1600"
+  },
+  {
+    "code": "INDUS-007",
+    "name": "CULTIWAR",
+    "slug": "indus-cultiwar",
+    "source_file": "CULTIWAR.jpg",
+    "dest_file": "indus-cultiwar.png",
+    "resolution": "892x1600"
+  },
+  {
+    "code": "INDUS-008",
+    "name": "EMATIN",
+    "slug": "indus-ematin",
+    "source_file": "EMATIN.jpg",
+    "dest_file": "indus-ematin.png",
+    "resolution": "1292x1600"
+  },
+  {
+    "code": "INDUS-009",
+    "name": "FLUDON",
+    "slug": "indus-fludon",
+    "source_file": "FLUDON.jpg",
+    "dest_file": "indus-fludon.png",
+    "resolution": "938x1600"
+  },
+  {
+    "code": "INDUS-010",
+    "name": "INDIGO",
+    "slug": "indus-indigo",
+    "source_file": "INDIGO.jpg",
+    "dest_file": "indus-indigo.png",
+    "resolution": "961x1600"
+  },
+  {
+    "code": "INDUS-011",
+    "name": "INDIMITE",
+    "slug": "indus-indimite",
+    "source_file": "INDIMITE.jpg",
+    "dest_file": "indus-indimite.png",
+    "resolution": "793x1600"
+  },
+  {
+    "code": "INDUS-012",
+    "name": "INDOX",
+    "slug": "indus-indox",
+    "source_file": "INDOX.jpg",
+    "dest_file": "indus-indox.png",
+    "resolution": "941x1600"
+  },
+  {
+    "code": "INDUS-013",
+    "name": "INDUS 505",
+    "slug": "indus-indus-505",
+    "source_file": "INDUS 505.jpg",
+    "dest_file": "indus-indus-505.png",
+    "resolution": "1065x1600"
+  },
+  {
+    "code": "INDUS-014",
+    "name": "INDUS-369",
+    "slug": "indus-indus-369",
+    "source_file": "INDUS-369.jpg",
+    "dest_file": "indus-indus-369.png",
+    "resolution": "1019x1600"
+  },
+  {
+    "code": "INDUS-015",
+    "name": "INTRON",
+    "slug": "indus-intron",
+    "source_file": "INTRON.jpg",
+    "dest_file": "indus-intron.png",
+    "resolution": "1001x1600"
+  },
+  {
+    "code": "INDUS-016",
+    "name": "LUXOR",
+    "slug": "indus-luxor",
+    "source_file": "LUXOR.jpg",
+    "dest_file": "indus-luxor.png",
+    "resolution": "819x1600"
+  },
+  {
+    "code": "INDUS-017",
+    "name": "MAKUTA",
+    "slug": "indus-makuta",
+    "source_file": "MAKUTA.jpg",
+    "dest_file": "indus-makuta.png",
+    "resolution": "1121x1600"
+  },
+  {
+    "code": "INDUS-018",
+    "name": "NAYARA",
+    "slug": "indus-nayara",
+    "source_file": "NAYARA.jpg",
+    "dest_file": "indus-nayara.png",
+    "resolution": "1274x1600"
+  },
+  {
+    "code": "INDUS-019",
+    "name": "NEOPOLICE",
+    "slug": "indus-neopolice",
+    "source_file": "NEO POLICE.jpg",
+    "dest_file": "indus-neopolice.png",
+    "resolution": "1156x1600"
+  },
+  {
+    "code": "INDUS-020",
+    "name": "NEXAZEN",
+    "slug": "indus-nexazen",
+    "source_file": "NEXAGEN.jpg",
+    "dest_file": "indus-nexazen.png",
+    "resolution": "546x709"
+  },
+  {
+    "code": "INDUS-021",
+    "name": "RAAFEL GR",
+    "slug": "indus-raafel-gr",
+    "source_file": "RAAFEL GR.jpg",
+    "dest_file": "indus-raafel-gr.png",
+    "resolution": "1196x1600"
+  },
+  {
+    "code": "INDUS-022",
+    "name": "RAAFEL SC",
+    "slug": "indus-raafel-sc",
+    "source_file": "RAAFEL SC.jpg",
+    "dest_file": "indus-raafel-sc.png",
+    "resolution": "879x1600"
+  },
+  {
+    "code": "INDUS-023",
+    "name": "RAFTAR",
+    "slug": "indus-raftar",
+    "source_file": "RAFTAR.jpg",
+    "dest_file": "indus-raftar.png",
+    "resolution": "1151x1600"
+  },
+  {
+    "code": "INDUS-024",
+    "name": "SPARX",
+    "slug": "indus-sparx",
+    "source_file": "SPARX.jpg",
+    "dest_file": "indus-sparx.png",
+    "resolution": "1146x1352"
+  },
+  {
+    "code": "INDUS-025",
+    "name": "STERLING",
+    "slug": "indus-sterling",
+    "source_file": "STERLING.jpg",
+    "dest_file": "indus-sterling.png",
+    "resolution": "837x1600"
+  },
+  {
+    "code": "INDUS-026",
+    "name": "TRADER",
+    "slug": "indus-trader",
+    "source_file": "TRADER.jpg",
+    "dest_file": "indus-trader.png",
+    "resolution": "1222x1600"
+  },
+  {
+    "code": "INDUS-032",
+    "name": "DUNLOP",
+    "slug": "indus-dunlop",
+    "source_file": "DUNLOP.jpg",
+    "dest_file": "indus-dunlop.png",
+    "resolution": "1208x1600"
+  },
+  {
+    "code": "INDUS-033",
+    "name": "ELIXIR",
+    "slug": "indus-elixir",
+    "source_file": "ELIXIR.jpg",
+    "dest_file": "indus-elixir.png",
+    "resolution": "1354x1600"
+  },
+  {
+    "code": "INDUS-034",
+    "name": "ERODE",
+    "slug": "indus-erode",
+    "source_file": "ERODE.jpg",
+    "dest_file": "indus-erode.png",
+    "resolution": "1188x1600"
+  },
+  {
+    "code": "INDUS-035",
+    "name": "HITMAX",
+    "slug": "indus-hitmax",
+    "source_file": "HITMAX.jpg",
+    "dest_file": "indus-hitmax.png",
+    "resolution": "793x1600"
+  },
+  {
+    "code": "INDUS-036",
+    "name": "INDISUPER",
+    "slug": "indus-indisuper",
+    "source_file": "INDISUPER.jpg",
+    "dest_file": "indus-indisuper.png",
+    "resolution": "835x1600"
+  },
+  {
+    "code": "INDUS-037",
+    "name": "INDUS PLUS",
+    "slug": "indus-indus-plus",
+    "source_file": "INDUS PLUS.jpg",
+    "dest_file": "indus-indus-plus.png",
+    "resolution": "801x1600"
+  },
+  {
+    "code": "INDUS-038",
+    "name": "INDUS XTRA",
+    "slug": "indus-indus-xtra",
+    "source_file": "INDUS XTRA.jpg",
+    "dest_file": "indus-indus-xtra.png",
+    "resolution": "935x1600"
+  },
+  {
+    "code": "INDUS-039",
+    "name": "JASMINE",
+    "slug": "indus-jasmine",
+    "source_file": "JASMINE.jpg",
+    "dest_file": "indus-jasmine.png",
+    "resolution": "1207x1600"
+  },
+  {
+    "code": "INDUS-040",
+    "name": "LOMBARAD",
+    "slug": "indus-lombarad",
+    "source_file": "LOMBARAD.jpg",
+    "dest_file": "indus-lombarad.png",
+    "resolution": "1600x1364"
+  },
+  {
+    "code": "INDUS-041",
+    "name": "NEO GOLD",
+    "slug": "indus-neo-gold",
+    "source_file": "NEO GOLD.jpg",
+    "dest_file": "indus-neo-gold.png",
+    "resolution": "888x1600"
+  },
+  {
+    "code": "INDUS-042",
+    "name": "PARAQUEEN",
+    "slug": "indus-paraqueen",
+    "source_file": "PARAQUEEN.jpg",
+    "dest_file": "indus-paraqueen.png",
+    "resolution": "494x697"
+  },
+  {
+    "code": "INDUS-043",
+    "name": "PERSIST",
+    "slug": "indus-persist",
+    "source_file": "PERSIST.jpg",
+    "dest_file": "indus-persist.png",
+    "resolution": "1237x1600"
+  },
+  {
+    "code": "INDUS-044",
+    "name": "POWER PLUS",
+    "slug": "indus-power-plus",
+    "source_file": "POWER PLUS.jpg",
+    "dest_file": "indus-power-plus.png",
+    "resolution": "899x1600"
+  },
+  {
+    "code": "INDUS-045",
+    "name": "PRE-GUARD",
+    "slug": "indus-pre-guard",
+    "source_file": "PRE-GUARD.jpg",
+    "dest_file": "indus-pre-guard.png",
+    "resolution": "886x1600"
+  },
+  {
+    "code": "INDUS-046",
+    "name": "ULTRAFAST",
+    "slug": "indus-ultrafast",
+    "source_file": "ULTRAFAST.jpg",
+    "dest_file": "indus-ultrafast.png",
+    "resolution": "1143x1600"
+  },
+  {
+    "code": "INDUS-047",
+    "name": "VIVANTA",
+    "slug": "indus-vivanta",
+    "source_file": "VIVANTA.jpg",
+    "dest_file": "indus-vivanta.png",
+    "resolution": "920x1600"
+  },
+  {
+    "code": "INDUS-049",
+    "name": "AGRISOL",
+    "slug": "indus-agrisol",
+    "source_file": "AGRISOL.jpg",
+    "dest_file": "indus-agrisol.png",
+    "resolution": "1241x1600"
+  },
+  {
+    "code": "INDUS-050",
+    "name": "CYZOLE",
+    "slug": "indus-cyzole",
+    "source_file": "CYZOLE.jpg",
+    "dest_file": "indus-cyzole.png",
+    "resolution": "1204x1600"
+  },
+  {
+    "code": "INDUS-051",
+    "name": "EXPLORE",
+    "slug": "indus-explore",
+    "source_file": "EXPLORE.jpg",
+    "dest_file": "indus-explore.png",
+    "resolution": "1182x1600"
+  },
+  {
+    "code": "INDUS-052",
+    "name": "FALCON",
+    "slug": "indus-falcon",
+    "source_file": "FALCON.jpg",
+    "dest_file": "indus-falcon.png",
+    "resolution": "792x1600"
+  },
+  {
+    "code": "INDUS-053",
+    "name": "INDUS-ONE",
+    "slug": "indus-indus-one",
+    "source_file": "INDUS-ONE.jpg",
+    "dest_file": "indus-indus-one.png",
+    "resolution": "1144x1600"
+  },
+  {
+    "code": "INDUS-054",
+    "name": "MANKEB",
+    "slug": "indus-mankeb",
+    "source_file": "MANKEB.jpg",
+    "dest_file": "indus-mankeb.png",
+    "resolution": "1146x1352"
+  },
+  {
+    "code": "INDUS-055",
+    "name": "MELUHA",
+    "slug": "indus-meluha",
+    "source_file": "MELUHA.jpg",
+    "dest_file": "indus-meluha.png",
+    "resolution": "1152x1600"
+  },
+  {
+    "code": "INDUS-056",
+    "name": "RYDER",
+    "slug": "indus-ryder",
+    "source_file": "RYDER.jpg",
+    "dest_file": "indus-ryder.png",
+    "resolution": "1154x1600"
+  },
+  {
+    "code": "INDUS-057",
+    "name": "SENSOR",
+    "slug": "indus-sensor",
+    "source_file": "SENSOR.jpg",
+    "dest_file": "indus-sensor.png",
+    "resolution": "749x1600"
+  },
+  {
+    "code": "INDUS-058",
+    "name": "SHOGUN",
+    "slug": "indus-shogun",
+    "source_file": "SHOGUN.jpg",
+    "dest_file": "indus-shogun.png",
+    "resolution": "854x1600"
+  },
+  {
+    "code": "INDUS-059",
+    "name": "STOPEX",
+    "slug": "indus-stopex",
+    "source_file": "STOPEX.jpg",
+    "dest_file": "indus-stopex.png",
+    "resolution": "1213x1600"
+  },
+  {
+    "code": "INDUS-060",
+    "name": "SULFIRE",
+    "slug": "indus-sulfire",
+    "source_file": "SULFIRE.jpg",
+    "dest_file": "indus-sulfire.png",
+    "resolution": "1263x1600"
+  },
+  {
+    "code": "INDUS-061",
+    "name": "TESLA",
+    "slug": "indus-tesla",
+    "source_file": "TESLA.jpg",
+    "dest_file": "indus-tesla.png",
+    "resolution": "1026x1600"
+  },
+  {
+    "code": "INDUS-063",
+    "name": "GABBARKING",
+    "slug": "indus-gabbarking",
+    "source_file": "GABBERKING.jpg",
+    "dest_file": "indus-gabbarking.png",
+    "resolution": "1223x1600"
+  }
+]
