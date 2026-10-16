@@ -75,7 +75,7 @@ export async function loginAdmin(email: string, password: string): Promise<Admin
   if (!isFirebaseConfigured || !auth) {
     localStorage.removeItem(LOCAL_ADMIN_KEY);
     throw new Error(
-      'Authentication service is currently unavailable. Please ensure production Firebase configuration is active.'
+      'Authentication service is currently unavailable: VITE_FIREBASE_API_KEY environment variable is missing in Vercel Project Settings.'
     );
   }
 
@@ -99,6 +99,12 @@ export async function loginAdmin(email: string, password: string): Promise<Admin
       throw new Error('Too many failed attempts. Access is temporarily restricted. Please try again later.');
     } else if (code === 'auth/network-request-failed') {
       throw new Error('Network error. Unable to contact authentication servers.');
+    } else if (code === 'auth/unauthorized-domain') {
+      throw new Error('Authentication domain not authorized. Please add indus-crop-care-pvt-ltd.vercel.app to Firebase Console -> Authentication -> Settings -> Authorized Domains.');
+    } else if (code === 'auth/operation-not-allowed') {
+      throw new Error('Email/Password provider is disabled. Please enable it in Firebase Console -> Authentication -> Sign-in method.');
+    } else if (code === 'auth/user-disabled') {
+      throw new Error('This administrator account has been disabled.');
     }
     throw new Error('Authentication failed. Invalid credentials.');
   }

@@ -57,6 +57,12 @@ export const AdminLoginPage: React.FC = () => {
         setError(msg || 'Invalid administrator email or password. Access denied.');
       } else if (msg.includes('too-many-requests')) {
         setError('Too many failed attempts. Access temporarily restricted. Try again later.');
+      } else if (
+        msg.includes('Authentication service is currently unavailable') ||
+        msg.includes('Authorized Domains') ||
+        msg.includes('provider is disabled')
+      ) {
+        setError(msg);
       } else {
         setError(msg || 'Authentication failed. Please check your network and credentials.');
       }
