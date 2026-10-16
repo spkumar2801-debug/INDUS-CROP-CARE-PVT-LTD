@@ -10,7 +10,7 @@ import {
   where, 
   serverTimestamp 
 } from 'firebase/firestore';
-import { db, isFirebaseConfigured } from '../lib/firebase';
+import { db, auth, isFirebaseConfigured } from '../lib/firebase';
 import { Product } from '../types/product';
 import { INITIAL_PRODUCTS } from '../data/initialProducts';
 
@@ -77,14 +77,17 @@ export async function getPublishedProducts(): Promise<Product[]> {
 export async function getAllProductsAdmin(): Promise<Product[]> {
   if (isFirebaseConfigured && db) {
     try {
-      const q = query(collection(db, PRODUCTS_COLLECTION));
-      const snapshot = await getDocs(q);
-      if (!snapshot.empty) {
-        const list = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Product));
-        return deduplicateProducts(list).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+      // Only execute unfiltered query if authenticated with Firebase Auth
+      if (auth?.currentUser) {
+        const q = query(collection(db, PRODUCTS_COLLECTION));
+        const snapshot = await getDocs(q);
+        if (!snapshot.empty) {
+          const list = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Product));
+          return deduplicateProducts(list).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+        }
       }
-    } catch (error) {
-      console.warn('[productService] Firestore admin query failed, using local store:', error);
+    } catch (error: any) {
+      console.warn('[productService] Firestore admin query note:', error?.message || error);
     }
   }
 

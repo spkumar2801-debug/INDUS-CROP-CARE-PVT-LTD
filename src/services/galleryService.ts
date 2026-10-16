@@ -9,7 +9,7 @@ import {
   where, 
   serverTimestamp 
 } from 'firebase/firestore';
-import { db, isFirebaseConfigured } from '../lib/firebase';
+import { db, auth, isFirebaseConfigured } from '../lib/firebase';
 import { GalleryItem } from '../types/gallery';
 import { INITIAL_GALLERY_ITEMS } from '../data/initialProducts';
 
@@ -73,14 +73,16 @@ export async function getPublishedGalleryItems(): Promise<GalleryItem[]> {
 export async function getAllGalleryItemsAdmin(): Promise<GalleryItem[]> {
   if (isFirebaseConfigured && db) {
     try {
-      const q = query(collection(db, GALLERY_COLLECTION));
-      const snapshot = await getDocs(q);
-      if (!snapshot.empty) {
-        const list = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as GalleryItem));
-        return deduplicateGalleryItems(list).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+      if (auth?.currentUser) {
+        const q = query(collection(db, GALLERY_COLLECTION));
+        const snapshot = await getDocs(q);
+        if (!snapshot.empty) {
+          const list = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as GalleryItem));
+          return deduplicateGalleryItems(list).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+        }
       }
-    } catch (error) {
-      console.warn('[galleryService] Firestore admin query failed, using local store:', error);
+    } catch (error: any) {
+      console.warn('[galleryService] Firestore admin query note:', error?.message || error);
     }
   }
 

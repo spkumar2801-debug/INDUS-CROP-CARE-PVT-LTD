@@ -22,7 +22,8 @@ service cloud.firestore {
         isSuperAdminEmail() ||
         request.auth.token.admin == true ||
         (exists(/databases/$(database)/documents/adminUsers/$(request.auth.uid)) &&
-         get(/databases/$(database)/documents/adminUsers/$(request.auth.uid)).data.role in ['admin', 'superadmin'])
+         (!('role' in get(/databases/$(database)/documents/adminUsers/$(request.auth.uid)).data) ||
+          get(/databases/$(database)/documents/adminUsers/$(request.auth.uid)).data.role in ['admin', 'superadmin', 'editor']))
       );
     }
 
@@ -38,17 +39,19 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // Gallery: Public read, Admin write
+    // Gallery: Public read for published items, Admin write
     match /gallery/{imageId} {
-      allow read: if true;
+      allow read: if resource.data.isPublished == true || isAdmin();
       allow write: if isAdmin();
     }
 
     // Customer Enquiries: Public can create with validated fields and size limits; only Admins can read, update, or delete
     match /enquiries/{enquiryId} {
-      allow create: if request.resource.data.name is string 
-                    && request.resource.data.name.size() > 0
-                    && request.resource.data.name.size() <= 100
+      allow create: if (
+                      (request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 100) ||
+                      (request.resource.data.fullName is string && request.resource.data.fullName.size() > 0 && request.resource.data.fullName.size() <= 100) ||
+                      (request.resource.data.customerName is string && request.resource.data.customerName.size() > 0 && request.resource.data.customerName.size() <= 100)
+                    )
                     && request.resource.data.phone is string
                     && request.resource.data.phone.size() >= 10
                     && request.resource.data.phone.size() <= 20;

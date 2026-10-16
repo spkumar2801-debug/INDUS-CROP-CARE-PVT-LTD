@@ -62,7 +62,7 @@ const ProtectedAdminRoute: React.FC<{ children: React.ReactNode }> = ({ children
     );
   }
 
-  if (!user) {
+  if (!user || !user.role || !['admin', 'superadmin', 'editor'].includes(user.role)) {
     return <Navigate to="/admin/login" replace />;
   }
 

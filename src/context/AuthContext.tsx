@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { AdminUser } from '../types/settings';
-import { getCurrentAdmin, loginAdmin, logoutAdmin, subscribeToAuthChanges } from '../services/authService';
+import { loginAdmin, logoutAdmin, subscribeToAuthChanges } from '../services/authService';
 
 interface AuthContextType {
   user: AdminUser | null;
@@ -12,7 +12,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<AdminUser | null>(getCurrentAdmin());
+  const [user, setUser] = useState<AdminUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -49,7 +49,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     </AuthContext.Provider>
   );
 };
-
+// eslint-disable-next-line react-refresh/only-export-components, react/only-export-components
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {

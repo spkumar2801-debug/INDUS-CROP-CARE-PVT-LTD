@@ -18,16 +18,21 @@ import { getAllProductsAdmin } from '../../services/productService';
 import { getAllGalleryItemsAdmin } from '../../services/galleryService';
 import { getSiteSettings } from '../../services/settingsService';
 import { getAllEnquiriesAdmin } from '../../services/enquiryService';
-import { isFirebaseConfigured, firebaseConfig } from '../../lib/firebase';
+import { isFirebaseConfigured, firebaseConfig, verifyFirebaseConnectivity } from '../../lib/firebase';
+import { useAuth } from '../../context/AuthContext';
 
 export const AdminDashboardPage: React.FC = () => {
+  const { user } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [galleryCount, setGalleryCount] = useState<number>(0);
   const [enquiriesCount, setEnquiriesCount] = useState<number>(0);
   const [whatsappNumber, setWhatsappNumber] = useState<string>('');
+  const [firebaseStatus, setFirebaseStatus] = useState<{ connected: boolean; status: string; message: string } | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    verifyFirebaseConnectivity().then(setFirebaseStatus);
+
     Promise.all([
       getAllProductsAdmin(),
       getAllGalleryItemsAdmin(),
@@ -39,7 +44,7 @@ export const AdminDashboardPage: React.FC = () => {
       setWhatsappNumber(settings.customerCareWhatsAppNumber || settings.whatsappNumber || '');
       setEnquiriesCount(enqs.length);
     }).finally(() => setLoading(false));
-  }, []);
+  }, [user]);
 
   const publishedCount = products.filter(p => p.isPublished).length;
   const categoriesCount = new Set(products.map(p => p.category)).size;
@@ -137,8 +142,11 @@ export const AdminDashboardPage: React.FC = () => {
                   </div>
                 </div>
               </div>
-              <span className={`status-indicator ${isFirebaseConfigured ? 'connected' : 'pending'}`}>
-                {isFirebaseConfigured ? 'Connected to Firebase' : 'Pending API Key in .env (Using Safe Local Cache)'}
+              <span className={`status-indicator ${
+                firebaseStatus?.status === 'connected' ? 'connected' :
+                firebaseStatus?.status === 'error' ? 'error' : 'pending'
+              }`}>
+                {firebaseStatus ? firebaseStatus.message : (isFirebaseConfigured ? 'Verifying live connection...' : 'Pending VITE_FIREBASE_API_KEY in environment configuration')}
               </span>
             </div>
 

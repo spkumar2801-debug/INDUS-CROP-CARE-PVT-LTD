@@ -9,7 +9,7 @@ import {
   orderBy, 
   serverTimestamp 
 } from 'firebase/firestore';
-import { db, isFirebaseConfigured } from '../lib/firebase';
+import { db, auth, isFirebaseConfigured } from '../lib/firebase';
 
 export interface CustomerEnquiry {
   id?: string;
@@ -82,7 +82,7 @@ export async function submitCustomerEnquiry(
     try {
       const docRef = await addDoc(collection(db, ENQUIRIES_COLLECTION), {
         ...payload,
-        // Match firestore.rules validation fields
+        name: trimmedName,
         customerName: trimmedName,
         phone: trimmedPhone
       });
@@ -94,7 +94,7 @@ export async function submitCustomerEnquiry(
 
       return { success: true, id: docRef.id };
     } catch (error: any) {
-      console.error('[enquiryService] Firestore submission failed:', error);
+      console.error('[enquiryService] Firestore submission note:', error?.message || error);
       // Fallback to local storage persistence
       const fallbackId = `enq_${Date.now()}`;
       const localList = getLocalEnquiries();
@@ -119,28 +119,30 @@ export async function submitCustomerEnquiry(
 export async function getAllEnquiriesAdmin(): Promise<CustomerEnquiry[]> {
   if (isFirebaseConfigured && db) {
     try {
-      const q = query(collection(db, ENQUIRIES_COLLECTION), orderBy('createdAt', 'desc'));
-      const snapshot = await getDocs(q);
-      if (!snapshot.empty) {
-        return snapshot.docs.map(d => {
-          const item = d.data();
-          return {
-            id: d.id,
-            fullName: item.fullName || item.customerName || 'Anonymous Farmer',
-            phone: item.phone || '',
-            state: item.state || '',
-            district: item.district || '',
-            interestedProduct: item.interestedProduct || item.productName || 'General Enquiry',
-            quantity: item.quantity || '',
-            message: item.message || '',
-            status: item.status || 'new',
-            createdAt: item.createdAt?.toDate ? item.createdAt.toDate().toISOString() : (item.createdAt || new Date().toISOString()),
-            updatedAt: item.updatedAt?.toDate ? item.updatedAt.toDate().toISOString() : item.updatedAt
-          } as CustomerEnquiry;
-        });
+      if (auth?.currentUser) {
+        const q = query(collection(db, ENQUIRIES_COLLECTION), orderBy('createdAt', 'desc'));
+        const snapshot = await getDocs(q);
+        if (!snapshot.empty) {
+          return snapshot.docs.map(d => {
+            const item = d.data();
+            return {
+              id: d.id,
+              fullName: item.fullName || item.customerName || item.name || 'Anonymous Farmer',
+              phone: item.phone || '',
+              state: item.state || '',
+              district: item.district || '',
+              interestedProduct: item.interestedProduct || item.productName || 'General Enquiry',
+              quantity: item.quantity || '',
+              message: item.message || '',
+              status: item.status || 'new',
+              createdAt: item.createdAt?.toDate ? item.createdAt.toDate().toISOString() : (item.createdAt || new Date().toISOString()),
+              updatedAt: item.updatedAt?.toDate ? item.updatedAt.toDate().toISOString() : item.updatedAt
+            } as CustomerEnquiry;
+          });
+        }
       }
-    } catch (error) {
-      console.warn('[enquiryService] Firestore admin query error:', error);
+    } catch (error: any) {
+      console.warn('[enquiryService] Firestore admin query note:', error?.message || error);
     }
   }
 

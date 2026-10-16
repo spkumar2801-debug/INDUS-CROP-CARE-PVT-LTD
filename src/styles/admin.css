@@ -703,6 +703,11 @@
   color: #E65100;
 }
 
+.status-indicator.error {
+  background-color: #FFEBEE;
+  color: #C62828;
+}
+
 /* 7. Tables System (Responsive & Scannable) */
 .admin-table-card {
   background-color: #FFFFFF;

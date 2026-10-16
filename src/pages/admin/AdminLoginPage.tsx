@@ -45,10 +45,16 @@ export const AdminLoginPage: React.FC = () => {
       navigate('/admin/dashboard', { replace: true });
     } catch (err: any) {
       console.error('Login error:', err);
-      // Clean readable Firebase auth errors
+      setPassword('');
       const msg = err?.message || '';
-      if (msg.includes('user-not-found') || msg.includes('wrong-password') || msg.includes('invalid-credential')) {
-        setError('Invalid administrator email or password. Please verify credentials.');
+      if (
+        msg.includes('user-not-found') || 
+        msg.includes('wrong-password') || 
+        msg.includes('invalid-credential') ||
+        msg.includes('Invalid credentials') ||
+        msg.includes('Access denied')
+      ) {
+        setError(msg || 'Invalid administrator email or password. Access denied.');
       } else if (msg.includes('too-many-requests')) {
         setError('Too many failed attempts. Access temporarily restricted. Try again later.');
       } else {
