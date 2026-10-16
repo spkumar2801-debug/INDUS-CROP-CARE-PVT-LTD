@@ -7,10 +7,22 @@ service cloud.firestore {
       return request.auth != null;
     }
     
+    function isSuperAdminEmail() {
+      return isAuthenticated() && 
+             request.auth.token.email != null &&
+             request.auth.token.email.lower() in [
+               'admin@induscropcare.com', 
+               'info@induscropcare.com',
+               'indusagriseedspl@gmail.com'
+             ];
+    }
+
     function isAdmin() {
       return isAuthenticated() && (
-        exists(/databases/$(database)/documents/adminUsers/$(request.auth.uid)) ||
-        request.auth.token.admin == true
+        isSuperAdminEmail() ||
+        request.auth.token.admin == true ||
+        (exists(/databases/$(database)/documents/adminUsers/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/adminUsers/$(request.auth.uid)).data.role in ['admin', 'superadmin'])
       );
     }
 
@@ -32,17 +44,21 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // Customer Enquiries: Public can create an enquiry; only Admins can read or manage
+    // Customer Enquiries: Public can create with validated fields and size limits; only Admins can read, update, or delete
     match /enquiries/{enquiryId} {
       allow create: if request.resource.data.name is string 
-                    && request.resource.data.phone is string;
+                    && request.resource.data.name.size() > 0
+                    && request.resource.data.name.size() <= 100
+                    && request.resource.data.phone is string
+                    && request.resource.data.phone.size() >= 10
+                    && request.resource.data.phone.size() <= 20;
       allow read, update, delete: if isAdmin();
     }
 
-    // Admin Profiles: Only authenticated users can access their own record
+    // Admin Profiles: Authenticated users can read their own profile; Admins can read and write all
     match /adminUsers/{userId} {
-      allow read: if isAuthenticated() && request.auth.uid == userId;
-      allow write: if isAdmin();
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      allow write: if isAdmin() || (isAuthenticated() && request.auth.uid == userId && isSuperAdminEmail());
     }
   }
 }

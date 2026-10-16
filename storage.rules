@@ -6,10 +6,28 @@ service firebase.storage {
       return request.auth != null;
     }
 
+    function isSuperAdminEmail() {
+      return isAuthenticated() && 
+             request.auth.token.email != null &&
+             request.auth.token.email.lower() in [
+               'admin@induscropcare.com', 
+               'info@induscropcare.com',
+               'indusagriseedspl@gmail.com'
+             ];
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && (
+        isSuperAdminEmail() ||
+        request.auth.token.admin == true
+      );
+    }
+
     // Public branding, products, and gallery media are readable by everyone
+    // Uploads strictly restricted to verified Admins with MIME type and size checks
     match /{allPaths=**} {
       allow read: if true;
-      allow write: if isAuthenticated()
+      allow write: if isAdmin()
                    && request.resource.size < 25 * 1024 * 1024
                    && (request.resource.contentType.matches('image/.*') || 
                        request.resource.contentType.matches('video/mp4') ||
