@@ -7,6 +7,7 @@ import { Footer } from './components/layout/Footer';
 import { ProductEnquirySection } from './components/enquiry/ProductEnquirySection';
 import { ProductDetailsModal } from './components/products/ProductDetailsModal';
 import { BrandedPageLoader } from './components/common/BrandedPageLoader';
+import { FloatingWhatsAppButton } from './components/common/FloatingWhatsAppButton';
 import { useScrollReveal } from './hooks/useScrollReveal';
 
 // Pages
@@ -26,6 +27,7 @@ import { AdminProductEditorPage } from './pages/admin/AdminProductEditorPage';
 import { AdminGalleryPage } from './pages/admin/AdminGalleryPage';
 import { AdminEnquiriesPage } from './pages/admin/AdminEnquiriesPage';
 import { AdminSettingsPage } from './pages/admin/AdminSettingsPage';
+import { AdminHeroMediaPage } from './pages/admin/AdminHeroMediaPage';
 
 // Data & Types
 import { Product } from './types/product';
@@ -85,6 +87,7 @@ const PublicLayout: React.FC<{
         <ProductEnquirySection products={products} selectedProductId={selectedEnquiryProduct} />
       )}
       <Footer onOpenQuoteModal={() => onOpenEnquiry()} />
+      <FloatingWhatsAppButton />
     </>
   );
 };
@@ -269,6 +272,14 @@ export const AppContent: React.FC = () => {
           element={
             <ProtectedAdminRoute>
               <AdminSettingsPage />
+            </ProtectedAdminRoute>
+          } 
+        />
+        <Route 
+          path="/admin/hero" 
+          element={
+            <ProtectedAdminRoute>
+              <AdminHeroMediaPage />
             </ProtectedAdminRoute>
           } 
         />

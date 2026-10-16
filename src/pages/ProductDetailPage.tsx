@@ -89,13 +89,22 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ onOpenQuot
         <div className="card" style={{ padding: 'clamp(20px, 4vw, 40px)', backgroundColor: '#0E291A', border: '1px solid rgba(255, 255, 255, 0.08)', marginBottom: '32px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '40px', alignItems: 'center' }}>
             
-            {/* Image Box */}
-            <div className="product-detail-hero-frame" style={{ position: 'relative', borderRadius: '16px', overflow: 'hidden', backgroundColor: '#071F11', border: '1px solid rgba(255, 255, 255, 0.09)', textAlign: 'center', padding: '24px' }}>
+            {/* Image Box — Studio Presentation */}
+            <div className="product-detail-hero-frame" style={{ 
+              position: 'relative', 
+              borderRadius: '16px', 
+              overflow: 'hidden', 
+              background: 'radial-gradient(circle at 50% 50%, #FFFFFF 0%, #EEF4EF 100%)', 
+              border: '1px solid rgba(255, 255, 255, 0.15)', 
+              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.25)',
+              textAlign: 'center', 
+              padding: '28px' 
+            }}>
               <img 
                 src={product.imageUrl} 
                 alt={`${product.name} - Indus Crop Care`} 
                 className="product-detail-hero-img"
-                style={{ maxHeight: '360px', width: 'auto', maxWidth: '100%', objectFit: 'contain', margin: '0 auto' }}
+                style={{ maxHeight: '360px', width: 'auto', maxWidth: '100%', objectFit: 'contain', margin: '0 auto', filter: 'drop-shadow(0 6px 16px rgba(0,0,0,0.12))' }}
               />
               <div className="product-detail-badge-overlay" style={{ marginTop: '16px', display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap' }}>
                 <span className="badge badge-gold">{product.category}</span>

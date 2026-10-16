@@ -15,7 +15,7 @@ import { Product } from '../types/product';
 import { INITIAL_PRODUCTS } from '../data/initialProducts';
 
 const PRODUCTS_COLLECTION = 'products';
-const LOCAL_STORAGE_KEY = 'indus_products_cache_v5';
+const LOCAL_STORAGE_KEY = 'indus_products_cache_v7';
 
 function deduplicateProducts(list: Product[]): Product[] {
   const map = new Map<string, Product>();
@@ -32,14 +32,14 @@ function getLocalProducts(): Product[] {
     const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) {
+      if (Array.isArray(parsed) && parsed.length >= INITIAL_PRODUCTS.length) {
         return deduplicateProducts(parsed);
       }
     }
   } catch (e) {
     console.error('Error reading local products cache:', e);
   }
-  // Initialize with the 4 authentic products from client spec sheets
+  // Initialize with full updated products catalogue
   localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(INITIAL_PRODUCTS));
   return INITIAL_PRODUCTS;
 }

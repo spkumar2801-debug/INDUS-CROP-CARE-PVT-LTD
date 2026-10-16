@@ -11,7 +11,8 @@ import {
   ExternalLink,
   Menu,
   X,
-  ShieldCheck
+  ShieldCheck,
+  Sparkles
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -32,6 +33,7 @@ export const AdminNav: React.FC = () => {
     { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { to: '/admin/products', icon: Sprout, label: 'All Products' },
     { to: '/admin/products/new', icon: PlusCircle, label: 'Add New Product' },
+    { to: '/admin/hero', icon: Sparkles, label: 'Hero Media Manager' },
     { to: '/admin/gallery', icon: ImageIcon, label: 'Image Gallery' },
     { to: '/admin/enquiries', icon: Inbox, label: 'Customer Enquiries' },
     { to: '/admin/settings', icon: Settings, label: 'Site Settings' },

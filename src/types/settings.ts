@@ -22,8 +22,37 @@ export interface SiteSettings {
   isoCertification?: string;
   operationalStates?: string[];
   logoUrl: string;
+  hero?: HeroSettings;
   updatedAt?: string;
   updatedBy?: string;
+}
+
+export interface HeroSettings {
+  mediaType: 'image' | 'video';
+  imageUrl: string;
+  imageMobileUrl?: string;
+  imagePositionDesktop?: string;
+  imagePositionMobile?: string;
+  imageFit?: 'cover' | 'contain';
+  videoUrl?: string;
+  videoMobileUrl?: string;
+  videoPosterUrl?: string;
+  videoLoop?: boolean;
+  videoMuted?: boolean;
+  overlayDarkness?: number;
+  gradientStrength?: number;
+  heroHeightPreset?: 'compact' | 'standard' | 'tall' | 'fullscreen';
+  badgeText?: string;
+  titleLine1?: string;
+  titleLine2?: string;
+  teluguMotto?: string;
+  description?: string;
+  primaryCtaText?: string;
+  primaryCtaLink?: string;
+  secondaryCtaText?: string;
+  secondaryCtaLink?: string;
+  publishedAt?: string;
+  publishedBy?: string;
 }
 
 export interface AdminUser {

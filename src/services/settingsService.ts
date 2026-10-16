@@ -1,6 +1,6 @@
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db, isFirebaseConfigured } from '../lib/firebase';
-import { SiteSettings } from '../types/settings';
+import { SiteSettings, HeroSettings } from '../types/settings';
 import { INITIAL_SETTINGS } from '../data/initialProducts';
 
 const SETTINGS_COLLECTION = 'siteSettings';
@@ -16,6 +16,10 @@ function getLocalSettings(): SiteSettings {
       return {
         ...INITIAL_SETTINGS,
         ...parsed,
+        hero: ({
+          ...INITIAL_SETTINGS.hero,
+          ...(parsed.hero || {})
+        } as HeroSettings),
         customerCareWhatsAppNumber: unified,
         whatsappNumber: unified
       };
@@ -59,6 +63,10 @@ export async function getSiteSettings(): Promise<SiteSettings> {
         const merged: SiteSettings = {
           ...INITIAL_SETTINGS,
           ...data,
+          hero: ({
+            ...INITIAL_SETTINGS.hero,
+            ...(data.hero || {})
+          } as HeroSettings),
           customerCareWhatsAppNumber: unified,
           whatsappNumber: unified
         };

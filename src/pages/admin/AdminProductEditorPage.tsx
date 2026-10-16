@@ -199,11 +199,10 @@ export const AdminProductEditorPage: React.FC = () => {
                     <option value="Fungicides">Fungicides</option>
                     <option value="Plant Growth Regulator">Plant Growth Regulator (PGR)</option>
                     <option value="Organic Fertilizers">Organic Fertilizers</option>
-                    <option value="Water Soluble Fertilizers">Water Soluble Fertilizers</option>
-                    <option value="Bio Fertilizers">Bio Fertilizers</option>
+                    <option value="Water-Soluble Fertilizers">Water-Soluble Fertilizers</option>
+                    <option value="Biofertilizers">Biofertilizers</option>
                     <option value="Bio Stimulants">Bio Stimulants</option>
-                    <option value="Micro Nutrient">Micro Nutrient</option>
-                    <option value="Micronutrients Combo">Micronutrients Combo</option>
+                    <option value="Micronutrients / Nutrients">Micronutrients / Nutrients</option>
                     <option value="Antibiotic Products">Antibiotic Products</option>
                   </optgroup>
                   <optgroup label="INDAS Seeds Division Crops">
@@ -237,11 +236,11 @@ export const AdminProductEditorPage: React.FC = () => {
                   <option value="Insecticides">Insecticides</option>
                   <option value="Herbicides">Herbicides</option>
                   <option value="Fungicides">Fungicides</option>
-                  <option value="Nutrients">Nutrients</option>
-                  <option value="Fertilizers">Fertilizers</option>
-                  <option value="Bio Fertilizers">Bio Fertilizers</option>
+                  <option value="Organic Fertilizers">Organic Fertilizers</option>
+                  <option value="Water-Soluble Fertilizers">Water-Soluble Fertilizers</option>
+                  <option value="Biofertilizers">Biofertilizers</option>
+                  <option value="Micronutrients / Nutrients">Micronutrients / Nutrients</option>
                   <option value="Biostimulants">Biostimulants</option>
-                  <option value="Biologicals">Biologicals</option>
                   <option value="PGR">PGR</option>
                   <option value="Antibiotics">Antibiotics</option>
                   <option value="Seeds">Seeds</option>

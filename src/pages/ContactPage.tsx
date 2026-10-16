@@ -80,66 +80,68 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
   };
 
   return (
-    <div style={{ backgroundColor: '#06180D', minHeight: '85vh', color: '#F4F8F3' }}>
+    <div style={{ backgroundColor: 'var(--color-sage-50)', minHeight: '85vh', color: 'var(--color-charcoal-800)' }}>
       
-      {/* Page Header */}
+      {/* Page Header — Deep Forest Botanical */}
       <section style={{ 
-        backgroundColor: '#0A2415', 
+        backgroundColor: 'var(--color-forest-900)', 
         color: '#FFFFFF', 
-        paddingTop: '60px', 
-        paddingBottom: '60px', 
+        paddingTop: 'clamp(48px, 7vw, 72px)', 
+        paddingBottom: 'clamp(48px, 7vw, 72px)', 
         borderBottom: '1px solid rgba(255, 255, 255, 0.08)' 
       }}>
         <div className="container" style={{ textAlign: 'center', maxWidth: '850px' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 14px', borderRadius: '999px', backgroundColor: 'rgba(37, 211, 102, 0.12)', border: '1px solid rgba(37, 211, 102, 0.3)', marginBottom: '16px' }}>
-            <Sparkles size={14} style={{ color: '#25D366' }} />
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 16px', borderRadius: 'var(--radius-pill)', backgroundColor: 'rgba(37, 211, 102, 0.12)', border: '1px solid rgba(37, 211, 102, 0.3)', marginBottom: '16px' }}>
+            <Sparkles size={14} style={{ color: 'var(--color-action-green)' }} />
             <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#A7F3D0', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
               Corporate & Technical Support
             </span>
           </div>
 
-          <h1 style={{ fontSize: 'clamp(2.2rem, 4vw, 3.2rem)', color: '#F4F8F3', marginBottom: '12px', fontWeight: 800 }}>
+          <h1 style={{ fontSize: 'clamp(2.2rem, 4.5vw, 3.4rem)', color: '#FFFFFF', marginBottom: '14px', fontWeight: 800, letterSpacing: '-0.025em' }}>
             Contact Indus Crop Care Pvt. Ltd.
           </h1>
 
-          <div className="telugu-quote" style={{ fontSize: '1.25rem', color: '#FFE082', marginBottom: '18px', fontWeight: 600 }}>
+          <div className="telugu-quote" style={{ fontSize: '1.25rem', color: 'var(--color-gold-400)', marginBottom: '18px', fontWeight: 700 }}>
             రైతన్నకు భరోసా.. ఇండస్ ఉత్పాదనలు
           </div>
 
-          <p style={{ fontSize: '1.05rem', color: '#CBDACD', margin: '0 auto', lineHeight: '1.6' }}>
+          <p style={{ fontSize: '1.08rem', color: 'var(--color-sage-200)', margin: '0 auto', lineHeight: '1.65' }}>
             Reach out directly to our corporate headquarters or registered office for dealership applications, technical agronomy inquiries, and crop protection supplies.
           </p>
         </div>
       </section>
 
       {/* Main Contact Grid */}
-      <section className="section" style={{ paddingTop: '50px', paddingBottom: '70px' }}>
+      <section className="section" style={{ paddingTop: '44px', paddingBottom: '76px' }}>
         <div className="container">
           
           {/* Official Banner Card */}
           <div style={{ 
-            borderRadius: '16px', 
+            borderRadius: 'var(--radius-lg)', 
             overflow: 'hidden', 
-            border: '1px solid rgba(255, 255, 255, 0.1)', 
-            marginBottom: '40px',
-            backgroundColor: '#0E291A'
+            border: '1px solid var(--color-border-light)', 
+            marginBottom: '44px',
+            backgroundColor: '#FFFFFF',
+            boxShadow: 'var(--shadow-card)'
           }}>
             <img 
               src="/images/branding/indus/contact-official-banner.jpg" 
               alt="Indus Crop Care Official Contact Card" 
               style={{ width: '100%', height: 'auto', display: 'block', maxHeight: '220px', objectFit: 'contain', backgroundColor: '#FFFFFF' }}
+              loading="lazy"
             />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 360px), 1fr))', gap: '36px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 360px), 1fr))', gap: '38px' }}>
             
             {/* Left Column: Official Contact Details */}
             <div>
               <span className="section-tag">Official Lines</span>
-              <h2 style={{ fontSize: '1.8rem', color: '#F4F8F3', marginBottom: '16px', fontWeight: 700 }}>
+              <h2 style={{ fontSize: 'clamp(1.6rem, 3vw, 2.1rem)', color: 'var(--color-charcoal-950)', marginBottom: '14px', fontWeight: 800 }}>
                 Corporate Offices & Direct Desks
               </h2>
-              <p style={{ color: '#9EB5A3', lineHeight: '1.6', marginBottom: '32px' }}>
+              <p style={{ color: 'var(--color-charcoal-600)', lineHeight: '1.65', marginBottom: '32px' }}>
                 With over 15 years of agricultural service across India, our offices are staffed with qualified agronomists and commercial advisors ready to support dealers and farmers.
               </p>
 
@@ -147,95 +149,95 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '36px' }}>
                 
                 {/* Corporate Office */}
-                <div className="card" style={{ padding: '22px', display: 'flex', alignItems: 'flex-start', gap: '16px', backgroundColor: '#0E291A', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-                  <div style={{ width: '46px', height: '46px', borderRadius: '10px', backgroundColor: 'rgba(37, 211, 102, 0.12)', color: '#25D366', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <div className="card card-light" style={{ padding: '24px', display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
+                  <div style={{ width: '48px', height: '48px', borderRadius: '12px', backgroundColor: 'var(--color-primary-green-surface)', color: 'var(--color-primary-green-dark)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     <Building2 size={24} />
                   </div>
                   <div>
-                    <span style={{ fontSize: '0.78rem', color: '#25D366', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                    <span style={{ fontSize: '0.76rem', color: 'var(--color-primary-green-dark)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                       Headquarters
                     </span>
-                    <h3 style={{ fontSize: '1.15rem', color: '#F4F8F3', margin: '4px 0 8px 0', fontWeight: 700 }}>
+                    <h3 style={{ fontSize: '1.18rem', color: 'var(--color-charcoal-950)', margin: '4px 0 8px 0', fontWeight: 800 }}>
                       Corporate Office
                     </h3>
-                    <p style={{ fontSize: '0.95rem', color: '#CBDACD', lineHeight: '1.6', margin: 0 }}>
+                    <p style={{ fontSize: '0.94rem', color: 'var(--color-charcoal-700)', lineHeight: '1.6', margin: 0 }}>
                       Apple Avenues, Plot No. 50, Peddaamberpet, Near ORR–Vijayawada Highway, Beside Indian Oil Petrol Pump, Pincode 501505, Telangana.
                     </p>
                   </div>
                 </div>
 
                 {/* Registered Office */}
-                <div className="card" style={{ padding: '22px', display: 'flex', alignItems: 'flex-start', gap: '16px', backgroundColor: '#0E291A', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-                  <div style={{ width: '46px', height: '46px', borderRadius: '10px', backgroundColor: 'rgba(251, 191, 36, 0.12)', color: '#F59E0B', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <div className="card card-light" style={{ padding: '24px', display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
+                  <div style={{ width: '48px', height: '48px', borderRadius: '12px', backgroundColor: 'rgba(251, 191, 36, 0.12)', color: '#D97706', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     <MapPin size={24} />
                   </div>
                   <div>
-                    <span style={{ fontSize: '0.78rem', color: '#F59E0B', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                    <span style={{ fontSize: '0.76rem', color: '#D97706', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                       Statutory Office
                     </span>
-                    <h3 style={{ fontSize: '1.15rem', color: '#F4F8F3', margin: '4px 0 8px 0', fontWeight: 700 }}>
+                    <h3 style={{ fontSize: '1.18rem', color: 'var(--color-charcoal-950)', margin: '4px 0 8px 0', fontWeight: 800 }}>
                       Registered Office
                     </h3>
-                    <p style={{ fontSize: '0.95rem', color: '#CBDACD', lineHeight: '1.6', margin: 0 }}>
+                    <p style={{ fontSize: '0.94rem', color: 'var(--color-charcoal-700)', lineHeight: '1.6', margin: 0 }}>
                       Sy. No. 627/E1, D. No. 17-88/3, Narayanagiri Road, Bhoodhan Pochampally (V&M), Yadadri, Bhuvanagiri District, Telangana State – 508284.
                     </p>
                   </div>
                 </div>
 
                 {/* Telephone & Mobile Cards */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px' }}>
                   
                   {/* Landline Telephone */}
-                  <div className="card" style={{ padding: '18px', backgroundColor: '#0E291A', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px', color: '#25D366' }}>
+                  <div className="card card-light" style={{ padding: '20px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', color: 'var(--color-primary-green-dark)' }}>
                       <Phone size={18} />
-                      <span style={{ fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Telephone</span>
+                      <span style={{ fontSize: '0.78rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Telephone</span>
                     </div>
-                    <a href="tel:04024110478" style={{ fontSize: '1.05rem', fontWeight: 700, color: '#F4F8F3', textDecoration: 'none' }}>
+                    <a href="tel:04024110478" style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--color-charcoal-950)', textDecoration: 'none' }}>
                       040-24110478
                     </a>
-                    <div style={{ fontSize: '0.78rem', color: '#94A3B8', marginTop: '4px' }}>Desk: Mon–Sat, 9AM–6PM</div>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--color-charcoal-500)', marginTop: '4px' }}>Desk: Mon–Sat, 9AM–6PM</div>
                   </div>
 
                   {/* Mobile / WhatsApp */}
-                  <div className="card" style={{ padding: '18px', backgroundColor: '#0E291A', border: '1px solid rgba(37, 211, 102, 0.3)', borderLeft: '4px solid #25D366' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px', color: '#25D366' }}>
+                  <div className="card card-light" style={{ padding: '20px', borderLeft: '4px solid var(--color-action-green)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', color: 'var(--color-action-green)' }}>
                       <MessageSquareShare size={18} />
-                      <span style={{ fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Mobile & WhatsApp</span>
+                      <span style={{ fontSize: '0.78rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Mobile & WhatsApp</span>
                     </div>
-                    <a href="tel:+918886069143" style={{ fontSize: '1.05rem', fontWeight: 700, color: '#FFE082', textDecoration: 'none' }}>
+                    <a href="tel:+918886069143" style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--color-charcoal-950)', textDecoration: 'none' }}>
                       +91 88860 69143
                     </a>
-                    <div style={{ fontSize: '0.78rem', color: '#94A3B8', marginTop: '4px' }}>Immediate WhatsApp response</div>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--color-charcoal-500)', marginTop: '4px' }}>Immediate WhatsApp response</div>
                   </div>
 
                 </div>
 
                 {/* Email & Website Cards */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px' }}>
                   
                   {/* Email */}
-                  <div className="card" style={{ padding: '18px', backgroundColor: '#0E291A', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px', color: '#38BDF8' }}>
+                  <div className="card card-light" style={{ padding: '20px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', color: '#0284C7' }}>
                       <Mail size={18} />
-                      <span style={{ fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Corporate Email</span>
+                      <span style={{ fontSize: '0.78rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Corporate Email</span>
                     </div>
-                    <a href="mailto:info@induscropcare.com" style={{ fontSize: '1rem', fontWeight: 700, color: '#F4F8F3', textDecoration: 'none' }}>
+                    <a href="mailto:info@induscropcare.com" style={{ fontSize: '0.96rem', fontWeight: 700, color: 'var(--color-charcoal-950)', textDecoration: 'underline' }}>
                       info@induscropcare.com
                     </a>
-                    <div style={{ fontSize: '0.78rem', color: '#94A3B8', marginTop: '4px' }}>General & institutional queries</div>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--color-charcoal-500)', marginTop: '4px' }}>General & institutional queries</div>
                   </div>
 
                   {/* Website */}
-                  <div className="card" style={{ padding: '18px', backgroundColor: '#0E291A', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px', color: '#A78BFA' }}>
+                  <div className="card card-light" style={{ padding: '20px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', color: '#7C3AED' }}>
                       <Globe size={18} />
-                      <span style={{ fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Official Web</span>
+                      <span style={{ fontSize: '0.78rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Official Web</span>
                     </div>
-                    <a href="https://www.induscropcare.com" target="_blank" rel="noopener noreferrer" style={{ fontSize: '1rem', fontWeight: 700, color: '#F4F8F3', textDecoration: 'none' }}>
+                    <a href="https://www.induscropcare.com" target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.96rem', fontWeight: 700, color: 'var(--color-charcoal-950)', textDecoration: 'none' }}>
                       www.induscropcare.com
                     </a>
-                    <div style={{ fontSize: '0.78rem', color: '#94A3B8', marginTop: '4px' }}>ISO 9001:2015 Certified Portal</div>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--color-charcoal-500)', marginTop: '4px' }}>ISO 9001:2015 Certified Portal</div>
                   </div>
 
                 </div>
@@ -246,7 +248,7 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
                     type="button" 
                     className="btn btn-whatsapp"
                     onClick={() => handleCustomerCareWhatsApp()}
-                    style={{ width: '100%', padding: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}
+                    style={{ width: '100%', minHeight: '50px', padding: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}
                   >
                     <MessageSquareShare size={20} />
                     <span>Chat on WhatsApp (+91 88860 69143)</span>
@@ -259,31 +261,31 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
 
             {/* Right Column: General Enquiry Form */}
             <div>
-              <div className="card dark-form" style={{ padding: 'clamp(20px, 4vw, 36px)', backgroundColor: '#0E291A', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#25D366', fontWeight: 700, fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '8px' }}>
+              <div className="card card-light" style={{ padding: 'clamp(24px, 4vw, 38px)' }}>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--color-primary-green-dark)', fontWeight: 800, fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '8px' }}>
                   <span>Official Communication Desk</span>
                 </div>
-                <h3 style={{ fontSize: '1.45rem', color: '#F4F8F3', marginBottom: '8px', fontWeight: 700 }}>
+                <h3 style={{ fontSize: '1.5rem', color: 'var(--color-charcoal-950)', marginBottom: '8px', fontWeight: 800 }}>
                   Send an Official Enquiry
                 </h3>
-                <p style={{ fontSize: '0.92rem', color: '#9EB5A3', marginBottom: '20px', lineHeight: '1.5' }}>
+                <p style={{ fontSize: '0.94rem', color: 'var(--color-charcoal-600)', marginBottom: '22px', lineHeight: '1.55' }}>
                   Select your enquiry category below. Our commercial and agronomy technical team will follow up directly.
                 </p>
 
                 {/* Enquiry Type Selector Tabs */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '8px', marginBottom: '22px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '8px', marginBottom: '24px' }}>
                   <button
                     type="button"
                     onClick={() => setEnquiryType('dealership')}
                     style={{
                       padding: '10px 12px',
-                      borderRadius: '8px',
+                      borderRadius: 'var(--radius-md)',
                       fontSize: '0.84rem',
                       fontWeight: 700,
                       cursor: 'pointer',
-                      border: enquiryType === 'dealership' ? '1.5px solid #25D366' : '1px solid rgba(255, 255, 255, 0.12)',
-                      backgroundColor: enquiryType === 'dealership' ? 'rgba(37, 211, 102, 0.15)' : 'rgba(255, 255, 255, 0.04)',
-                      color: enquiryType === 'dealership' ? '#25D366' : '#CBDACD',
+                      border: enquiryType === 'dealership' ? '1.5px solid var(--color-primary-green)' : '1px solid var(--color-border-light)',
+                      backgroundColor: enquiryType === 'dealership' ? 'var(--color-primary-green-surface)' : 'var(--color-sage-50)',
+                      color: enquiryType === 'dealership' ? 'var(--color-primary-green-dark)' : 'var(--color-charcoal-700)',
                       transition: 'all 0.15s ease'
                     }}
                   >
@@ -294,13 +296,13 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
                     onClick={() => setEnquiryType('quotation')}
                     style={{
                       padding: '10px 12px',
-                      borderRadius: '8px',
+                      borderRadius: 'var(--radius-md)',
                       fontSize: '0.84rem',
                       fontWeight: 700,
                       cursor: 'pointer',
-                      border: enquiryType === 'quotation' ? '1.5px solid #25D366' : '1px solid rgba(255, 255, 255, 0.12)',
-                      backgroundColor: enquiryType === 'quotation' ? 'rgba(37, 211, 102, 0.15)' : 'rgba(255, 255, 255, 0.04)',
-                      color: enquiryType === 'quotation' ? '#25D366' : '#CBDACD',
+                      border: enquiryType === 'quotation' ? '1.5px solid var(--color-primary-green)' : '1px solid var(--color-border-light)',
+                      backgroundColor: enquiryType === 'quotation' ? 'var(--color-primary-green-surface)' : 'var(--color-sage-50)',
+                      color: enquiryType === 'quotation' ? 'var(--color-primary-green-dark)' : 'var(--color-charcoal-700)',
                       transition: 'all 0.15s ease'
                     }}
                   >
@@ -311,13 +313,13 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
                     onClick={() => setEnquiryType('agronomy')}
                     style={{
                       padding: '10px 12px',
-                      borderRadius: '8px',
+                      borderRadius: 'var(--radius-md)',
                       fontSize: '0.84rem',
                       fontWeight: 700,
                       cursor: 'pointer',
-                      border: enquiryType === 'agronomy' ? '1.5px solid #25D366' : '1px solid rgba(255, 255, 255, 0.12)',
-                      backgroundColor: enquiryType === 'agronomy' ? 'rgba(37, 211, 102, 0.15)' : 'rgba(255, 255, 255, 0.04)',
-                      color: enquiryType === 'agronomy' ? '#25D366' : '#CBDACD',
+                      border: enquiryType === 'agronomy' ? '1.5px solid var(--color-primary-green)' : '1px solid var(--color-border-light)',
+                      backgroundColor: enquiryType === 'agronomy' ? 'var(--color-primary-green-surface)' : 'var(--color-sage-50)',
+                      color: enquiryType === 'agronomy' ? 'var(--color-primary-green-dark)' : 'var(--color-charcoal-700)',
                       transition: 'all 0.15s ease'
                     }}
                   >
@@ -326,18 +328,18 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
                 </div>
 
                 {submitted ? (
-                  <div style={{ backgroundColor: 'rgba(37, 211, 102, 0.08)', border: '1px solid rgba(37, 211, 102, 0.25)', padding: '28px', borderRadius: '12px', textAlign: 'center' }}>
-                    <CheckCircle size={44} style={{ color: '#25D366', margin: '0 auto 12px auto' }} />
-                    <h4 style={{ color: '#F4F8F3', fontSize: '1.25rem', marginBottom: '8px', fontWeight: 700 }}>
+                  <div style={{ backgroundColor: 'var(--color-primary-green-surface)', border: '1px solid rgba(14, 107, 56, 0.25)', padding: '32px 24px', borderRadius: 'var(--radius-lg)', textAlign: 'center' }}>
+                    <CheckCircle size={48} style={{ color: 'var(--color-primary-green)', margin: '0 auto 14px auto' }} />
+                    <h4 style={{ color: 'var(--color-charcoal-950)', fontSize: '1.3rem', marginBottom: '8px', fontWeight: 800 }}>
                       Enquiry Submitted Successfully
                     </h4>
-                    <p style={{ color: '#CBDACD', fontSize: '0.92rem', margin: 0, lineHeight: '1.6' }}>
+                    <p style={{ color: 'var(--color-charcoal-700)', fontSize: '0.94rem', margin: 0, lineHeight: '1.6' }}>
                       Thank you for contacting <strong>Indus Crop Care Pvt. Ltd.</strong> Your message has been safely recorded in our official database. Our team will review your requirements and reach out to you directly.
                     </p>
                     <button 
                       type="button" 
-                      className="btn btn-sm btn-outline-white" 
-                      style={{ marginTop: '20px' }}
+                      className="btn btn-outline" 
+                      style={{ marginTop: '22px' }}
                       onClick={() => { 
                         setSubmitted(false); 
                         setFormData({ 
@@ -349,18 +351,18 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
                     </button>
                   </div>
                 ) : (
-                  <form onSubmit={handleSubmit}>
+                  <form onSubmit={handleSubmit} noValidate>
                     
                     {formError && (
-                      <div style={{ backgroundColor: 'rgba(239, 68, 68, 0.12)', border: '1px solid rgba(239, 68, 68, 0.3)', padding: '12px 16px', borderRadius: '8px', color: '#FCA5A5', fontSize: '0.88rem', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <div className="enquiry-error-alert" role="alert">
                         <AlertCircle size={16} />
                         <span>{formError}</span>
                       </div>
                     )}
 
-                    <div className="form-group" style={{ marginBottom: '16px' }}>
-                      <label className="form-label" htmlFor="contact-name" style={{ display: 'block', fontSize: '0.88rem', color: '#CBDACD', marginBottom: '6px' }}>
-                        Full Name / Company Name <span style={{ color: '#EF4444' }}>*</span>
+                    <div className="form-group">
+                      <label className="form-label" htmlFor="contact-name">
+                        Full Name / Business Name <span className="req">*</span>
                       </label>
                       <input 
                         type="text" 
@@ -370,14 +372,14 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
                         value={formData.name}
                         onChange={e => setFormData({ ...formData, name: e.target.value })}
                         required
-                        style={{ width: '100%', padding: '12px 14px', borderRadius: '8px', backgroundColor: '#071F11', border: '1px solid rgba(255, 255, 255, 0.12)', color: '#F4F8F3', fontSize: '0.95rem' }}
+                        disabled={isSubmitting}
                       />
                     </div>
 
-                    <div className="form-grid-2" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px', marginBottom: '16px' }}>
+                    <div className="form-grid-2">
                       <div className="form-group">
-                        <label className="form-label" htmlFor="contact-phone" style={{ display: 'block', fontSize: '0.88rem', color: '#CBDACD', marginBottom: '6px' }}>
-                          Mobile / WhatsApp <span style={{ color: '#EF4444' }}>*</span>
+                        <label className="form-label" htmlFor="contact-phone">
+                          Mobile / WhatsApp <span className="req">*</span>
                         </label>
                         <input 
                           type="tel" 
@@ -387,12 +389,12 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
                           value={formData.phone}
                           onChange={e => setFormData({ ...formData, phone: e.target.value })}
                           required
-                          style={{ width: '100%', padding: '12px 14px', borderRadius: '8px', backgroundColor: '#071F11', border: '1px solid rgba(255, 255, 255, 0.12)', color: '#F4F8F3', fontSize: '0.95rem' }}
+                          disabled={isSubmitting}
                         />
                       </div>
 
                       <div className="form-group">
-                        <label className="form-label" htmlFor="contact-email" style={{ display: 'block', fontSize: '0.88rem', color: '#CBDACD', marginBottom: '6px' }}>
+                        <label className="form-label" htmlFor="contact-email">
                           Email Address
                         </label>
                         <input 
@@ -402,7 +404,7 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
                           placeholder="name@domain.com"
                           value={formData.email}
                           onChange={e => setFormData({ ...formData, email: e.target.value })}
-                          style={{ width: '100%', padding: '12px 14px', borderRadius: '8px', backgroundColor: '#071F11', border: '1px solid rgba(255, 255, 255, 0.12)', color: '#F4F8F3', fontSize: '0.95rem' }}
+                          disabled={isSubmitting}
                         />
                       </div>
                     </div>
@@ -410,9 +412,9 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
                     {/* Conditional Fields for Product Quotation */}
                     {enquiryType === 'quotation' && (
                       <>
-                        <div className="form-grid-2" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px', marginBottom: '16px' }}>
+                        <div className="form-grid-2">
                           <div className="form-group">
-                            <label className="form-label" htmlFor="contact-state" style={{ display: 'block', fontSize: '0.88rem', color: '#CBDACD', marginBottom: '6px' }}>
+                            <label className="form-label" htmlFor="contact-state">
                               State
                             </label>
                             <input 
@@ -422,12 +424,12 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
                               placeholder="e.g. Telangana / AP / Karnataka"
                               value={formData.state}
                               onChange={e => setFormData({ ...formData, state: e.target.value })}
-                              style={{ width: '100%', padding: '12px 14px', borderRadius: '8px', backgroundColor: '#071F11', border: '1px solid rgba(255, 255, 255, 0.12)', color: '#F4F8F3', fontSize: '0.95rem' }}
+                              disabled={isSubmitting}
                             />
                           </div>
 
                           <div className="form-group">
-                            <label className="form-label" htmlFor="contact-district" style={{ display: 'block', fontSize: '0.88rem', color: '#CBDACD', marginBottom: '6px' }}>
+                            <label className="form-label" htmlFor="contact-district">
                               District / Region
                             </label>
                             <input 
@@ -437,14 +439,14 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
                               placeholder="e.g. Warangal / Guntur / Khammam"
                               value={formData.district}
                               onChange={e => setFormData({ ...formData, district: e.target.value })}
-                              style={{ width: '100%', padding: '12px 14px', borderRadius: '8px', backgroundColor: '#071F11', border: '1px solid rgba(255, 255, 255, 0.12)', color: '#F4F8F3', fontSize: '0.95rem' }}
+                              disabled={isSubmitting}
                             />
                           </div>
                         </div>
 
-                        <div className="form-grid-2" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px', marginBottom: '16px' }}>
+                        <div className="form-grid-2">
                           <div className="form-group">
-                            <label className="form-label" htmlFor="contact-product" style={{ display: 'block', fontSize: '0.88rem', color: '#CBDACD', marginBottom: '6px' }}>
+                            <label className="form-label" htmlFor="contact-product">
                               Formulation / Product Name
                             </label>
                             <input 
@@ -454,12 +456,12 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
                               placeholder="e.g. Abola, Intron, Cartap, Hybrid Seeds"
                               value={formData.productName}
                               onChange={e => setFormData({ ...formData, productName: e.target.value })}
-                              style={{ width: '100%', padding: '12px 14px', borderRadius: '8px', backgroundColor: '#071F11', border: '1px solid rgba(255, 255, 255, 0.12)', color: '#F4F8F3', fontSize: '0.95rem' }}
+                              disabled={isSubmitting}
                             />
                           </div>
 
                           <div className="form-group">
-                            <label className="form-label" htmlFor="contact-quantity" style={{ display: 'block', fontSize: '0.88rem', color: '#CBDACD', marginBottom: '6px' }}>
+                            <label className="form-label" htmlFor="contact-quantity">
                               Required Quantity / Units
                             </label>
                             <input 
@@ -469,15 +471,15 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
                               placeholder="e.g. 50 Litres / 100 kg / 20 Packs"
                               value={formData.quantity}
                               onChange={e => setFormData({ ...formData, quantity: e.target.value })}
-                              style={{ width: '100%', padding: '12px 14px', borderRadius: '8px', backgroundColor: '#071F11', border: '1px solid rgba(255, 255, 255, 0.12)', color: '#F4F8F3', fontSize: '0.95rem' }}
+                              disabled={isSubmitting}
                             />
                           </div>
                         </div>
                       </>
                     )}
 
-                    <div className="form-group" style={{ marginBottom: '20px' }}>
-                      <label className="form-label" htmlFor="contact-message" style={{ display: 'block', fontSize: '0.88rem', color: '#CBDACD', marginBottom: '6px' }}>
+                    <div className="form-group">
+                      <label className="form-label" htmlFor="contact-message">
                         {enquiryType === 'dealership' ? 'Dealership Area & Commercial Details' : 
                          enquiryType === 'quotation' ? 'Specific Requirements / Delivery Schedule' : 
                          'Crop Symptoms / Technical Advisory Query'}
@@ -493,14 +495,14 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
                         }
                         value={formData.message}
                         onChange={e => setFormData({ ...formData, message: e.target.value })}
-                        style={{ width: '100%', padding: '12px 14px', borderRadius: '8px', backgroundColor: '#071F11', border: '1px solid rgba(255, 255, 255, 0.12)', color: '#F4F8F3', fontSize: '0.95rem', resize: 'vertical' }}
+                        disabled={isSubmitting}
                       />
                     </div>
 
                     <button 
                       type="submit" 
                       className="btn btn-primary"
-                      style={{ width: '100%', padding: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontWeight: 700 }}
+                      style={{ width: '100%', minHeight: '48px', fontWeight: 700 }}
                       disabled={isSubmitting}
                     >
                       <Send size={18} />

@@ -25,3 +25,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local development resources and calibration scripts
+resources/
+scripts/

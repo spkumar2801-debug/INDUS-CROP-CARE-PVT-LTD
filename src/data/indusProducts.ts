@@ -3415,7 +3415,7 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "code": "ICC-064",
     "slug": "indus-groful-prom",
     "category": "Organic Fertilizers",
-    "broadGroup": "Fertilizers",
+    "broadGroup": "Organic Fertilizers",
     "formulation": "Organic DAP (Phosphorus-Rich Organic Manure)",
     "shortDescription": "Authentic Indus Crop Care Organic Fertilizer formulation: Organic DAP (Phosphorus-Rich Organic Manure). Formulated for maximum crop protection and optimal yield response.",
     "description": "Indus Crop Care GROFUL PROM is a high-performance agricultural solution formulated with Organic DAP (Phosphorus-Rich Organic Manure). Developed in collaboration with top agricultural scientists and manufactured under strict ISO 9001:2015 quality standards, delivering dependable field efficacy and high return on investment for progressive growers.",
@@ -3441,7 +3441,7 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
       },
       {
         "label": "Application Sector",
-        "value": "Fertilizers"
+        "value": "Organic Fertilizers"
       },
       {
         "label": "Manufacturer",
@@ -3469,7 +3469,7 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "code": "ICC-065",
     "slug": "indus-insta",
     "category": "Organic Fertilizers",
-    "broadGroup": "Fertilizers",
+    "broadGroup": "Organic Fertilizers",
     "formulation": "Organic-Potash",
     "shortDescription": "Authentic Indus Crop Care Organic Fertilizer formulation: Organic-Potash. Formulated for maximum crop protection and optimal yield response.",
     "description": "Indus Crop Care INSTA is a high-performance agricultural solution formulated with Organic-Potash. Developed in collaboration with top agricultural scientists and manufactured under strict ISO 9001:2015 quality standards, delivering dependable field efficacy and high return on investment for progressive growers.",
@@ -3495,7 +3495,7 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
       },
       {
         "label": "Application Sector",
-        "value": "Fertilizers"
+        "value": "Organic Fertilizers"
       },
       {
         "label": "Manufacturer",
@@ -3523,7 +3523,7 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "code": "ICC-066",
     "slug": "indus-coryze",
     "category": "Organic Fertilizers",
-    "broadGroup": "Fertilizers",
+    "broadGroup": "Organic Fertilizers",
     "formulation": "Organic Water Soluble Fertilizer",
     "shortDescription": "Authentic Indus Crop Care Organic Fertilizer formulation: Organic Water Soluble Fertilizer. Formulated for maximum crop protection and optimal yield response.",
     "description": "Indus Crop Care CORYZE is a high-performance agricultural solution formulated with Organic Water Soluble Fertilizer. Developed in collaboration with top agricultural scientists and manufactured under strict ISO 9001:2015 quality standards, delivering dependable field efficacy and high return on investment for progressive growers.",
@@ -3549,7 +3549,7 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
       },
       {
         "label": "Application Sector",
-        "value": "Fertilizers"
+        "value": "Organic Fertilizers"
       },
       {
         "label": "Manufacturer",
@@ -3577,7 +3577,7 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "code": "ICC-067",
     "slug": "indus-amulya",
     "category": "Organic Fertilizers",
-    "broadGroup": "Fertilizers",
+    "broadGroup": "Organic Fertilizers",
     "formulation": "Neem High / Amulya Neem Cake",
     "shortDescription": "Authentic Indus Crop Care Organic Fertilizer formulation: Neem High / Amulya Neem Cake. Formulated for maximum crop protection and optimal yield response.",
     "description": "Indus Crop Care INDUS AMULYA is a high-performance agricultural solution formulated with Neem High / Amulya Neem Cake. Developed in collaboration with top agricultural scientists and manufactured under strict ISO 9001:2015 quality standards, delivering dependable field efficacy and high return on investment for progressive growers.",
@@ -3603,7 +3603,7 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
       },
       {
         "label": "Application Sector",
-        "value": "Fertilizers"
+        "value": "Organic Fertilizers"
       },
       {
         "label": "Manufacturer",
@@ -3631,7 +3631,7 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "code": "ICC-068",
     "slug": "indus-gold",
     "category": "Organic Fertilizers",
-    "broadGroup": "Fertilizers",
+    "broadGroup": "Organic Fertilizers",
     "formulation": "City Compost / Organic Fertilizer",
     "shortDescription": "Authentic Indus Crop Care Organic Fertilizer formulation: City Compost / Organic Fertilizer. Formulated for maximum crop protection and optimal yield response.",
     "description": "Indus Crop Care INDUS GOLD is a high-performance agricultural solution formulated with City Compost / Organic Fertilizer. Developed in collaboration with top agricultural scientists and manufactured under strict ISO 9001:2015 quality standards, delivering dependable field efficacy and high return on investment for progressive growers.",
@@ -3657,7 +3657,7 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
       },
       {
         "label": "Application Sector",
-        "value": "Fertilizers"
+        "value": "Organic Fertilizers"
       },
       {
         "label": "Manufacturer",
@@ -3684,8 +3684,8 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "name": "FERMAXX",
     "code": "ICC-069",
     "slug": "indus-fermaxx",
-    "category": "Micro Nutrient",
-    "broadGroup": "Nutrients",
+    "category": "Micronutrients / Nutrients",
+    "broadGroup": "Micronutrients / Nutrients",
     "formulation": "Formula-1 (for all crop)",
     "shortDescription": "Authentic Indus Crop Care Micro Nutrient formulation: Formula-1 (for all crop). Formulated for maximum crop protection and optimal yield response.",
     "description": "Indus Crop Care FERMAXX is a high-performance agricultural solution formulated with Formula-1 (for all crop). Developed in collaboration with top agricultural scientists and manufactured under strict ISO 9001:2015 quality standards, delivering dependable field efficacy and high return on investment for progressive growers.",
@@ -3707,11 +3707,11 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
       },
       {
         "label": "Primary Category",
-        "value": "Micro Nutrient"
+        "value": "Micronutrients / Nutrients"
       },
       {
         "label": "Application Sector",
-        "value": "Nutrients"
+        "value": "Micronutrients / Nutrients"
       },
       {
         "label": "Manufacturer",
@@ -3738,8 +3738,8 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "name": "FOSTER",
     "code": "ICC-070",
     "slug": "indus-foster",
-    "category": "Micro Nutrient",
-    "broadGroup": "Nutrients",
+    "category": "Micronutrients / Nutrients",
+    "broadGroup": "Micronutrients / Nutrients",
     "formulation": "Chelated with Biostimulants",
     "shortDescription": "Authentic Indus Crop Care Micro Nutrient formulation: Chelated with Biostimulants. Formulated for maximum crop protection and optimal yield response.",
     "description": "Indus Crop Care FOSTER is a high-performance agricultural solution formulated with Chelated with Biostimulants. Developed in collaboration with top agricultural scientists and manufactured under strict ISO 9001:2015 quality standards, delivering dependable field efficacy and high return on investment for progressive growers.",
@@ -3761,11 +3761,11 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
       },
       {
         "label": "Primary Category",
-        "value": "Micro Nutrient"
+        "value": "Micronutrients / Nutrients"
       },
       {
         "label": "Application Sector",
-        "value": "Nutrients"
+        "value": "Micronutrients / Nutrients"
       },
       {
         "label": "Manufacturer",
@@ -3792,8 +3792,8 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "name": "INDUS BHUVIJA",
     "code": "ICC-071",
     "slug": "indus-bhuvija",
-    "category": "Micro Nutrient",
-    "broadGroup": "Nutrients",
+    "category": "Micronutrients / Nutrients",
+    "broadGroup": "Micronutrients / Nutrients",
     "formulation": "Paddy Special Formula-7",
     "shortDescription": "Authentic Indus Crop Care Micro Nutrient formulation: Paddy Special Formula-7. Formulated for maximum crop protection and optimal yield response.",
     "description": "Indus Crop Care INDUS BHUVIJA is a high-performance agricultural solution formulated with Paddy Special Formula-7. Developed in collaboration with top agricultural scientists and manufactured under strict ISO 9001:2015 quality standards, delivering dependable field efficacy and high return on investment for progressive growers.",
@@ -3815,11 +3815,11 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
       },
       {
         "label": "Primary Category",
-        "value": "Micro Nutrient"
+        "value": "Micronutrients / Nutrients"
       },
       {
         "label": "Application Sector",
-        "value": "Nutrients"
+        "value": "Micronutrients / Nutrients"
       },
       {
         "label": "Manufacturer",
@@ -3846,8 +3846,8 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "name": "INDUS ZINC 12%",
     "code": "ICC-072",
     "slug": "indus-zinc-12",
-    "category": "Micro Nutrient",
-    "broadGroup": "Nutrients",
+    "category": "Micronutrients / Nutrients",
+    "broadGroup": "Micronutrients / Nutrients",
     "formulation": "Chelated Zinc 12%",
     "shortDescription": "Authentic Indus Crop Care Micro Nutrient formulation: Chelated Zinc 12%. Formulated for maximum crop protection and optimal yield response.",
     "description": "Indus Crop Care INDUS ZINC 12% is a high-performance agricultural solution formulated with Chelated Zinc 12%. Developed in collaboration with top agricultural scientists and manufactured under strict ISO 9001:2015 quality standards, delivering dependable field efficacy and high return on investment for progressive growers.",
@@ -3869,11 +3869,11 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
       },
       {
         "label": "Primary Category",
-        "value": "Micro Nutrient"
+        "value": "Micronutrients / Nutrients"
       },
       {
         "label": "Application Sector",
-        "value": "Nutrients"
+        "value": "Micronutrients / Nutrients"
       },
       {
         "label": "Manufacturer",
@@ -3900,8 +3900,8 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "name": "TRISHUL",
     "code": "ICC-073",
     "slug": "indus-trishul",
-    "category": "Micro Nutrient",
-    "broadGroup": "Nutrients",
+    "category": "Micronutrients / Nutrients",
+    "broadGroup": "Micronutrients / Nutrients",
     "formulation": "CMS- Soil Conditioner",
     "shortDescription": "Authentic Indus Crop Care Micro Nutrient formulation: CMS- Soil Conditioner. Formulated for maximum crop protection and optimal yield response.",
     "description": "Indus Crop Care TRISHUL is a high-performance agricultural solution formulated with CMS- Soil Conditioner. Developed in collaboration with top agricultural scientists and manufactured under strict ISO 9001:2015 quality standards, delivering dependable field efficacy and high return on investment for progressive growers.",
@@ -3923,11 +3923,11 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
       },
       {
         "label": "Primary Category",
-        "value": "Micro Nutrient"
+        "value": "Micronutrients / Nutrients"
       },
       {
         "label": "Application Sector",
-        "value": "Nutrients"
+        "value": "Micronutrients / Nutrients"
       },
       {
         "label": "Manufacturer",
@@ -3954,8 +3954,8 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "name": "HI-ZINK GR 33%",
     "code": "ICC-074",
     "slug": "indus-hi-zink-gr-33",
-    "category": "Micro Nutrient",
-    "broadGroup": "Nutrients",
+    "category": "Micronutrients / Nutrients",
+    "broadGroup": "Micronutrients / Nutrients",
     "formulation": "Zinc Monohydrate 33% (9+1)",
     "shortDescription": "Authentic Indus Crop Care Micro Nutrient formulation: Zinc Monohydrate 33% (9+1). Formulated for maximum crop protection and optimal yield response.",
     "description": "Indus Crop Care HI-ZINK GR 33% is a high-performance agricultural solution formulated with Zinc Monohydrate 33% (9+1). Developed in collaboration with top agricultural scientists and manufactured under strict ISO 9001:2015 quality standards, delivering dependable field efficacy and high return on investment for progressive growers.",
@@ -3977,11 +3977,11 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
       },
       {
         "label": "Primary Category",
-        "value": "Micro Nutrient"
+        "value": "Micronutrients / Nutrients"
       },
       {
         "label": "Application Sector",
-        "value": "Nutrients"
+        "value": "Micronutrients / Nutrients"
       },
       {
         "label": "Manufacturer",
@@ -4008,8 +4008,8 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "name": "INDUS MAG",
     "code": "ICC-075",
     "slug": "indus-mag",
-    "category": "Micro Nutrient",
-    "broadGroup": "Nutrients",
+    "category": "Micronutrients / Nutrients",
+    "broadGroup": "Micronutrients / Nutrients",
     "formulation": "Magnesium Sulphate 9.6%",
     "shortDescription": "Authentic Indus Crop Care Micro Nutrient formulation: Magnesium Sulphate 9.6%. Formulated for maximum crop protection and optimal yield response.",
     "description": "Indus Crop Care INDUS MAG is a high-performance agricultural solution formulated with Magnesium Sulphate 9.6%. Developed in collaboration with top agricultural scientists and manufactured under strict ISO 9001:2015 quality standards, delivering dependable field efficacy and high return on investment for progressive growers.",
@@ -4031,11 +4031,11 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
       },
       {
         "label": "Primary Category",
-        "value": "Micro Nutrient"
+        "value": "Micronutrients / Nutrients"
       },
       {
         "label": "Application Sector",
-        "value": "Nutrients"
+        "value": "Micronutrients / Nutrients"
       },
       {
         "label": "Manufacturer",
@@ -4062,8 +4062,8 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "name": "INDUS BORON",
     "code": "ICC-076",
     "slug": "indus-boron",
-    "category": "Micro Nutrient",
-    "broadGroup": "Nutrients",
+    "category": "Micronutrients / Nutrients",
+    "broadGroup": "Micronutrients / Nutrients",
     "formulation": "Boron 20%",
     "shortDescription": "Authentic Indus Crop Care Micro Nutrient formulation: Boron 20%. Formulated for maximum crop protection and optimal yield response.",
     "description": "Indus Crop Care INDUS BORON is a high-performance agricultural solution formulated with Boron 20%. Developed in collaboration with top agricultural scientists and manufactured under strict ISO 9001:2015 quality standards, delivering dependable field efficacy and high return on investment for progressive growers.",
@@ -4085,11 +4085,11 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
       },
       {
         "label": "Primary Category",
-        "value": "Micro Nutrient"
+        "value": "Micronutrients / Nutrients"
       },
       {
         "label": "Application Sector",
-        "value": "Nutrients"
+        "value": "Micronutrients / Nutrients"
       },
       {
         "label": "Manufacturer",
@@ -4116,8 +4116,8 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "name": "INDUS BORON-14.5%",
     "code": "ICC-077",
     "slug": "indus-boron-14.5",
-    "category": "Micro Nutrient",
-    "broadGroup": "Nutrients",
+    "category": "Micronutrients / Nutrients",
+    "broadGroup": "Micronutrients / Nutrients",
     "formulation": "Boron-14.5%",
     "shortDescription": "Authentic Indus Crop Care Micro Nutrient formulation: Boron-14.5%. Formulated for maximum crop protection and optimal yield response.",
     "description": "Indus Crop Care INDUS BORON-14.5% is a high-performance agricultural solution formulated with Boron-14.5%. Developed in collaboration with top agricultural scientists and manufactured under strict ISO 9001:2015 quality standards, delivering dependable field efficacy and high return on investment for progressive growers.",
@@ -4139,11 +4139,11 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
       },
       {
         "label": "Primary Category",
-        "value": "Micro Nutrient"
+        "value": "Micronutrients / Nutrients"
       },
       {
         "label": "Application Sector",
-        "value": "Nutrients"
+        "value": "Micronutrients / Nutrients"
       },
       {
         "label": "Manufacturer",
@@ -4170,8 +4170,8 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "name": "HIKER",
     "code": "ICC-078",
     "slug": "indus-hiker",
-    "category": "Micro Nutrient",
-    "broadGroup": "Nutrients",
+    "category": "Micronutrients / Nutrients",
+    "broadGroup": "Micronutrients / Nutrients",
     "formulation": "Potassium Schoenite",
     "shortDescription": "Authentic Indus Crop Care Micro Nutrient formulation: Potassium Schoenite. Formulated for maximum crop protection and optimal yield response.",
     "description": "Indus Crop Care HIKER is a high-performance agricultural solution formulated with Potassium Schoenite. Developed in collaboration with top agricultural scientists and manufactured under strict ISO 9001:2015 quality standards, delivering dependable field efficacy and high return on investment for progressive growers.",
@@ -4193,11 +4193,11 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
       },
       {
         "label": "Primary Category",
-        "value": "Micro Nutrient"
+        "value": "Micronutrients / Nutrients"
       },
       {
         "label": "Application Sector",
-        "value": "Nutrients"
+        "value": "Micronutrients / Nutrients"
       },
       {
         "label": "Manufacturer",
@@ -4224,8 +4224,8 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "name": "I NUTRI",
     "code": "ICC-079",
     "slug": "indus-i-nutri",
-    "category": "Micro Nutrient",
-    "broadGroup": "Nutrients",
+    "category": "Micronutrients / Nutrients",
+    "broadGroup": "Micronutrients / Nutrients",
     "formulation": "Water Soluble Formula-7",
     "shortDescription": "Authentic Indus Crop Care Micro Nutrient formulation: Water Soluble Formula-7. Formulated for maximum crop protection and optimal yield response.",
     "description": "Indus Crop Care I NUTRI is a high-performance agricultural solution formulated with Water Soluble Formula-7. Developed in collaboration with top agricultural scientists and manufactured under strict ISO 9001:2015 quality standards, delivering dependable field efficacy and high return on investment for progressive growers.",
@@ -4247,11 +4247,11 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
       },
       {
         "label": "Primary Category",
-        "value": "Micro Nutrient"
+        "value": "Micronutrients / Nutrients"
       },
       {
         "label": "Application Sector",
-        "value": "Nutrients"
+        "value": "Micronutrients / Nutrients"
       },
       {
         "label": "Manufacturer",
@@ -4278,8 +4278,8 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "name": "SWARNA MAX",
     "code": "ICC-080",
     "slug": "indus-swarna-max",
-    "category": "Micro Nutrient",
-    "broadGroup": "Nutrients",
+    "category": "Micronutrients / Nutrients",
+    "broadGroup": "Micronutrients / Nutrients",
     "formulation": "Formula-4",
     "shortDescription": "Authentic Indus Crop Care Micro Nutrient formulation: Formula-4. Formulated for maximum crop protection and optimal yield response.",
     "description": "Indus Crop Care SWARNA MAX is a high-performance agricultural solution formulated with Formula-4. Developed in collaboration with top agricultural scientists and manufactured under strict ISO 9001:2015 quality standards, delivering dependable field efficacy and high return on investment for progressive growers.",
@@ -4301,11 +4301,11 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
       },
       {
         "label": "Primary Category",
-        "value": "Micro Nutrient"
+        "value": "Micronutrients / Nutrients"
       },
       {
         "label": "Application Sector",
-        "value": "Nutrients"
+        "value": "Micronutrients / Nutrients"
       },
       {
         "label": "Manufacturer",
@@ -4332,8 +4332,8 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "name": "PROMAXX",
     "code": "ICC-081",
     "slug": "indus-promaxx",
-    "category": "Micro Nutrient",
-    "broadGroup": "Nutrients",
+    "category": "Micronutrients / Nutrients",
+    "broadGroup": "Micronutrients / Nutrients",
     "formulation": "Micro Nutrient Fertilizer",
     "shortDescription": "Authentic Indus Crop Care Micro Nutrient formulation: Micro Nutrient Fertilizer. Formulated for maximum crop protection and optimal yield response.",
     "description": "Indus Crop Care PROMAXX is a high-performance agricultural solution formulated with Micro Nutrient Fertilizer. Developed in collaboration with top agricultural scientists and manufactured under strict ISO 9001:2015 quality standards, delivering dependable field efficacy and high return on investment for progressive growers.",
@@ -4355,11 +4355,11 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
       },
       {
         "label": "Primary Category",
-        "value": "Micro Nutrient"
+        "value": "Micronutrients / Nutrients"
       },
       {
         "label": "Application Sector",
-        "value": "Nutrients"
+        "value": "Micronutrients / Nutrients"
       },
       {
         "label": "Manufacturer",
@@ -4386,8 +4386,8 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "name": "CALIBER",
     "code": "ICC-082",
     "slug": "indus-caliber",
-    "category": "Micro Nutrient",
-    "broadGroup": "Nutrients",
+    "category": "Micronutrients / Nutrients",
+    "broadGroup": "Micronutrients / Nutrients",
     "formulation": "Calcium + Boron-Liquid form",
     "shortDescription": "Authentic Indus Crop Care Micro Nutrient formulation: Calcium + Boron-Liquid form. Formulated for maximum crop protection and optimal yield response.",
     "description": "Indus Crop Care CALIBER is a high-performance agricultural solution formulated with Calcium + Boron-Liquid form. Developed in collaboration with top agricultural scientists and manufactured under strict ISO 9001:2015 quality standards, delivering dependable field efficacy and high return on investment for progressive growers.",
@@ -4409,11 +4409,11 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
       },
       {
         "label": "Primary Category",
-        "value": "Micro Nutrient"
+        "value": "Micronutrients / Nutrients"
       },
       {
         "label": "Application Sector",
-        "value": "Nutrients"
+        "value": "Micronutrients / Nutrients"
       },
       {
         "label": "Manufacturer",
@@ -4440,8 +4440,8 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "name": "13:00:45",
     "code": "ICC-083",
     "slug": "indus-13-00-45",
-    "category": "Water Soluble Fertilizers",
-    "broadGroup": "Fertilizers",
+    "category": "Water-Soluble Fertilizers",
+    "broadGroup": "Water-Soluble Fertilizers",
     "formulation": "NPK 13:00:45",
     "shortDescription": "Authentic Indus Crop Care Water Soluble Fertilizer formulation: NPK 13:00:45. Formulated for maximum crop protection and optimal yield response.",
     "description": "Indus Crop Care 13:00:45 is a high-performance agricultural solution formulated with NPK 13:00:45. Developed in collaboration with top agricultural scientists and manufactured under strict ISO 9001:2015 quality standards, delivering dependable field efficacy and high return on investment for progressive growers.",
@@ -4463,11 +4463,11 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
       },
       {
         "label": "Primary Category",
-        "value": "Water Soluble Fertilizers"
+        "value": "Water-Soluble Fertilizers"
       },
       {
         "label": "Application Sector",
-        "value": "Fertilizers"
+        "value": "Water-Soluble Fertilizers"
       },
       {
         "label": "Manufacturer",
@@ -4494,8 +4494,8 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "name": "19:19:19",
     "code": "ICC-084",
     "slug": "indus-19-19-19",
-    "category": "Water Soluble Fertilizers",
-    "broadGroup": "Fertilizers",
+    "category": "Water-Soluble Fertilizers",
+    "broadGroup": "Water-Soluble Fertilizers",
     "formulation": "NPK 19:19:19",
     "shortDescription": "Authentic Indus Crop Care Water Soluble Fertilizer formulation: NPK 19:19:19. Formulated for maximum crop protection and optimal yield response.",
     "description": "Indus Crop Care 19:19:19 is a high-performance agricultural solution formulated with NPK 19:19:19. Developed in collaboration with top agricultural scientists and manufactured under strict ISO 9001:2015 quality standards, delivering dependable field efficacy and high return on investment for progressive growers.",
@@ -4517,11 +4517,11 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
       },
       {
         "label": "Primary Category",
-        "value": "Water Soluble Fertilizers"
+        "value": "Water-Soluble Fertilizers"
       },
       {
         "label": "Application Sector",
-        "value": "Fertilizers"
+        "value": "Water-Soluble Fertilizers"
       },
       {
         "label": "Manufacturer",
@@ -4548,8 +4548,8 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "name": "00:00:50",
     "code": "ICC-085",
     "slug": "indus-00-00-50",
-    "category": "Water Soluble Fertilizers",
-    "broadGroup": "Fertilizers",
+    "category": "Water-Soluble Fertilizers",
+    "broadGroup": "Water-Soluble Fertilizers",
     "formulation": "NPK 00:00:50 (Potassium Sulphate)",
     "shortDescription": "Authentic Indus Crop Care Water Soluble Fertilizer formulation: NPK 00:00:50 (Potassium Sulphate). Formulated for maximum crop protection and optimal yield response.",
     "description": "Indus Crop Care 00:00:50 is a high-performance agricultural solution formulated with NPK 00:00:50 (Potassium Sulphate). Developed in collaboration with top agricultural scientists and manufactured under strict ISO 9001:2015 quality standards, delivering dependable field efficacy and high return on investment for progressive growers.",
@@ -4571,11 +4571,11 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
       },
       {
         "label": "Primary Category",
-        "value": "Water Soluble Fertilizers"
+        "value": "Water-Soluble Fertilizers"
       },
       {
         "label": "Application Sector",
-        "value": "Fertilizers"
+        "value": "Water-Soluble Fertilizers"
       },
       {
         "label": "Manufacturer",
@@ -4602,8 +4602,8 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "name": "12:61:0",
     "code": "ICC-086",
     "slug": "indus-12-61-0",
-    "category": "Water Soluble Fertilizers",
-    "broadGroup": "Fertilizers",
+    "category": "Water-Soluble Fertilizers",
+    "broadGroup": "Water-Soluble Fertilizers",
     "formulation": "NPK 12:61:0 (Mono Ammonium Phosphate)",
     "shortDescription": "Authentic Indus Crop Care Water Soluble Fertilizer formulation: NPK 12:61:0 (Mono Ammonium Phosphate). Formulated for maximum crop protection and optimal yield response.",
     "description": "Indus Crop Care 12:61:0 is a high-performance agricultural solution formulated with NPK 12:61:0 (Mono Ammonium Phosphate). Developed in collaboration with top agricultural scientists and manufactured under strict ISO 9001:2015 quality standards, delivering dependable field efficacy and high return on investment for progressive growers.",
@@ -4625,11 +4625,11 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
       },
       {
         "label": "Primary Category",
-        "value": "Water Soluble Fertilizers"
+        "value": "Water-Soluble Fertilizers"
       },
       {
         "label": "Application Sector",
-        "value": "Fertilizers"
+        "value": "Water-Soluble Fertilizers"
       },
       {
         "label": "Manufacturer",
@@ -4656,8 +4656,8 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "name": "00:52:34",
     "code": "ICC-087",
     "slug": "indus-00-52-34",
-    "category": "Water Soluble Fertilizers",
-    "broadGroup": "Fertilizers",
+    "category": "Water-Soluble Fertilizers",
+    "broadGroup": "Water-Soluble Fertilizers",
     "formulation": "NPK 00:52:34 (Mono Potassium Phosphate)",
     "shortDescription": "Authentic Indus Crop Care Water Soluble Fertilizer formulation: NPK 00:52:34 (Mono Potassium Phosphate). Formulated for maximum crop protection and optimal yield response.",
     "description": "Indus Crop Care 00:52:34 is a high-performance agricultural solution formulated with NPK 00:52:34 (Mono Potassium Phosphate). Developed in collaboration with top agricultural scientists and manufactured under strict ISO 9001:2015 quality standards, delivering dependable field efficacy and high return on investment for progressive growers.",
@@ -4679,11 +4679,11 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
       },
       {
         "label": "Primary Category",
-        "value": "Water Soluble Fertilizers"
+        "value": "Water-Soluble Fertilizers"
       },
       {
         "label": "Application Sector",
-        "value": "Fertilizers"
+        "value": "Water-Soluble Fertilizers"
       },
       {
         "label": "Manufacturer",
@@ -4710,8 +4710,8 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "name": "CALCIUM NITRATE",
     "code": "ICC-088",
     "slug": "indus-calcium-nitrate",
-    "category": "Water Soluble Fertilizers",
-    "broadGroup": "Fertilizers",
+    "category": "Water-Soluble Fertilizers",
+    "broadGroup": "Water-Soluble Fertilizers",
     "formulation": "Calcium Nitrate (NPK)",
     "shortDescription": "Authentic Indus Crop Care Water Soluble Fertilizer formulation: Calcium Nitrate (NPK). Formulated for maximum crop protection and optimal yield response.",
     "description": "Indus Crop Care CALCIUM NITRATE is a high-performance agricultural solution formulated with Calcium Nitrate (NPK). Developed in collaboration with top agricultural scientists and manufactured under strict ISO 9001:2015 quality standards, delivering dependable field efficacy and high return on investment for progressive growers.",
@@ -4733,11 +4733,11 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
       },
       {
         "label": "Primary Category",
-        "value": "Water Soluble Fertilizers"
+        "value": "Water-Soluble Fertilizers"
       },
       {
         "label": "Application Sector",
-        "value": "Fertilizers"
+        "value": "Water-Soluble Fertilizers"
       },
       {
         "label": "Manufacturer",
@@ -4764,8 +4764,8 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "name": "ECHO-ROOT",
     "code": "ICC-089",
     "slug": "indus-echo-root",
-    "category": "Bio Fertilizers",
-    "broadGroup": "Bio Fertilizers",
+    "category": "Biofertilizers",
+    "broadGroup": "Biofertilizers",
     "formulation": "VAM - Vascular Arbuscular Mycorrhiza",
     "shortDescription": "Authentic Indus Crop Care Bio Fertilizer formulation: VAM - Vascular Arbuscular Mycorrhiza. Formulated for maximum crop protection and optimal yield response.",
     "description": "Indus Crop Care ECHO-ROOT is a high-performance agricultural solution formulated with VAM - Vascular Arbuscular Mycorrhiza. Developed in collaboration with top agricultural scientists and manufactured under strict ISO 9001:2015 quality standards, delivering dependable field efficacy and high return on investment for progressive growers.",
@@ -4787,11 +4787,11 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
       },
       {
         "label": "Primary Category",
-        "value": "Bio Fertilizers"
+        "value": "Biofertilizers"
       },
       {
         "label": "Application Sector",
-        "value": "Bio Fertilizers"
+        "value": "Biofertilizers"
       },
       {
         "label": "Manufacturer",
@@ -4818,8 +4818,8 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "name": "O-FERA",
     "code": "ICC-090",
     "slug": "indus-o-fera",
-    "category": "Bio Fertilizers",
-    "broadGroup": "Bio Fertilizers",
+    "category": "Biofertilizers",
+    "broadGroup": "Biofertilizers",
     "formulation": "Microbial Biostimulant",
     "shortDescription": "Authentic Indus Crop Care Bio Fertilizer formulation: Microbial Biostimulant. Formulated for maximum crop protection and optimal yield response.",
     "description": "Indus Crop Care O-FERA is a high-performance agricultural solution formulated with Microbial Biostimulant. Developed in collaboration with top agricultural scientists and manufactured under strict ISO 9001:2015 quality standards, delivering dependable field efficacy and high return on investment for progressive growers.",
@@ -4841,11 +4841,11 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
       },
       {
         "label": "Primary Category",
-        "value": "Bio Fertilizers"
+        "value": "Biofertilizers"
       },
       {
         "label": "Application Sector",
-        "value": "Bio Fertilizers"
+        "value": "Biofertilizers"
       },
       {
         "label": "Manufacturer",
@@ -4872,8 +4872,8 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "name": "INDUS PSB",
     "code": "ICC-091",
     "slug": "indus-psb",
-    "category": "Bio Fertilizers",
-    "broadGroup": "Bio Fertilizers",
+    "category": "Biofertilizers",
+    "broadGroup": "Biofertilizers",
     "formulation": "Bio Fertilizer-Phosphorous (Phosphorous Solubilizing Bacteria)",
     "shortDescription": "Authentic Indus Crop Care Bio Fertilizer formulation: Bio Fertilizer-Phosphorous (Phosphorous Solubilizing Bacteria). Formulated for maximum crop protection and optimal yield response.",
     "description": "Indus Crop Care INDUS PSB is a high-performance agricultural solution formulated with Bio Fertilizer-Phosphorous (Phosphorous Solubilizing Bacteria). Developed in collaboration with top agricultural scientists and manufactured under strict ISO 9001:2015 quality standards, delivering dependable field efficacy and high return on investment for progressive growers.",
@@ -4895,11 +4895,11 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
       },
       {
         "label": "Primary Category",
-        "value": "Bio Fertilizers"
+        "value": "Biofertilizers"
       },
       {
         "label": "Application Sector",
-        "value": "Bio Fertilizers"
+        "value": "Biofertilizers"
       },
       {
         "label": "Manufacturer",
@@ -4926,8 +4926,8 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "name": "INDUS KMB",
     "code": "ICC-092",
     "slug": "indus-kmb",
-    "category": "Bio Fertilizers",
-    "broadGroup": "Bio Fertilizers",
+    "category": "Biofertilizers",
+    "broadGroup": "Biofertilizers",
     "formulation": "Bio Fertilizer-Potash (Potassium Solubilizing Bacteria)",
     "shortDescription": "Authentic Indus Crop Care Bio Fertilizer formulation: Bio Fertilizer-Potash (Potassium Solubilizing Bacteria). Formulated for maximum crop protection and optimal yield response.",
     "description": "Indus Crop Care INDUS KMB is a high-performance agricultural solution formulated with Bio Fertilizer-Potash (Potassium Solubilizing Bacteria). Developed in collaboration with top agricultural scientists and manufactured under strict ISO 9001:2015 quality standards, delivering dependable field efficacy and high return on investment for progressive growers.",
@@ -4949,11 +4949,11 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
       },
       {
         "label": "Primary Category",
-        "value": "Bio Fertilizers"
+        "value": "Biofertilizers"
       },
       {
         "label": "Application Sector",
-        "value": "Bio Fertilizers"
+        "value": "Biofertilizers"
       },
       {
         "label": "Manufacturer",
@@ -4980,8 +4980,8 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "name": "INDUS ZNSB",
     "code": "ICC-093",
     "slug": "indus-znsb",
-    "category": "Bio Fertilizers",
-    "broadGroup": "Bio Fertilizers",
+    "category": "Biofertilizers",
+    "broadGroup": "Biofertilizers",
     "formulation": "Bio Fertilizer-Zinc (Zinc Solubilizing Bacteria)",
     "shortDescription": "Authentic Indus Crop Care Bio Fertilizer formulation: Bio Fertilizer-Zinc (Zinc Solubilizing Bacteria). Formulated for maximum crop protection and optimal yield response.",
     "description": "Indus Crop Care INDUS ZNSB is a high-performance agricultural solution formulated with Bio Fertilizer-Zinc (Zinc Solubilizing Bacteria). Developed in collaboration with top agricultural scientists and manufactured under strict ISO 9001:2015 quality standards, delivering dependable field efficacy and high return on investment for progressive growers.",
@@ -5003,11 +5003,11 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
       },
       {
         "label": "Primary Category",
-        "value": "Bio Fertilizers"
+        "value": "Biofertilizers"
       },
       {
         "label": "Application Sector",
-        "value": "Bio Fertilizers"
+        "value": "Biofertilizers"
       },
       {
         "label": "Manufacturer",
@@ -5034,8 +5034,8 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "name": "FERTIK",
     "code": "ICC-094",
     "slug": "indus-fertik",
-    "category": "Bio Fertilizers",
-    "broadGroup": "Bio Fertilizers",
+    "category": "Biofertilizers",
+    "broadGroup": "Biofertilizers",
     "formulation": "Potash derived from Rhodiphytes",
     "shortDescription": "Authentic Indus Crop Care Bio Fertilizer formulation: Potash derived from Rhodiphytes. Formulated for maximum crop protection and optimal yield response.",
     "description": "Indus Crop Care FERTIK is a high-performance agricultural solution formulated with Potash derived from Rhodiphytes. Developed in collaboration with top agricultural scientists and manufactured under strict ISO 9001:2015 quality standards, delivering dependable field efficacy and high return on investment for progressive growers.",
@@ -5057,11 +5057,11 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
       },
       {
         "label": "Primary Category",
-        "value": "Bio Fertilizers"
+        "value": "Biofertilizers"
       },
       {
         "label": "Application Sector",
-        "value": "Bio Fertilizers"
+        "value": "Biofertilizers"
       },
       {
         "label": "Manufacturer",
@@ -5088,8 +5088,8 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "name": "GROZYME GRANULES",
     "code": "ICC-095",
     "slug": "indus-grozyme-granules",
-    "category": "Bio Fertilizers",
-    "broadGroup": "Bio Fertilizers",
+    "category": "Biofertilizers",
+    "broadGroup": "Biofertilizers",
     "formulation": "Bio Fertilizer Carrier Based Consortia (NPK Consortiam)",
     "shortDescription": "Authentic Indus Crop Care Bio Fertilizer formulation: Bio Fertilizer Carrier Based Consortia (NPK Consortiam). Formulated for maximum crop protection and optimal yield response.",
     "description": "Indus Crop Care GROZYME GRANULES is a high-performance agricultural solution formulated with Bio Fertilizer Carrier Based Consortia (NPK Consortiam). Developed in collaboration with top agricultural scientists and manufactured under strict ISO 9001:2015 quality standards, delivering dependable field efficacy and high return on investment for progressive growers.",
@@ -5111,11 +5111,11 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
       },
       {
         "label": "Primary Category",
-        "value": "Bio Fertilizers"
+        "value": "Biofertilizers"
       },
       {
         "label": "Application Sector",
-        "value": "Bio Fertilizers"
+        "value": "Biofertilizers"
       },
       {
         "label": "Manufacturer",
@@ -5142,8 +5142,8 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "name": "GROWZYME",
     "code": "ICC-096",
     "slug": "indus-growzyme",
-    "category": "Bio Fertilizers",
-    "broadGroup": "Bio Fertilizers",
+    "category": "Biofertilizers",
+    "broadGroup": "Biofertilizers",
     "formulation": "Bio Fertilizer Liquid Consortia (NPK Liquid Consortia)",
     "shortDescription": "Authentic Indus Crop Care Bio Fertilizer formulation: Bio Fertilizer Liquid Consortia (NPK Liquid Consortia). Formulated for maximum crop protection and optimal yield response.",
     "description": "Indus Crop Care GROWZYME is a high-performance agricultural solution formulated with Bio Fertilizer Liquid Consortia (NPK Liquid Consortia). Developed in collaboration with top agricultural scientists and manufactured under strict ISO 9001:2015 quality standards, delivering dependable field efficacy and high return on investment for progressive growers.",
@@ -5165,11 +5165,11 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
       },
       {
         "label": "Primary Category",
-        "value": "Bio Fertilizers"
+        "value": "Biofertilizers"
       },
       {
         "label": "Application Sector",
-        "value": "Bio Fertilizers"
+        "value": "Biofertilizers"
       },
       {
         "label": "Manufacturer",
@@ -5628,8 +5628,8 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "name": "INDUS DHARTHI",
     "code": "ICC-105",
     "slug": "indus-dharthi",
-    "category": "Micronutrients Combo",
-    "broadGroup": "Nutrients",
+    "category": "Micronutrients / Nutrients",
+    "broadGroup": "Micronutrients / Nutrients",
     "formulation": "Bio Fertilizer / Micronutrients Combo",
     "shortDescription": "Authentic Indus Crop Care Micronutrients Combo formulation: Bio Fertilizer / Micronutrients Combo. Formulated for maximum crop protection and optimal yield response.",
     "description": "Indus Crop Care INDUS DHARTHI is a high-performance agricultural solution formulated with Bio Fertilizer / Micronutrients Combo. Developed in collaboration with top agricultural scientists and manufactured under strict ISO 9001:2015 quality standards, delivering dependable field efficacy and high return on investment for progressive growers.",
@@ -5651,11 +5651,11 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
       },
       {
         "label": "Primary Category",
-        "value": "Micronutrients Combo"
+        "value": "Micronutrients / Nutrients"
       },
       {
         "label": "Application Sector",
-        "value": "Nutrients"
+        "value": "Micronutrients / Nutrients"
       },
       {
         "label": "Manufacturer",
@@ -5676,5 +5676,335 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "isFeatured": false,
     "sortOrder": 105,
     "sourcePage": 19
+  },
+  {
+    "id": "indus-profit",
+    "name": "PROFIT",
+    "code": "ICC-106",
+    "slug": "indus-profit",
+    "category": "Bio Stimulants",
+    "broadGroup": "Biostimulants",
+    "formulation": "Plant Energizer & Anti-Stress Biostimulant",
+    "shortDescription": "Authentic Indus Crop Care Biostimulant formulation: Plant Energizer & Anti-Stress Biostimulant. Enhances crop resilience against biotic pests and environmental stress.",
+    "description": "Indus Crop Care PROFIT is a versatile agricultural biostimulant formulated to enhance crop resilience against both biotic (insect pests) and abiotic (environmental) stress factors. It promotes healthier plant growth by protecting crops from harmful pests and adverse weather conditions, leading to better yields and stronger plants.",
+    "features": [
+      "Active Technical Composition: Plant Energizer & Anti-Stress Biostimulant",
+      "Official Indus Category: Bio Stimulants",
+      "Available Pack Sizes: 100 ml, 250 ml, 500 ml, 1 Liter",
+      "Recommended Dosage: 2.5 ml per 1 Liter of water (foliar application)",
+      "Target Crops: Chili, vegetables, fruit orchards, pulses, and cash crops",
+      "Enhances resistance to pests and environmental stress, promoting higher productivity"
+    ],
+    "specifications": [
+      {
+        "label": "Product Name",
+        "value": "PROFIT"
+      },
+      {
+        "label": "Technical Composition",
+        "value": "Plant Energizer & Anti-Stress Biostimulant"
+      },
+      {
+        "label": "Primary Category",
+        "value": "Bio Stimulants"
+      },
+      {
+        "label": "Application Sector",
+        "value": "Biostimulants"
+      },
+      {
+        "label": "Recommended Dosage",
+        "value": "2.5 ml per 1 Liter of water"
+      },
+      {
+        "label": "Available Packs",
+        "value": "100 ml, 250 ml, 500 ml, 1 Liter"
+      },
+      {
+        "label": "Recommended Crops",
+        "value": "Chili, vegetables, and fruits"
+      },
+      {
+        "label": "Manufacturer",
+        "value": "Indus Crop Care Pvt. Ltd."
+      },
+      {
+        "label": "Quality Standard",
+        "value": "ISO 9001:2015 Certified Manufacturing"
+      },
+      {
+        "label": "Official Catalogue Reference",
+        "value": "Reference Shop Verified"
+      }
+    ],
+    "imageUrl": "/images/indus-products/indus-profit.jpg",
+    "sheetImageUrl": "/images/indus-products/indus-profit.jpg",
+    "isPublished": true,
+    "isFeatured": false,
+    "sortOrder": 106,
+    "sourcePage": 20
+  },
+  {
+    "id": "indus-rana",
+    "name": "RANA",
+    "code": "ICC-107",
+    "slug": "indus-rana",
+    "category": "Bio Stimulants",
+    "broadGroup": "Biostimulants",
+    "formulation": "Crop Resilience & Growth Promoter",
+    "shortDescription": "Authentic Indus Crop Care Biostimulant formulation: Crop Resilience & Growth Promoter. Formulated to enhance resistance against biotic and abiotic stress factors.",
+    "description": "Indus Crop Care RANA is a high-potency bio-stimulant engineered to enhance crop resistance against both biotic (insect pests) and abiotic (environmental) stresses. Promotes balanced vegetative flushes, chlorophyll synthesis, and accelerated recovery from pest damage.",
+    "features": [
+      "Active Technical Composition: Crop Resilience & Growth Promoter",
+      "Official Indus Category: Bio Stimulants",
+      "Available Pack Sizes: 100 ml, 250 ml, 500 ml, 1 Liter",
+      "Recommended Dosage: 2.5 ml per 1 Liter of water",
+      "Target Crops: Chili, vegetables, fruit crops, and cotton",
+      "Protects crops from adverse climatic factors and pest challenges"
+    ],
+    "specifications": [
+      {
+        "label": "Product Name",
+        "value": "RANA"
+      },
+      {
+        "label": "Technical Composition",
+        "value": "Crop Resilience & Growth Promoter"
+      },
+      {
+        "label": "Primary Category",
+        "value": "Bio Stimulants"
+      },
+      {
+        "label": "Application Sector",
+        "value": "Biostimulants"
+      },
+      {
+        "label": "Recommended Dosage",
+        "value": "2.5 ml per 1 Liter of water"
+      },
+      {
+        "label": "Available Packs",
+        "value": "100 ml, 250 ml, 500 ml, 1 Liter"
+      },
+      {
+        "label": "Recommended Crops",
+        "value": "Chili, vegetables, and fruits"
+      },
+      {
+        "label": "Manufacturer",
+        "value": "Indus Crop Care Pvt. Ltd."
+      },
+      {
+        "label": "Quality Standard",
+        "value": "ISO 9001:2015 Certified Manufacturing"
+      },
+      {
+        "label": "Official Catalogue Reference",
+        "value": "Reference Shop Verified"
+      }
+    ],
+    "imageUrl": "/images/indus-products/indus-rana.png",
+    "sheetImageUrl": "/images/indus-products/indus-rana.png",
+    "isPublished": true,
+    "isFeatured": false,
+    "sortOrder": 107,
+    "sourcePage": 20
+  },
+  {
+    "id": "indus-tsunami",
+    "name": "TSUNAMI",
+    "code": "ICC-108",
+    "slug": "indus-tsunami",
+    "category": "Bio Stimulants",
+    "broadGroup": "Biostimulants",
+    "formulation": "High-Potency Stress Shield & Yield Vitalizer",
+    "shortDescription": "Authentic Indus Crop Care Biostimulant formulation: High-Potency Stress Shield & Yield Vitalizer. Ensures robust cellular stamina and sustained reproductive growth.",
+    "description": "Indus Crop Care TSUNAMI is a powerful agricultural solution designed to enhance the resilience of crops against both biotic (insect pests) and abiotic (environmental) stress factors. This product ensures healthier and more robust plants by providing protection against harmful pests and adverse weather conditions.",
+    "features": [
+      "Active Technical Composition: High-Potency Stress Shield & Yield Vitalizer",
+      "Official Indus Category: Bio Stimulants",
+      "Available Pack Sizes: 100 ml, 250 ml, 500 ml, 1 Liter",
+      "Recommended Dosage: 2.5 ml per 1 Liter of water",
+      "Target Crops: Chili, vegetables, pulses, and fruit crops",
+      "Fosters vigorous branching, flower retention, and uniform fruit sizing"
+    ],
+    "specifications": [
+      {
+        "label": "Product Name",
+        "value": "TSUNAMI"
+      },
+      {
+        "label": "Technical Composition",
+        "value": "High-Potency Stress Shield & Yield Vitalizer"
+      },
+      {
+        "label": "Primary Category",
+        "value": "Bio Stimulants"
+      },
+      {
+        "label": "Application Sector",
+        "value": "Biostimulants"
+      },
+      {
+        "label": "Recommended Dosage",
+        "value": "2.5 ml per 1 Liter of water"
+      },
+      {
+        "label": "Available Packs",
+        "value": "100 ml, 250 ml, 500 ml, 1 Liter"
+      },
+      {
+        "label": "Recommended Crops",
+        "value": "Chili, vegetables, and fruit crops"
+      },
+      {
+        "label": "Manufacturer",
+        "value": "Indus Crop Care Pvt. Ltd."
+      },
+      {
+        "label": "Quality Standard",
+        "value": "ISO 9001:2015 Certified Manufacturing"
+      },
+      {
+        "label": "Official Catalogue Reference",
+        "value": "Reference Shop Verified"
+      }
+    ],
+    "imageUrl": "/images/indus-products/indus-tsunami.jpg",
+    "sheetImageUrl": "/images/indus-products/indus-tsunami.jpg",
+    "isPublished": true,
+    "isFeatured": false,
+    "sortOrder": 108,
+    "sourcePage": 20
+  },
+  {
+    "id": "indus-vijetha",
+    "name": "VIJETHA",
+    "code": "ICC-109",
+    "slug": "indus-vijetha",
+    "category": "Bio Stimulants",
+    "broadGroup": "Biostimulants",
+    "formulation": "Multi-Action Yield Enhancer & Plant Health Booster",
+    "shortDescription": "Authentic Indus Crop Care Biostimulant formulation: Multi-Action Yield Enhancer & Plant Health Booster. Enhances vegetative vigour and maximum yield potential.",
+    "description": "Indus Crop Care VIJETHA is a proprietary yield enhancer that helps crops become resistant to both biotic (insect pests) and abiotic (environmental) stress factors. It ensures protection from pests and weather-related challenges, promoting healthy growth and top-grade produce.",
+    "features": [
+      "Active Technical Composition: Multi-Action Yield Enhancer & Plant Health Booster",
+      "Official Indus Category: Bio Stimulants",
+      "Available Pack Sizes: 100 ml, 250 ml, 500 ml, 1 Liter",
+      "Recommended Dosage: 2.5 ml per 1 Liter of water",
+      "Target Crops: Chili, vegetables, oilseeds, and fruit orchards",
+      "Maximizes nutrient mobilization and post-stress vegetative recovery"
+    ],
+    "specifications": [
+      {
+        "label": "Product Name",
+        "value": "VIJETHA"
+      },
+      {
+        "label": "Technical Composition",
+        "value": "Multi-Action Yield Enhancer & Plant Health Booster"
+      },
+      {
+        "label": "Primary Category",
+        "value": "Bio Stimulants"
+      },
+      {
+        "label": "Application Sector",
+        "value": "Biostimulants"
+      },
+      {
+        "label": "Recommended Dosage",
+        "value": "2.5 ml per 1 Liter of water"
+      },
+      {
+        "label": "Available Packs",
+        "value": "100 ml, 250 ml, 500 ml, 1 Liter"
+      },
+      {
+        "label": "Recommended Crops",
+        "value": "Chili, vegetables, and fruits"
+      },
+      {
+        "label": "Manufacturer",
+        "value": "Indus Crop Care Pvt. Ltd."
+      },
+      {
+        "label": "Quality Standard",
+        "value": "ISO 9001:2015 Certified Manufacturing"
+      },
+      {
+        "label": "Official Catalogue Reference",
+        "value": "Reference Shop Verified"
+      }
+    ],
+    "imageUrl": "/images/indus-products/indus-vijetha.png",
+    "sheetImageUrl": "/images/indus-products/indus-vijetha.png",
+    "isPublished": true,
+    "isFeatured": false,
+    "sortOrder": 109,
+    "sourcePage": 20
+  },
+  {
+    "id": "indus-glyphosate-20-sl",
+    "name": "DUNLOP 20 SL",
+    "code": "ICC-110",
+    "slug": "indus-glyphosate-20-sl",
+    "category": "Herbicides",
+    "broadGroup": "Herbicides",
+    "formulation": "Glyphosate Ammonium Salt 20% SL",
+    "shortDescription": "Authentic Indus Crop Care Herbicide formulation: Glyphosate Ammonium Salt 20% SL. Water-soluble systemic non-selective herbicide with rapid foliar uptake and rain-fastness.",
+    "description": "Indus Crop Care DUNLOP 20 SL is a systemic, non-selective, post-emergence herbicide formulated with Glyphosate Ammonium Salt 20% SL. Provides superior rain-fastness and rapid translocated absorption for total weed control in non-cropped areas, tea plantations, and orchards within 7-10 days.",
+    "features": [
+      "Active Technical Composition: Glyphosate Ammonium Salt 20% SL",
+      "Official Indus Category: Herbicides",
+      "Application Area: Non-crop areas, tea plantations, orchards, and bunds",
+      "Rapid absorption with enhanced rain-fastness",
+      "Delivers complete translocation to root systems, eliminating deep-rooted perennials"
+    ],
+    "specifications": [
+      {
+        "label": "Product Name",
+        "value": "DUNLOP 20 SL"
+      },
+      {
+        "label": "Technical Composition",
+        "value": "Glyphosate Ammonium Salt 20% SL"
+      },
+      {
+        "label": "Primary Category",
+        "value": "Herbicides"
+      },
+      {
+        "label": "Application Sector",
+        "value": "Herbicides"
+      },
+      {
+        "label": "Target Use",
+        "value": "Non-crop areas, tea plantations, orchards"
+      },
+      {
+        "label": "Effect Speed",
+        "value": "Total kill of target weeds within 7-10 days"
+      },
+      {
+        "label": "Manufacturer",
+        "value": "Indus Crop Care Pvt. Ltd."
+      },
+      {
+        "label": "Quality Standard",
+        "value": "ISO 9001:2015 Certified Manufacturing"
+      },
+      {
+        "label": "Official Catalogue Reference",
+        "value": "Herbicides Portfolio"
+      }
+    ],
+    "imageUrl": "/images/indus-products/indus-dunlop-20-sl.png",
+    "sheetImageUrl": "/images/indus-products/indus-dunlop-20-sl.png",
+    "isPublished": true,
+    "isFeatured": false,
+    "sortOrder": 110,
+    "sourcePage": 20
   }
 ];

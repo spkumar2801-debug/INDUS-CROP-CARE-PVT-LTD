@@ -34,11 +34,11 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
                 ISO 9001:2015 Certified
               </span>
             </div>
-            <h2 id="product-details-title" style={{ fontSize: '1.5rem', color: '#FFFFFF', fontWeight: 800 }}>
-              {product.name} {product.formulation && <span style={{ fontSize: '1.05rem', fontWeight: 600, color: '#25D366' }}>({product.formulation})</span>}
+            <h2 id="product-details-title" style={{ fontSize: '1.5rem', color: 'var(--color-charcoal-950, #0D1611)', fontWeight: 800 }}>
+              {product.name} {product.formulation && <span style={{ fontSize: '1.05rem', fontWeight: 600, color: 'var(--color-primary-green-dark, #0A522A)' }}>({product.formulation})</span>}
             </h2>
             {product.categoryTelugu && (
-              <p className="telugu-quote" style={{ margin: '4px 0 0 0', fontSize: '1.05rem', color: '#FFE082' }}>
+              <p className="telugu-quote" style={{ margin: '4px 0 0 0', fontSize: '1.02rem', color: 'var(--color-charcoal-700, #2C3E35)', fontWeight: 600 }}>
                 {product.categoryTelugu} {product.code ? `(${product.code})` : ''}
               </p>
             )}
@@ -68,18 +68,18 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
               <span className="modal-crop-seal">Certified Specimen</span>
             </div>
             <div>
-              <p style={{ fontSize: '0.96rem', lineHeight: '1.65', color: '#DCE8DF', marginBottom: '16px' }}>
+              <p style={{ fontSize: '0.98rem', lineHeight: '1.68', color: 'var(--color-charcoal-800, #1B2921)', marginBottom: '18px' }}>
                 {product.description}
               </p>
               {product.features && product.features.length > 0 && (
                 <div>
-                  <h4 style={{ fontSize: '0.85rem', textTransform: 'uppercase', color: '#25D366', marginBottom: '10px', letterSpacing: '0.05em', fontWeight: 800 }}>
+                  <h4 style={{ fontSize: '0.85rem', textTransform: 'uppercase', color: 'var(--color-primary-green-dark, #0A522A)', marginBottom: '10px', letterSpacing: '0.05em', fontWeight: 800 }}>
                     Key Agronomic Highlights
                   </h4>
                   <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '8px', padding: 0 }}>
                     {product.features.slice(0, 5).map((f, i) => (
-                      <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '0.88rem', color: '#D4E5D8', lineHeight: '1.4' }}>
-                        <CheckCircle size={15} style={{ color: '#25D366', flexShrink: 0, marginTop: '2px' }} />
+                      <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '0.9rem', color: 'var(--color-charcoal-800, #1B2921)', lineHeight: '1.45' }}>
+                        <CheckCircle size={16} style={{ color: 'var(--color-primary-green, #0E6B38)', flexShrink: 0, marginTop: '2px' }} />
                         <span>{f}</span>
                       </li>
                     ))}
@@ -151,8 +151,8 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
           {activeTab === 'telugu' && (
             <div>
               {product.teluguDescription ? (
-                <div style={{ backgroundColor: 'rgba(255, 224, 130, 0.08)', padding: '16px', borderRadius: 'var(--radius-md)', marginBottom: '16px', borderLeft: '4px solid #FFE082', border: '1px solid rgba(255, 224, 130, 0.2)' }}>
-                  <p className="telugu-quote" style={{ margin: 0, fontSize: '0.98rem', lineHeight: '1.7', color: '#FFE082' }}>
+                <div style={{ backgroundColor: 'rgba(217, 119, 6, 0.08)', padding: '16px 20px', borderRadius: 'var(--radius-md)', marginBottom: '18px', borderLeft: '4px solid #D97706', border: '1px solid rgba(217, 119, 6, 0.2)' }}>
+                  <p className="telugu-quote" style={{ margin: 0, fontSize: '1rem', lineHeight: '1.75', color: 'var(--color-charcoal-900, #111E16)', fontWeight: 500 }}>
                     {product.teluguDescription}
                   </p>
                 </div>
@@ -177,17 +177,17 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
                 </table>
               ) : (
                 <div style={{ 
-                  backgroundColor: 'rgba(255, 255, 255, 0.04)', 
-                  border: '1px solid rgba(255, 255, 255, 0.1)', 
-                  borderRadius: '10px', 
-                  padding: '20px', 
+                  backgroundColor: 'var(--color-sage-50, #F4F7F4)', 
+                  border: '1px solid var(--color-border-light, #E2ECE4)', 
+                  borderRadius: '12px', 
+                  padding: '24px', 
                   textAlign: 'center', 
                   margin: '16px 0' 
                 }}>
-                  <p style={{ color: '#FFE082', fontSize: '1rem', fontFamily: 'var(--font-telugu)', margin: '0 0 8px 0', fontWeight: 600 }}>
+                  <p style={{ color: 'var(--color-charcoal-900, #111E16)', fontSize: '1.02rem', fontFamily: 'var(--font-telugu)', margin: '0 0 8px 0', fontWeight: 700 }}>
                     ఈ ఫార్ములేషన్ వివరాలు ప్రస్తుతం అధికారిక ఆంగ్ల కేటలాగ్‌లో అందుబాటులో ఉన్నాయి.
                   </p>
-                  <p style={{ color: '#CBDACD', fontSize: '0.86rem', lineHeight: '1.5', margin: 0 }}>
+                  <p style={{ color: 'var(--color-charcoal-600, #4A5D52)', fontSize: '0.9rem', lineHeight: '1.6', margin: 0 }}>
                     రైతులకు సమగ్ర పంట రక్షణ మోతాదులు మరియు సాంకేతిక సలహాల కోసం మా నిపుణుల డెస్క్‌ను వాట్సాప్ ద్వారా సంప్రదించండి.
                   </p>
                 </div>
@@ -200,7 +200,7 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
             <div className="sheet-img-wrap">
               <div className="sheet-official-header">
                 <span className="badge badge-gold">Official Catalogue Document</span>
-                <span style={{ fontSize: '0.82rem', color: '#25D366', fontWeight: 600 }}>
+                <span style={{ fontSize: '0.85rem', color: 'var(--color-primary-green-dark, #0A522A)', fontWeight: 700 }}>
                   Indus Crop Care Verified Document
                 </span>
               </div>
@@ -214,15 +214,15 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
                   }
                 }}
               />
-              <p style={{ fontSize: '0.85rem', color: '#CBDACD', marginTop: '14px', lineHeight: '1.5' }}>
+              <p style={{ fontSize: '0.88rem', color: 'var(--color-charcoal-600, #4A5D52)', marginTop: '14px', lineHeight: '1.55' }}>
                 Authentic technical release document issued by Indus Crop Care Pvt. Ltd. All chemical, biological, and nutritional specifications are documented from verified manufacturing and laboratory tests.
               </p>
             </div>
           )}
 
           {/* Bottom Action Footer */}
-          <div style={{ marginTop: '28px', paddingTop: '20px', borderTop: '1px solid rgba(255, 255, 255, 0.12)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
-            <span style={{ fontSize: '0.85rem', color: '#A0B8A5' }}>
+          <div style={{ marginTop: '28px', paddingTop: '20px', borderTop: '1px solid var(--color-border-light, #E2ECE4)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
+            <span style={{ fontSize: '0.86rem', color: 'var(--color-charcoal-600, #4A5D52)', fontWeight: 500 }}>
               Scientific agronomic and crop protection advisory available for commercial and retail farmers.
             </span>
             <button 

@@ -30,29 +30,29 @@ export const GalleryPage: React.FC = () => {
   }, [items, selectedCategory]);
 
   return (
-    <div style={{ backgroundColor: '#06180D', minHeight: '80vh' }}>
+    <div style={{ backgroundColor: 'var(--color-sage-50)', minHeight: '85vh', color: 'var(--color-charcoal-800)' }}>
       
-      {/* Page Header */}
-      <section style={{ backgroundColor: '#0A2415', color: '#FFFFFF', paddingTop: '60px', paddingBottom: '60px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
-        <div className="container" style={{ textAlign: 'center' }}>
-          <span className="badge badge-gold" style={{ marginBottom: '14px' }}>
+      {/* Page Header — Deep Forest Botanical */}
+      <section style={{ backgroundColor: 'var(--color-forest-900)', color: '#FFFFFF', paddingTop: 'clamp(48px, 7vw, 72px)', paddingBottom: 'clamp(48px, 7vw, 72px)', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
+        <div className="container" style={{ textAlign: 'center', maxWidth: '850px' }}>
+          <span className="badge badge-gold" style={{ marginBottom: '16px' }}>
             Field Trials & Visual Documentation
           </span>
-          <h1 style={{ fontSize: 'clamp(2.2rem, 3.8vw, 3rem)', color: '#F4F8F3', marginBottom: '12px' }}>
+          <h1 style={{ fontSize: 'clamp(2.2rem, 4.5vw, 3.4rem)', color: '#FFFFFF', marginBottom: '14px', fontWeight: 800, letterSpacing: '-0.025em' }}>
             Indus Crop Care Gallery
           </h1>
-          <p style={{ fontSize: '1.05rem', color: '#CBDACD', maxWidth: '680px', margin: '0 auto', lineHeight: '1.6' }}>
+          <p style={{ fontSize: '1.08rem', color: 'var(--color-sage-200)', maxWidth: '680px', margin: '0 auto', lineHeight: '1.65' }}>
             Real crop protection results, farmer field trials, demonstration plots, and agricultural exhibitions managed directly by Indus Crop Care Pvt. Ltd.
           </p>
         </div>
       </section>
 
       {/* Main Gallery Grid */}
-      <section className="section">
+      <section className="section" style={{ paddingTop: '40px', paddingBottom: '76px' }}>
         <div className="container">
           
           {/* Category Filter Chips */}
-          <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '40px' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '8px', marginBottom: '40px' }}>
             {categories.map(cat => (
               <button
                 key={cat}
@@ -66,14 +66,14 @@ export const GalleryPage: React.FC = () => {
           </div>
 
           {loading ? (
-            <div style={{ textAlign: 'center', padding: '60px 20px', color: '#9EB5A3' }}>
+            <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--color-charcoal-600)' }}>
               Loading gallery...
             </div>
           ) : filteredItems.length === 0 ? (
-            <div className="card" style={{ padding: '50px 20px', textAlign: 'center', maxWidth: '500px', margin: '0 auto', backgroundColor: '#0E291A' }}>
-              <ImageIcon size={44} style={{ color: '#25D366', margin: '0 auto 16px auto' }} />
-              <h3 style={{ color: '#F4F8F3' }}>Gallery Updates Underway</h3>
-              <p style={{ color: '#9EB5A3' }}>
+            <div className="card card-light" style={{ padding: '50px 20px', textAlign: 'center', maxWidth: '500px', margin: '0 auto' }}>
+              <ImageIcon size={44} style={{ color: 'var(--color-primary-green)', margin: '0 auto 16px auto' }} />
+              <h3 style={{ color: 'var(--color-charcoal-950)' }}>Gallery Updates Underway</h3>
+              <p style={{ color: 'var(--color-charcoal-600)' }}>
                 Field photography will appear as field trials are uploaded.
               </p>
             </div>

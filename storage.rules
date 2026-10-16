@@ -1,0 +1,20 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Public branding, products, and gallery media are readable by everyone
+    match /{allPaths=**} {
+      allow read: if true;
+      allow write: if isAuthenticated()
+                   && request.resource.size < 25 * 1024 * 1024
+                   && (request.resource.contentType.matches('image/.*') || 
+                       request.resource.contentType.matches('video/mp4') ||
+                       request.resource.contentType.matches('video/webm') ||
+                       request.resource.contentType.matches('application/pdf'));
+    }
+  }
+}

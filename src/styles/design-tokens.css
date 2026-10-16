@@ -1,56 +1,69 @@
 /* ========================================================
-   INDAS AGRI SEEDS INDIA PVT LTD — Design System Tokens
-   Curated palette extracted from official company logo
+   INDUS CROP CARE PVT. LTD. — Premium Design System Tokens
+   Curated Editorial & High-Performance Agricultural Palette
    ======================================================== */
 
 :root {
-  /* Brand Primary Colors */
+  /* Brand Core Forest Greens (Selective use for Hero & High-Impact accents) */
+  --color-forest-950: #04120A;
+  --color-forest-900: #061E11;
+  --color-forest-850: #082616;
+  --color-forest-800: #0B331D;
+  --color-forest-700: #0E4226;
+  --color-forest-600: #145A34;
+
+  /* Agricultural Emerald & Action Greens */
   --color-primary-green: #0E6B38;
-  --color-primary-green-dark: #094E27;
-  --color-primary-green-darker: #06341A;
+  --color-primary-green-dark: #0A522A;
+  --color-primary-green-darker: #06381C;
   --color-primary-green-light: #168547;
   --color-primary-green-surface: #EBF5EE;
-
-  /* Brand Accents */
-  --color-sprout-green: #66B634;
-  --color-sprout-light: #80D048;
-  --color-harvest-gold: #E79E18;
-  --color-harvest-gold-hover: #D18C0E;
-  --color-harvest-gold-light: #FEF7E8;
-  --color-seed-brown: #683B20;
-
-  /* Dark Agricultural Palette (Refined Brand Identity) */
-  --color-dark-forest: #06180D;
-  --color-dark-botanical: #0A2415;
-  --color-dark-surface: #0E2B1A;
-  --color-dark-surface-elevated: #153924;
-  --color-dark-border: rgba(255, 255, 255, 0.09);
-  --color-dark-border-subtle: rgba(46, 204, 113, 0.2);
-  --color-ivory-primary: #F4F8F3;
-  --color-ivory-secondary: #CBDACD;
-  --color-ivory-muted: #91A795;
-  --color-gold-muted: #E5A817;
-  --color-gold-glow: rgba(229, 168, 23, 0.22);
   --color-action-green: #25D366;
   --color-action-green-hover: #1EBE5D;
+  --color-action-green-glow: rgba(37, 211, 102, 0.35);
 
-  /* Neutrals & Surfaces */
+  /* Warm Ivory Palette — Primary Page & Editorial Surfaces */
+  --color-ivory-50: #FCFBF9;
+  --color-ivory-100: #FAF8F5;
+  --color-ivory-200: #F3EFE8;
+  --color-ivory-300: #E9E3D8;
   --color-bg-white: #FFFFFF;
-  --color-bg-warm: #F8FAF7;
-  --color-bg-tint: #F2F7F2;
-  --color-surface-card: #FFFFFF;
-  --color-surface-dark: #071E10;
 
-  /* High-Contrast Typography */
-  --color-text-title: #102416;
-  --color-text-body: #2C3E30;
-  --color-text-muted: #566E5B;
-  --color-text-inverse: #FFFFFF;
+  /* Muted Sage — Secondary Backgrounds & Subtle Transitions */
+  --color-sage-50: #F4F7F4;
+  --color-sage-100: #EAF0EB;
+  --color-sage-200: #DCE5DE;
+  --color-sage-300: #C2D2C6;
+  --color-sage-400: #9EB5A3;
 
-  /* Borders & Dividers */
-  --color-border: #DDE8DF;
-  --color-border-focused: #0E6B38;
-  --color-border-accent: rgba(102, 182, 52, 0.35);
+  /* Charcoal & High-Legibility Typography (No near-black on dark green!) */
+  --color-charcoal-950: #0D1611;
+  --color-charcoal-900: #111A15;
+  --color-charcoal-800: #1B2921;
+  --color-charcoal-700: #2C3E33;
+  --color-charcoal-600: #44594D;
+  --color-charcoal-500: #5C7365;
+  --color-charcoal-400: #7E9687;
+
+  /* Light Surface Typography Defaults */
+  --color-text-main: var(--color-charcoal-900);
+  --color-text-muted: var(--color-charcoal-600);
+  --color-text-subtle: var(--color-charcoal-500);
+
+  /* Dark Surface Typography */
+  --color-text-dark-primary: #FFFFFF;
+  --color-text-dark-secondary: #D4E5D8;
+  --color-text-dark-muted: #9BB3A1;
+
+  /* Restrained Warm Gold Accents */
+  --color-harvest-gold: #E5A817;
+  --color-harvest-gold-hover: #D18C0E;
+  --color-harvest-gold-light: #FEF7E8;
+  --color-gold-400: #F5C74E;
+  --color-gold-500: #E5A817;
+  --color-gold-600: #C58D0B;
+  --color-gold-glow: rgba(229, 168, 23, 0.28);
+  --color-gold-subtle: rgba(229, 168, 23, 0.12);
 
   /* Status Colors */
   --color-success: #1E8E3E;
@@ -63,26 +76,39 @@
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-telugu: 'Noto Sans Telugu', 'Plus Jakarta Sans', sans-serif;
 
-  /* Shadows */
-  --shadow-subtle: 0 2px 8px rgba(14, 107, 56, 0.05);
-  --shadow-card: 0 4px 18px rgba(14, 107, 56, 0.08);
-  --shadow-card-hover: 0 14px 34px rgba(14, 107, 56, 0.14);
-  --shadow-dropdown: 0 10px 30px rgba(7, 30, 16, 0.16);
-  --shadow-modal: 0 24px 64px rgba(6, 40, 20, 0.28);
+  /* Borders & Dividers */
+  --color-border-light: #E2E9E3;
+  --color-border-light-subtle: #EDF3EE;
+  --color-border-dark: rgba(255, 255, 255, 0.12);
+  --color-border-dark-highlight: rgba(37, 211, 102, 0.35);
 
-  /* Transitions */
-  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+  /* Elevation & Shadows */
+  --shadow-subtle: 0 2px 8px rgba(10, 38, 22, 0.04);
+  --shadow-card: 0 4px 20px rgba(10, 38, 22, 0.06);
+  --shadow-card-hover: 0 14px 34px rgba(10, 38, 22, 0.12);
+  --shadow-dark-card: 0 12px 36px rgba(0, 0, 0, 0.35);
+  --shadow-dark-card-hover: 0 20px 48px -10px rgba(0, 0, 0, 0.55);
+  --shadow-dropdown: 0 16px 40px rgba(5, 22, 13, 0.16);
+  --shadow-modal: 0 25px 70px rgba(4, 18, 10, 0.45);
+
+  /* Easing & Timing */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: 160ms var(--ease-out-expo);
+  --transition-normal: 280ms var(--ease-out-expo);
+  --transition-slow: 480ms var(--ease-out-expo);
 
   /* Radii */
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 26px;
+  --radius-pill: 9999px;
   --radius-full: 9999px;
 
-  /* Layout */
-  --max-width: 1240px;
-  --header-height: 82px;
+  /* Layout Standards */
+  --max-width: 1280px;
+  --header-height: 80px;
+  --header-height-mobile: 64px;
 }

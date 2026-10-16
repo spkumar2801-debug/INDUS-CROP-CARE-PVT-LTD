@@ -11,7 +11,7 @@ interface ProductCardProps {
 export const ProductCard: React.FC<ProductCardProps> = ({ product, onOpenQuote, onOpenDetails }) => {
   return (
     <article className="product-card" id={`product-${product.code.toLowerCase().replace(/\s+/g, '-')}`}>
-      {/* Premium Crop Photography & Badges */}
+      {/* Studio Crop Photography & Badges */}
       <div 
         className="product-card-img-wrap"
         onClick={() => onOpenDetails(product)}
@@ -23,7 +23,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onOpenQuote, 
             onOpenDetails(product);
           }
         }}
-        aria-label={`View technical specifications for ${product.name} ${product.code}`}
+        aria-label={`View specifications for ${product.name} ${product.code}`}
       >
         <img 
           src={product.imageUrl} 
@@ -47,8 +47,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onOpenQuote, 
 
         {/* Hover Quick Action */}
         <div className="product-card-hover-action">
-          <Eye size={14} />
-          <span>View Details & Specs</span>
+          <Eye size={13} />
+          <span>Specs & Details</span>
         </div>
       </div>
 
@@ -58,16 +58,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onOpenQuote, 
 
         {/* Formulation / Technical Composition Highlight */}
         {product.formulation && (
-          <div style={{ margin: '6px 0 10px 0' }}>
+          <div style={{ margin: '4px 0 8px 0' }}>
             <span style={{ 
               display: 'inline-block', 
-              fontSize: '0.8rem', 
-              fontWeight: 600, 
-              color: '#25D366', 
-              background: 'rgba(37, 211, 102, 0.12)', 
-              border: '1px solid rgba(37, 211, 102, 0.3)', 
+              fontSize: '0.78rem', 
+              fontWeight: 700, 
+              color: 'var(--color-primary-green-dark)', 
+              background: 'var(--color-primary-green-surface)', 
+              border: '1px solid rgba(14, 107, 56, 0.22)', 
               padding: '3px 8px', 
-              borderRadius: '4px',
+              borderRadius: 'var(--radius-xs)',
               lineHeight: '1.3'
             }}>
               {product.formulation}
@@ -117,7 +117,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onOpenQuote, 
             onClick={() => onOpenQuote(product)}
             title={`Direct WhatsApp enquiry for ${product.name} ${product.code}`}
           >
-            <MessageSquareShare size={16} />
+            <MessageSquareShare size={15} />
             <span>WhatsApp Enquiry</span>
           </button>
 
@@ -125,10 +125,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onOpenQuote, 
             type="button" 
             className="btn-card-details"
             onClick={() => onOpenDetails(product)}
-            title={`View technical specifications for ${product.name} ${product.code}`}
+            title={`View specifications for ${product.name} ${product.code}`}
           >
-            <FileText size={15} />
-            <span>Technical Specifications</span>
+            <FileText size={14} />
+            <span>Specifications</span>
           </button>
         </div>
       </div>

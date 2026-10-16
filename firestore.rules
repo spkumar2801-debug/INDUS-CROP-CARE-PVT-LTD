@@ -2,85 +2,47 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper functions for secure role-based access
+    // Helper functions
     function isAuthenticated() {
       return request.auth != null;
     }
-
-    // Checks whether the authenticated user has an active admin profile
+    
     function isAdmin() {
       return isAuthenticated() && (
-        request.auth.token.admin == true ||
-        (request.auth.token.email_verified == true && 
-         request.auth.token.email in ['info@induscropcare.com', 'admin@induscropcare.com', 'info@indasagriseeds.com']) ||
-        exists(/databases/$(database)/documents/adminUsers/$(request.auth.uid))
+        exists(/databases/$(database)/documents/adminUsers/$(request.auth.uid)) ||
+        request.auth.token.admin == true
       );
     }
 
-    // Default deny rule for any unrecognized collections
-    match /{document=**} {
-      allow read, write: if false;
-    }
-
-    // 1. Products collection
-    // Public visitors can ONLY read products where isPublished is explicitly true
-    // Only authenticated administrators can create, update, or delete products
-    match /products/{productId} {
-      allow read: if resource.data.isPublished == true || isAdmin();
-      allow create, update: if isAdmin() &&
-                            request.resource.data.name is string &&
-                            request.resource.data.name.size() >= 2 &&
-                            request.resource.data.name.size() <= 200;
-      allow delete: if isAdmin();
-    }
-
-    // 2. Gallery collection
-    // Public visitors can ONLY read items where isPublished is explicitly true
-    // Only authenticated administrators can manage gallery visuals
-    match /gallery/{itemId} {
-      allow read: if resource.data.isPublished == true || isAdmin();
-      allow create, update: if isAdmin() &&
-                            request.resource.data.title is string &&
-                            request.resource.data.title.size() >= 2 &&
-                            request.resource.data.title.size() <= 200;
-      allow delete: if isAdmin();
-    }
-
-    // 3. Site Settings collection
-    // Public can read general site settings (contact info, verified WhatsApp number)
-    // Only administrators can edit settings
-    match /siteSettings/{settingDoc} {
+    // Site Settings: Public read, Admin write
+    match /siteSettings/{docId} {
       allow read: if true;
       allow write: if isAdmin();
     }
 
-    // 4. Admin Users collection
-    // Self-escalation strictly forbidden: normal users cannot read or create admin roles
-    // An admin can read their own profile; superadmins can manage profiles
-    match /adminUsers/{userId} {
-      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
-      allow write: if isAdmin() && request.auth.uid != userId; // Prevent privilege self-escalation
+    // Products: Public read for published products, Admin write
+    match /products/{productId} {
+      allow read: if resource.data.isPublished == true || isAdmin();
+      allow write: if isAdmin();
     }
 
-    // 5. Customer Enquiries collection
-    // Public visitors can submit an enquiry with validated required fields and size constraints to prevent DoS
-    // Customer information is strictly private; only authenticated admins can read, update, or delete
+    // Gallery: Public read, Admin write
+    match /gallery/{imageId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Customer Enquiries: Public can create an enquiry; only Admins can read or manage
     match /enquiries/{enquiryId} {
-      allow create: if ((request.resource.data.fullName is string && 
-                         request.resource.data.fullName.size() >= 2 && 
-                         request.resource.data.fullName.size() <= 100) ||
-                        (request.resource.data.customerName is string && 
-                         request.resource.data.customerName.size() >= 2 && 
-                         request.resource.data.customerName.size() <= 100)) &&
-                       request.resource.data.phone is string &&
-                       request.resource.data.phone.size() >= 10 &&
-                       request.resource.data.phone.size() <= 20 &&
-                       (!('message' in request.resource.data) || (request.resource.data.message is string && request.resource.data.message.size() <= 3000)) &&
-                       (!('state' in request.resource.data) || (request.resource.data.state is string && request.resource.data.state.size() <= 100)) &&
-                       (!('district' in request.resource.data) || (request.resource.data.district is string && request.resource.data.district.size() <= 100)) &&
-                       (!('interestedProduct' in request.resource.data) || (request.resource.data.interestedProduct is string && request.resource.data.interestedProduct.size() <= 200)) &&
-                       (!('quantity' in request.resource.data) || (request.resource.data.quantity is string && request.resource.data.quantity.size() <= 100));
+      allow create: if request.resource.data.name is string 
+                    && request.resource.data.phone is string;
       allow read, update, delete: if isAdmin();
+    }
+
+    // Admin Profiles: Only authenticated users can access their own record
+    match /adminUsers/{userId} {
+      allow read: if isAuthenticated() && request.auth.uid == userId;
+      allow write: if isAdmin();
     }
   }
 }

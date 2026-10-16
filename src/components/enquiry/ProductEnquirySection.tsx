@@ -52,7 +52,7 @@ export const ProductEnquirySection: React.FC<ProductEnquirySectionProps> = ({
     try {
       // Find selected product name
       const prod = products.find(p => p.id === interestedProduct || p.code === interestedProduct);
-      const productLabel = prod ? `${prod.name} — ${prod.code}` : (interestedProduct || 'General Hybrid Seeds');
+      const productLabel = prod ? `${prod.name} — ${prod.code}` : (interestedProduct || 'General Crop Care Portfolio');
 
       const res = await submitCustomerEnquiry({
         fullName,
@@ -89,11 +89,11 @@ export const ProductEnquirySection: React.FC<ProductEnquirySectionProps> = ({
       aria-labelledby="enquiry-heading"
     >
       <div className="container">
-        <div className="enquiry-card-wrapper">
+        <div className="enquiry-card-wrapper reveal-on-scroll">
           
           {/* Header Banner */}
           <div className="enquiry-header">
-            <span className="section-tag" style={{ background: 'rgba(255,255,255,0.15)', color: '#FFFFFF', marginBottom: '12px' }}>
+            <span className="section-tag" style={{ background: 'rgba(37, 211, 102, 0.14)', color: 'var(--color-action-green)', border: '1px solid rgba(37, 211, 102, 0.3)', marginBottom: '14px' }}>
               <Sprout size={14} />
               <span>Official Product Enquiry Desk</span>
             </span>
@@ -121,13 +121,13 @@ export const ProductEnquirySection: React.FC<ProductEnquirySectionProps> = ({
                 type="button" 
                 className="btn btn-primary"
                 onClick={() => setSubmittedId(null)}
-                style={{ marginTop: '20px' }}
+                style={{ marginTop: '22px' }}
               >
                 Submit Another Enquiry
               </button>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="enquiry-form" noValidate>
+            <form onSubmit={handleSubmit} className="enquiry-form dark-form" noValidate>
               
               {error && (
                 <div className="enquiry-error-alert" role="alert">
@@ -190,7 +190,7 @@ export const ProductEnquirySection: React.FC<ProductEnquirySectionProps> = ({
                     onChange={e => setInterestedProduct(e.target.value)}
                     disabled={loading}
                   >
-                    <option value="">General Hybrid Seeds Portfolio</option>
+                    <option value="">General Crop Care & Formulation Portfolio</option>
                     {products.map(p => (
                       <option key={p.id} value={p.id}>
                         {p.name} — {p.code} ({p.category})
@@ -208,7 +208,7 @@ export const ProductEnquirySection: React.FC<ProductEnquirySectionProps> = ({
                     id="enq-quantity"
                     type="text" 
                     className="form-control"
-                    placeholder="e.g. 500 grams, 5 kg, 20 packets"
+                    placeholder="e.g. 50 Litres, 100 kg, 20 packets"
                     value={quantity}
                     onChange={e => setQuantity(e.target.value)}
                     disabled={loading}
@@ -224,7 +224,7 @@ export const ProductEnquirySection: React.FC<ProductEnquirySectionProps> = ({
                     id="enq-state"
                     type="text" 
                     className="form-control"
-                    placeholder="e.g. Andhra Pradesh, Telangana"
+                    placeholder="e.g. Telangana, Andhra Pradesh, Karnataka"
                     value={state}
                     onChange={e => setState(e.target.value)}
                     disabled={loading}
@@ -240,7 +240,7 @@ export const ProductEnquirySection: React.FC<ProductEnquirySectionProps> = ({
                     id="enq-district"
                     type="text" 
                     className="form-control"
-                    placeholder="e.g. Guntur, Kurnool, Warangal"
+                    placeholder="e.g. Warangal, Guntur, Khammam"
                     value={district}
                     onChange={e => setDistrict(e.target.value)}
                     disabled={loading}
@@ -258,7 +258,7 @@ export const ProductEnquirySection: React.FC<ProductEnquirySectionProps> = ({
                   id="enq-message"
                   className="form-control"
                   rows={3}
-                  placeholder="Share any special nursery specifications, expected sowing season, or dealer inquiries..."
+                  placeholder="Share any special crop symptoms, expected sowing season, or dealer inquiries..."
                   value={message}
                   onChange={e => setMessage(e.target.value)}
                   disabled={loading}
@@ -285,7 +285,7 @@ export const ProductEnquirySection: React.FC<ProductEnquirySectionProps> = ({
                   )}
                 </button>
                 <span className="enquiry-privacy-note">
-                  Your contact details are strictly kept private and processed only by authorized INDAS staff.
+                  Your contact details are strictly kept private and processed only by authorized Indus Crop Care staff.
                 </span>
               </div>
 

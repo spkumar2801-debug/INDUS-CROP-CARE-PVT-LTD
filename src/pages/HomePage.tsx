@@ -5,21 +5,23 @@ import {
   ShieldCheck, 
   Microscope, 
   Award, 
-  TrendingUp, 
   MessageSquareShare, 
   ArrowRight,
   Sparkles,
   PhoneCall,
   Leaf,
-  CheckCircle2,
   Layers,
   FlaskConical,
-  HeartHandshake
+  HeartHandshake,
+  Building2,
+  Check,
+  TrendingUp
 } from 'lucide-react';
 import { Product } from '../types/product';
 import { getPublishedProducts } from '../services/productService';
 import { ProductCard } from '../components/products/ProductCard';
 import { CountUpNumber } from '../components/common/CountUpNumber';
+import { useSiteSettings } from '../context/SettingsContext';
 
 interface HomePageProps {
   onOpenQuote: (product?: Product) => void;
@@ -29,183 +31,274 @@ interface HomePageProps {
 export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const { settings } = useSiteSettings();
 
   useEffect(() => {
+    document.documentElement.classList.add('page-home');
     getPublishedProducts()
       .then(data => setProducts(data))
       .finally(() => setLoading(false));
+
+    return () => {
+      document.documentElement.classList.remove('page-home');
+    };
   }, []);
 
-  // Display only the premier first four featured formulations on homepage
+  const hero = settings?.hero;
+
+  const heroMediaType = hero?.mediaType || 'image';
+  const heroImageUrl = hero?.imageUrl || '/assets/indus-crop-hero.webp';
+  const heroImageMobileUrl = hero?.imageMobileUrl || '/assets/indus-crop-hero-mobile.webp';
+  const heroPositionDesktop = hero?.imagePositionDesktop || 'center 36%';
+  const heroPositionMobile = hero?.imagePositionMobile || 'center center';
+  const heroFit = hero?.imageFit || 'cover';
+  
+  const heroVideoUrl = hero?.videoUrl || '/videos/hero-cinematic.mp4';
+  const heroVideoPoster = hero?.videoPosterUrl || heroImageUrl;
+  const heroVideoLoop = hero?.videoLoop !== false;
+  const heroVideoMuted = hero?.videoMuted !== false;
+
+  const overlayDarkness = typeof hero?.overlayDarkness === 'number' ? hero.overlayDarkness : 0.65;
+  const gradientStrength = typeof hero?.gradientStrength === 'number' ? hero.gradientStrength : 0.8;
+  const heightPreset = hero?.heroHeightPreset || 'standard';
+
+  const badgeText = hero?.badgeText || 'Over 15 Years of Agri-Input Leadership & Innovation';
+  const titleLine1 = hero?.titleLine1 || 'Advancing Crop Health.';
+  const titleLine2 = hero?.titleLine2 || 'Growing Tomorrow.';
+  const teluguMotto = hero?.teluguMotto || 'రైతన్నకు భరోసా.. ఇండస్ ఉత్పాదనలు';
+  const description = hero?.description || 'Indus Crop Care Pvt. Ltd. is a renowned agri-input enterprise with an established track record across Organic & Water-Soluble Fertilizers, Plant Micronutrients, Biofertilizers, Crop Protection Chemicals, Biopesticides, and Biostimulants — empowering farmers to maximize yields and enhance sustainability.';
+  const primaryCtaText = hero?.primaryCtaText || 'Explore Products';
+  const primaryCtaLink = hero?.primaryCtaLink || '/products';
+  const secondaryCtaText = hero?.secondaryCtaText || 'Contact Us';
+  const secondaryCtaLink = hero?.secondaryCtaLink || '/contact';
+
+  // Display premier first 4 featured formulations on homepage
   const displayedProducts = useMemo(() => {
     const featured = products.filter(p => p.isFeatured || p.isPublished);
     return featured.slice(0, 4);
   }, [products]);
 
-  // Spotlight product (e.g. INTRON or ABOLA)
-  const spotlightProduct = useMemo(() => {
-    return products.find(p => p.slug === 'indus-intron') || 
-           products.find(p => p.slug === 'indus-abola') || 
-           products[0] || null;
-  }, [products]);
-
   return (
     <div>
-      {/* 1. Hero Section */}
-      <section className="hero-section" style={{ position: 'relative', overflow: 'hidden' }}>
-        <div className="hero-overlay" />
+      {/* 1. Cinematic Hero Section */}
+      <section 
+        className={`hero-section hero-height-${heightPreset}`} 
+        aria-label="Indus Crop Care Hero"
+      >
+        <div 
+          className="hero-cinematic-bg" 
+          aria-hidden="true"
+          style={{
+            backgroundImage: heroMediaType === 'image' ? `url('${heroImageUrl}')` : undefined,
+            backgroundPosition: heroPositionDesktop,
+            ['--hero-pos-desktop' as string]: heroPositionDesktop,
+            ['--hero-pos-mobile' as string]: heroPositionMobile,
+            ['--hero-fit' as string]: heroFit
+          } as React.CSSProperties}
+        >
+          {heroMediaType === 'video' ? (
+            <video
+              className="hero-video-element"
+              autoPlay
+              muted={heroVideoMuted}
+              loop={heroVideoLoop}
+              playsInline
+              poster={heroVideoPoster}
+              aria-hidden="true"
+              onError={(e) => {
+                // Seamlessly fallback to high-resolution photorealistic poster
+                (e.target as HTMLVideoElement).style.display = 'none';
+              }}
+            >
+              <source src={heroVideoUrl} type="video/mp4" />
+              {hero?.videoMobileUrl && <source src={hero.videoMobileUrl} type="video/mp4" />}
+            </video>
+          ) : (
+            <picture>
+              {heroImageMobileUrl && (
+                <source media="(max-width: 640px)" srcSet={heroImageMobileUrl} />
+              )}
+              <img 
+                src={heroImageUrl} 
+                alt="Indus Crop Care Agricultural Landscape" 
+                className="hero-image-element"
+                loading="eager"
+                decoding="async"
+              />
+            </picture>
+          )}
+        </div>
+
+        {/* Dynamic Multi-stop Editorial Gradient Overlays */}
+        <div 
+          className="hero-overlay" 
+          aria-hidden="true" 
+          style={{
+            background: `linear-gradient(90deg, 
+              rgba(3, 14, 7, ${Math.min(0.96, overlayDarkness + 0.25)}) 0%, 
+              rgba(3, 14, 7, ${overlayDarkness}) 45%, 
+              rgba(3, 14, 7, ${overlayDarkness * 0.55}) 78%, 
+              rgba(3, 14, 7, ${overlayDarkness * 0.35}) 100%),
+              linear-gradient(180deg, 
+              rgba(3, 14, 7, ${gradientStrength * 0.65}) 0%, 
+              transparent 35%, 
+              rgba(3, 14, 7, ${gradientStrength}) 100%)`
+          }}
+        />
+
         <div className="container">
-          <div className="hero-grid" style={{ alignItems: 'center' }}>
+          <div className="hero-content-wrap">
             
-            {/* Left Column: Headline & Value Proposition */}
-            <div>
-              <div className="hero-badge">
-                <span className="dot" />
-                <span>Over 15 Years of Agri-Input Leadership & Innovation</span>
-              </div>
-
-              <h1 className="hero-title">
-                Science For<br />
-                <span className="highlight-gold" style={{ color: '#25D366' }}>Sustainability.</span>
-              </h1>
-
-              <div className="hero-telugu-banner">
-                <span>రైతన్నకు భరోసా.. ఇండస్ ఉత్పాదనలు</span>
-              </div>
-
-              <p className="hero-desc">
-                Indus Crop Care Pvt. Ltd. is a renowned agri-input enterprise with an established track record across Organic & Water-Soluble Fertilizers, Plant Micronutrients, Biofertilizers, Crop Protection Chemicals, Biopesticides, and Biostimulants — empowering farmers to maximize yields and enhance sustainability.
-              </p>
-
-              <div className="hero-actions">
-                <Link to="/products" className="btn btn-accent">
-                  <FlaskConical size={19} />
-                  <span>Explore 105+ Formulations</span>
-                </Link>
-
-                <button 
-                  type="button" 
-                  className="btn btn-whatsapp"
-                  onClick={() => onOpenQuote()}
-                >
-                  <MessageSquareShare size={19} />
-                  <span>WhatsApp Advisory</span>
-                </button>
-              </div>
-
-              {/* Four Verified Trust Pillars */}
-              <div className="hero-metrics">
-                <div className="hero-metric-item">
-                  <h4 style={{ color: '#FFE082' }}>
-                    <CountUpNumber end={15} suffix="+ Years" />
-                  </h4>
-                  <p>Agricultural Trust & R&D Excellence</p>
-                </div>
-                <div className="hero-metric-item">
-                  <h4 style={{ color: '#25D366' }}>
-                    <CountUpNumber end={105} suffix="+" />
-                  </h4>
-                  <p>Standardized Products & Formulations</p>
-                </div>
-                <div className="hero-metric-item">
-                  <h4 style={{ color: '#FFFFFF' }}>ISO Certified</h4>
-                  <p>ISO 9001:2015 Quality Manufacturing</p>
-                </div>
-                <div className="hero-metric-item">
-                  <h4 style={{ color: '#FFE082' }}>Pan-India</h4>
-                  <p>Distributor & Farmer Partnership</p>
-                </div>
-              </div>
+            {/* Introductory Eyebrow Badge */}
+            <div className="hero-badge">
+              <span className="dot" aria-hidden="true" />
+              <span>{badgeText}</span>
+              <span className="hero-badge-rule" aria-hidden="true" />
             </div>
 
-            {/* Right Column: Hero Graphic Showcase with Circular Art and Real Packaging */}
-            <div>
-              <div className="hero-card-showcase" style={{ background: 'linear-gradient(145deg, #0C2818 0%, #061A0F 100%)', borderRadius: '18px', border: '1px solid rgba(255, 255, 255, 0.12)', padding: '24px', boxShadow: '0 20px 50px rgba(0,0,0,0.45)' }}>
-                
-                {/* Official Circular Artwork Badge */}
-                <div style={{ textAlign: 'center', marginBottom: '16px' }}>
-                  <img 
-                    src="/images/branding/indus/indus-hero-circle.png" 
-                    alt="Indus Crop Care - Sustainable Agriculture Cycle" 
-                    style={{ maxWidth: '280px', width: '100%', borderRadius: '50%', border: '4px solid rgba(37, 211, 102, 0.3)', boxShadow: '0 8px 30px rgba(0,0,0,0.3)', margin: '0 auto', display: 'block' }}
-                  />
-                </div>
+            {/* Editorial Hero Headline */}
+            <h1 className="hero-title">
+              {titleLine1}<br />
+              <span className="hero-gradient-text">{titleLine2}</span>
+            </h1>
 
-                {spotlightProduct && (
-                  <div style={{ background: 'rgba(255, 255, 255, 0.05)', borderRadius: '12px', padding: '16px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                      <span className="badge badge-green" style={{ fontSize: '0.75rem' }}>{spotlightProduct.category}</span>
-                      <span style={{ fontSize: '0.78rem', color: '#FFE082', fontWeight: 600 }}>Catalogue Page {spotlightProduct.sourcePage || 7}</span>
-                    </div>
-
-                    <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                      <div style={{ width: '80px', height: '90px', background: '#FFFFFF', borderRadius: '8px', padding: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                        <img 
-                          src={spotlightProduct.imageUrl} 
-                          alt={spotlightProduct.name} 
-                          style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' }}
-                        />
-                      </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <h4 style={{ color: '#FFFFFF', fontSize: '1.1rem', margin: '0 0 4px 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {spotlightProduct.name}
-                        </h4>
-                        <div style={{ fontSize: '0.8rem', color: '#CBDACD', lineHeight: '1.3', marginBottom: '10px' }}>
-                          {spotlightProduct.formulation}
-                        </div>
-                        <div style={{ display: 'flex', gap: '8px' }}>
-                          <button 
-                            type="button" 
-                            className="btn btn-whatsapp btn-sm"
-                            style={{ height: '34px', fontSize: '0.82rem', padding: '0 12px' }}
-                            onClick={() => onOpenQuote(spotlightProduct)}
-                          >
-                            <MessageSquareShare size={14} />
-                            <span>Enquire</span>
-                          </button>
-                          <button 
-                            type="button" 
-                            className="btn btn-outline-white btn-sm"
-                            style={{ height: '34px', fontSize: '0.82rem', padding: '0 12px' }}
-                            onClick={() => onOpenDetails(spotlightProduct)}
-                          >
-                            <span>Specs</span>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
+            {/* Telugu Brand Motto Banner */}
+            {teluguMotto && (
+              <div className="hero-telugu-banner">
+                <span>{teluguMotto}</span>
               </div>
+            )}
+
+            {/* Hero Supporting Narrative */}
+            <p className="hero-desc">
+              {description}
+            </p>
+
+            {/* Hero Action CTAs */}
+            <div className="hero-actions">
+              <Link 
+                to={primaryCtaLink} 
+                className="hero-btn-primary" 
+                aria-label={primaryCtaText}
+              >
+                <span>{primaryCtaText}</span>
+                <ArrowRight size={17} className="hero-btn-arrow" />
+              </Link>
+
+              <Link 
+                to={secondaryCtaLink} 
+                className="hero-btn-secondary"
+                aria-label={secondaryCtaText}
+              >
+                <PhoneCall size={16} className="hero-btn-icon" />
+                <span>{secondaryCtaText}</span>
+              </Link>
             </div>
 
           </div>
         </div>
       </section>
 
-      {/* 2. Official Certifications & Accreditations Banner */}
-      <section style={{ backgroundColor: '#092113', padding: '24px 0', borderTop: '1px solid rgba(255, 255, 255, 0.08)', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
+      {/* 2. Reference-Inspired Credentials Section: "Our Legacy of Agronomic Precision" */}
+      <section className="credentials-section" aria-label="Indus Agricultural Credentials">
+        <div className="credentials-ambient" />
+        <div className="container">
+          
+          <div className="section-title-wrap reveal-on-scroll" style={{ marginBottom: '40px' }}>
+            <span className="section-tag">
+              <ShieldCheck size={14} />
+              <span>Standard of Excellence</span>
+            </span>
+            <h2 className="section-title" style={{ color: '#FFFFFF' }}>
+              OUR LEGACY OF AGRONOMIC PRECISION
+            </h2>
+            <p className="section-subtitle" style={{ color: 'var(--color-sage-200)' }}>
+              15+ Years of Dedicated Field Trials, Scientific Formulation & Farmer Trust
+            </p>
+          </div>
+
+          <div className="credentials-grid">
+            
+            {/* Metric 1: 15+ Years */}
+            <div className="credential-item reveal-on-scroll stagger-1">
+              <div className="credential-icon-orb">
+                <Building2 size={24} style={{ color: 'var(--color-action-green)' }} />
+              </div>
+              <div className="credential-number" style={{ color: '#FFE082' }}>
+                <CountUpNumber end={15} suffix="+" />
+              </div>
+              <div className="credential-label-top">ESTABLISHED</div>
+              <div className="credential-label-bottom">IN TELANGANA</div>
+              <p className="credential-desc">Over 15 Years of Continuous Agronomic Excellence</p>
+            </div>
+
+            {/* Metric 2: 105+ Formulations */}
+            <div className="credential-item reveal-on-scroll stagger-2">
+              <div className="credential-icon-orb">
+                <FlaskConical size={24} style={{ color: 'var(--color-action-green)' }} />
+              </div>
+              <div className="credential-number" style={{ color: 'var(--color-action-green)' }}>
+                <CountUpNumber end={105} suffix="+" />
+              </div>
+              <div className="credential-label-top">REGISTERED</div>
+              <div className="credential-label-bottom">FORMULATIONS</div>
+              <p className="credential-desc">Standardized Crop Care & Nutrition Solutions</p>
+            </div>
+
+            {/* Metric 3: ISO 9001:2015 */}
+            <div className="credential-item reveal-on-scroll stagger-3">
+              <div className="credential-icon-orb">
+                <Award size={24} style={{ color: 'var(--color-action-green)' }} />
+              </div>
+              <div className="credential-number" style={{ color: '#FFFFFF' }}>
+                ISO 9001
+              </div>
+              <div className="credential-label-top">QUALITY CERTIFIED</div>
+              <div className="credential-label-bottom">MANUFACTURING</div>
+              <p className="credential-desc">FCO & Central CIB Registered Standards</p>
+            </div>
+
+            {/* Metric 4: Pan-India Network */}
+            <div className="credential-item reveal-on-scroll stagger-4">
+              <div className="credential-icon-orb">
+                <HeartHandshake size={24} style={{ color: 'var(--color-action-green)' }} />
+              </div>
+              <div className="credential-number" style={{ color: '#FFE082' }}>
+                Pan-India
+              </div>
+              <div className="credential-label-top">DISTRIBUTOR</div>
+              <div className="credential-label-bottom">& FARMER NETWORK</div>
+              <p className="credential-desc">Trusted Across Telangana, AP & Leading States</p>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      {/* 3. Official Certifications & Accreditations Ribbon */}
+      <section style={{ backgroundColor: 'var(--color-sage-100)', padding: '22px 0', borderBottom: '1px solid var(--color-sage-200)' }}>
         <div className="container" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '20px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#D4E5D7' }}>
-            <ShieldCheck size={22} style={{ color: '#25D366' }} />
-            <span style={{ fontSize: '0.92rem', fontWeight: 600 }}>
-              Official Accreditations & Quality Standards
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--color-charcoal-800)' }}>
+            <ShieldCheck size={22} style={{ color: 'var(--color-primary-green)' }} />
+            <span style={{ fontSize: '0.94rem', fontWeight: 700 }}>
+              Official Accreditations & Statutory Compliance
             </span>
           </div>
 
-          <div style={{ background: '#FFFFFF', borderRadius: '10px', padding: '10px 18px', display: 'flex', alignItems: 'center', overflowX: 'auto', maxWidth: '100%' }}>
+          <div style={{ background: '#FFFFFF', borderRadius: '10px', padding: '10px 20px', display: 'flex', alignItems: 'center', overflowX: 'auto', maxWidth: '100%', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
             <img 
               src="/images/branding/indus/certifications-bar.png" 
-              alt="FCO, Central CIB Registered, Certified ISO 9001:2015, PMMA, BIPA" 
-              style={{ maxHeight: '38px', width: 'auto', objectFit: 'contain' }}
+              alt="FCO Registered, Central CIB Registered, Certified ISO 9001:2015, PMMA, BIPA" 
+              style={{ maxHeight: '36px', width: 'auto', objectFit: 'contain' }}
+              loading="lazy"
             />
           </div>
         </div>
       </section>
 
-      {/* 3. Broad Product Groups Spectrum */}
-      <section className="section" style={{ backgroundColor: '#06180D' }}>
+      {/* 4. Broad Product Spectrum — Clean Warm Ivory Editorial Section */}
+      <section className="section section-editorial-light" aria-label="Formulations Portfolio">
         <div className="container">
           <div className="section-title-wrap reveal-on-scroll">
             <span className="section-tag">
@@ -220,54 +313,45 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 250px), 1fr))', gap: '20px' }}>
+          <div className="homepage-formulations-grid">
             {[
-              { title: 'Insecticides', count: '31 Formulations', desc: 'Advanced organophosphates, phenylpyrazoles, and diamides for pest control.', icon: <ShieldCheck size={24} style={{ color: '#25D366' }} />, page: 'Pages 7-9' },
-              { title: 'Herbicides', count: '17 Formulations', desc: 'Selective pre- and post-emergent weed control for cotton, paddy, and maize.', icon: <Sprout size={24} style={{ color: '#FFE082' }} />, page: 'Pages 10-11' },
-              { title: 'Fungicides', count: '14 Formulations', desc: 'Systemic and contact triazoles & strobilurins against blight and blast.', icon: <Microscope size={24} style={{ color: '#25D366' }} />, page: 'Pages 12-13' },
-              { title: 'Plant Growth Regulator', count: 'Gibberellic Acid', desc: 'High-purity PGR solutions to stimulate cell division and fruit elongation.', icon: <TrendingUp size={24} style={{ color: '#FFE082' }} />, page: 'Page 13' },
-              { title: 'Organic Fertilizers', count: '5 Formulations', desc: 'Organic DAP (PROM), Neem-rich cakes, City Compost, and organic potash.', icon: <Leaf size={24} style={{ color: '#25D366' }} />, page: 'Page 14' },
-              { title: 'Micro Nutrients', count: '14 Formulations', desc: 'Chelated zinc, magnesium sulphate, boron 20%, and multi-micronutrient combos.', icon: <FlaskConical size={24} style={{ color: '#FFE082' }} />, page: 'Page 15' },
-              { title: 'Water Soluble Fertilizers', count: '6 Formulations', desc: 'Pure 100% water-soluble NPK grades: 19:19:19, 13:00:45, 00:52:34, and 12:61:0.', icon: <Layers size={24} style={{ color: '#25D366' }} />, page: 'Page 16' },
-              { title: 'Bio Fertilizers', count: '8 Formulations', desc: 'Mycorrhiza (VAM), PSB, KMB, ZnSB, and NPK consortium consortia.', icon: <Award size={24} style={{ color: '#FFE082' }} />, page: 'Page 17' },
-              { title: 'Bio Stimulants', count: '6 Formulations', desc: 'Yield boosters, 99% soluble humic acid, soil neutralizers, and miticides.', icon: <HeartHandshake size={24} style={{ color: '#25D366' }} />, page: 'Page 18' },
-              { title: 'Antibiotic Products', count: '2 Formulations', desc: 'Organic bactericides and natural antibiotics for viral and bacterial blights.', icon: <ShieldCheck size={24} style={{ color: '#FFE082' }} />, page: 'Page 19' },
-            ].slice(0, 4).map((group, idx) => (
+              { title: 'Insecticides', count: '31 Formulations', desc: 'Advanced organophosphates, phenylpyrazoles, and diamides for targeted pest control.', icon: <ShieldCheck size={24} style={{ color: 'var(--color-primary-green)' }} />, page: 'Pages 7-9' },
+              { title: 'Herbicides', count: '18 Formulations', desc: 'Selective pre- and post-emergent weed control for cotton, paddy, and maize.', icon: <Sprout size={24} style={{ color: 'var(--color-harvest-gold)' }} />, page: 'Pages 10-11' },
+              { title: 'Fungicides', count: '14 Formulations', desc: 'Systemic and contact triazoles & strobilurins against blight and blast.', icon: <Microscope size={24} style={{ color: 'var(--color-primary-green)' }} />, page: 'Pages 12-13' },
+              { title: 'Water-Soluble Fertilizers', count: '6 Formulations', desc: 'Pure 100% water-soluble NPK grades: 19:19:19, 13:00:45, 00:52:34, 12:61:0, 00:00:50, and Calcium Nitrate.', icon: <Layers size={24} style={{ color: 'var(--color-primary-green)' }} />, page: 'Page 16' },
+            ].map((group, idx) => (
               <div 
                 key={idx}
-                className="card reveal-on-scroll"
+                className={`card card-light reveal-on-scroll stagger-${idx + 1}`}
                 style={{ 
-                  padding: '24px', 
-                  backgroundColor: '#0E291A', 
-                  border: '1px solid rgba(255, 255, 255, 0.08)',
-                  borderTop: '3px solid #25D366',
+                  padding: '26px', 
                   display: 'flex',
                   flexDirection: 'column',
-                  transition: 'transform 0.2s ease, border-color 0.2s ease'
+                  borderTop: '3px solid var(--color-primary-green)'
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-                  <div style={{ width: '44px', height: '44px', borderRadius: '10px', background: 'rgba(255, 255, 255, 0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                  <div style={{ width: '46px', height: '46px', borderRadius: '12px', background: 'var(--color-sage-100)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     {group.icon}
                   </div>
-                  <span style={{ fontSize: '0.75rem', color: '#FFE082', background: 'rgba(255, 224, 130, 0.1)', padding: '2px 8px', borderRadius: '4px', fontWeight: 600 }}>
+                  <span style={{ fontSize: '0.74rem', color: 'var(--color-charcoal-700)', background: 'var(--color-sage-100)', padding: '3px 9px', borderRadius: '4px', fontWeight: 700 }}>
                     {group.page}
                   </span>
                 </div>
-                <h3 style={{ fontSize: '1.15rem', color: '#F4F8F3', marginBottom: '4px' }}>
+                <h3 style={{ fontSize: '1.2rem', color: 'var(--color-charcoal-950)', marginBottom: '4px' }}>
                   {group.title}
                 </h3>
-                <div style={{ fontSize: '0.85rem', color: '#25D366', fontWeight: 600, marginBottom: '8px' }}>
+                <div style={{ fontSize: '0.86rem', color: 'var(--color-primary-green)', fontWeight: 700, marginBottom: '10px' }}>
                   {group.count}
                 </div>
-                <p style={{ fontSize: '0.85rem', color: '#9EB5A3', lineHeight: '1.5', flex: 1, margin: '0 0 16px 0' }}>
+                <p style={{ fontSize: '0.88rem', color: 'var(--color-charcoal-600)', lineHeight: '1.55', flex: 1, margin: '0 0 18px 0' }}>
                   {group.desc}
                 </p>
                 <Link 
                   to={`/products?category=${encodeURIComponent(group.title)}`} 
-                  style={{ color: '#CBDACD', fontSize: '0.85rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                  style={{ color: 'var(--color-primary-green-dark)', fontSize: '0.88rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                 >
-                  <span>View Products</span>
+                  <span>View Formulations</span>
                   <ArrowRight size={14} />
                 </Link>
               </div>
@@ -275,34 +359,22 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
           </div>
 
           {/* Premium "View All Formulations" CTA */}
-          <div style={{ textAlign: 'center', marginTop: '36px' }}>
+          <div style={{ textAlign: 'center', marginTop: '40px' }}>
             <Link 
               to="/products" 
-              className="btn btn-outline-white"
-              style={{ 
-                minHeight: '48px', 
-                padding: '12px 28px', 
-                display: 'inline-flex', 
-                alignItems: 'center', 
-                justifyContent: 'center',
-                gap: '10px',
-                border: '1.5px solid rgba(37, 211, 102, 0.6)',
-                color: '#25D366',
-                background: 'rgba(37, 211, 102, 0.06)',
-                fontWeight: 700,
-                fontSize: '0.96rem'
-              }}
+              className="btn btn-outline"
+              style={{ minHeight: '48px', padding: '12px 30px' }}
             >
               <Layers size={18} />
-              <span>View All Formulations & Categories</span>
+              <span>Explore All 11 Formulations & Categories</span>
               <ArrowRight size={16} />
             </Link>
           </div>
         </div>
       </section>
 
-      {/* 4. Filterable Featured Products Section */}
-      <section className="section" style={{ backgroundColor: '#092113', borderTop: '1px solid rgba(255, 255, 255, 0.06)' }}>
+      {/* 5. Featured Catalogue Products Section — Soft Sage Editorial Surface */}
+      <section className="section section-editorial-sage" aria-label="Featured Products">
         <div className="container">
           <div className="section-title-wrap reveal-on-scroll">
             <span className="section-tag">
@@ -318,27 +390,32 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
           </div>
 
           {loading ? (
-            <div style={{ textAlign: 'center', padding: '60px 20px', color: '#9EB5A3' }}>
+            <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--color-charcoal-600)' }}>
               Loading products...
             </div>
           ) : (
             <div className="products-grid">
-              {displayedProducts.map(product => (
-                <ProductCard 
-                  key={product.id}
-                  product={product}
-                  onOpenQuote={onOpenQuote}
-                  onOpenDetails={onOpenDetails}
-                />
+              {displayedProducts.map((product, idx) => (
+                <div 
+                  key={product.id} 
+                  className={`reveal-on-scroll stagger-${(idx % 4) + 1}`}
+                  style={{ display: 'flex', flexDirection: 'column' }}
+                >
+                  <ProductCard 
+                    product={product}
+                    onOpenQuote={onOpenQuote}
+                    onOpenDetails={onOpenDetails}
+                  />
+                </div>
               ))}
             </div>
           )}
 
-          <div style={{ textAlign: 'center', marginTop: '40px' }}>
+          <div style={{ textAlign: 'center', marginTop: '44px' }}>
             <Link 
               to="/products" 
               className="btn btn-primary"
-              style={{ minHeight: '48px', padding: '12px 28px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
+              style={{ minHeight: '50px', padding: '14px 32px' }}
             >
               <span>Explore Complete 105+ Formulations Catalogue</span>
               <ArrowRight size={18} />
@@ -347,13 +424,13 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
         </div>
       </section>
 
-      {/* 5. Crop Production System (Page 20 of PDF) */}
-      <section className="section" style={{ backgroundColor: '#06180D', borderTop: '1px solid rgba(255, 255, 255, 0.06)' }}>
+      {/* 6. Crop Production System (Page 20 of PDF) */}
+      <section className="section section-dark-botanical" aria-label="Crop Production System">
         <div className="container">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '40px', alignItems: 'center' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: '44px', alignItems: 'center' }}>
             
-            {/* Left: Diagram explanation */}
-            <div>
+            {/* Left Column: Integrated System Description */}
+            <div className="reveal-on-scroll">
               <span className="section-tag">
                 <Sparkles size={14} />
                 <span>Integrated Crop Production System</span>
@@ -361,21 +438,23 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
               <h2 className="section-title">
                 Best Partner for Quality Agri Inputs
               </h2>
-              <p style={{ fontSize: '1.05rem', lineHeight: '1.7', color: '#CBDACD', marginBottom: '24px' }}>
+              <p style={{ fontSize: '1.05rem', lineHeight: '1.7', color: 'var(--color-sage-200)', marginBottom: '26px' }}>
                 Indus Crop Care delivers a holistic Crop Production System connecting soil health, nutrient optimization, and targeted pest and disease management to ensure high yield, eco-friendly farming, and sustainable agricultural livelihoods.
               </p>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '28px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '32px' }}>
                 {[
                   { title: 'Nutrient Management', desc: 'Precision water-soluble NPK and organic fertilizers to fuel every growth phase.' },
                   { title: 'Soil Health Management', desc: 'Microbial bio-fertilizers, soil neutralizers, and mycorrhiza to restore soil fertility.' },
                   { title: 'Pest & Disease Management', desc: 'Advanced insecticides, herbicides, and systemic fungicides to protect crops from sowing to harvest.' },
                 ].map((item, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                    <CheckCircle2 size={20} style={{ color: '#25D366', flexShrink: 0, marginTop: '3px' }} />
+                    <div style={{ width: '22px', height: '22px', borderRadius: '50%', background: 'rgba(37, 211, 102, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px' }}>
+                      <Check size={14} style={{ color: 'var(--color-action-green)' }} />
+                    </div>
                     <div>
-                      <h4 style={{ color: '#F4F8F3', fontSize: '1rem', margin: '0 0 3px 0' }}>{item.title}</h4>
-                      <p style={{ color: '#9EB5A3', fontSize: '0.88rem', margin: 0 }}>{item.desc}</p>
+                      <h4 style={{ color: '#FFFFFF', fontSize: '1.02rem', margin: '0 0 3px 0' }}>{item.title}</h4>
+                      <p style={{ color: 'var(--color-sage-300)', fontSize: '0.88rem', margin: 0 }}>{item.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -387,31 +466,57 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
               </Link>
             </div>
 
-            {/* Right: Key Values Cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '16px' }}>
-              {[
-                { label: 'High Yield', desc: 'Proven agronomic formulations for maximum fruit and grain output.' },
-                { label: 'Cost Effective', desc: 'Optimized dosage rates ensuring higher profitability per acre.' },
-                { label: 'ECO Friendly', desc: 'Biological consortia reducing soil degradation and chemical runoff.' },
-                { label: 'Sustainability', desc: 'Long-term environmental and rural community resilience.' }
-              ].map((val, idx) => (
-                <div 
-                  key={idx}
-                  className="card"
-                  style={{ padding: '24px', backgroundColor: '#0E291A', border: '1px solid rgba(255, 255, 255, 0.08)', borderLeft: '4px solid #FFE082' }}
-                >
-                  <h4 style={{ color: '#FFE082', fontSize: '1.15rem', marginBottom: '8px' }}>{val.label}</h4>
-                  <p style={{ color: '#9EB5A3', fontSize: '0.85rem', margin: 0, lineHeight: '1.5' }}>{val.desc}</p>
-                </div>
-              ))}
+            {/* Right Column: Official Cycle Artwork */}
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px 0' }} className="reveal-on-scroll">
+              <img 
+                src="/images/branding/indus/indus-hero-circle.png" 
+                alt="Indus Crop Care - Sustainable Agriculture Cycle" 
+                style={{ maxWidth: '280px', width: '100%', borderRadius: '50%', border: '2px solid rgba(37, 211, 102, 0.35)', boxShadow: '0 12px 36px rgba(0,0,0,0.45)' }}
+                loading="lazy"
+              />
             </div>
 
+          </div>
+
+          {/* 4 Balanced Benefit Cards Spanning Full Width */}
+          <div className="homepage-benefits-grid" style={{ marginTop: '48px' }}>
+            {[
+              { label: 'High Yield', desc: 'Proven agronomic formulations for maximum fruit and grain output.', icon: <TrendingUp size={22} style={{ color: 'var(--color-gold-400)' }} /> },
+              { label: 'Cost Effective', desc: 'Optimized dosage rates ensuring higher profitability per acre.', icon: <Award size={22} style={{ color: 'var(--color-gold-400)' }} /> },
+              { label: 'ECO Friendly', desc: 'Biological consortia reducing soil degradation and chemical runoff.', icon: <Sprout size={22} style={{ color: 'var(--color-gold-400)' }} /> },
+              { label: 'Sustainability', desc: 'Long-term environmental and rural community resilience.', icon: <ShieldCheck size={22} style={{ color: 'var(--color-gold-400)' }} /> }
+            ].map((val, idx) => (
+              <div 
+                key={idx}
+                className={`card card-dark reveal-on-scroll stagger-${idx + 1}`}
+                style={{ 
+                  padding: '24px 20px', 
+                  borderLeft: '4px solid var(--color-gold-400)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '10px',
+                  height: '100%'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'rgba(245, 199, 78, 0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    {val.icon}
+                  </div>
+                  <h4 style={{ color: 'var(--color-gold-400, #F5C74E)', fontSize: '1.18rem', margin: 0, fontWeight: 700 }}>
+                    {val.label}
+                  </h4>
+                </div>
+                <p style={{ color: '#E8F2EA', fontSize: '0.9rem', margin: 0, lineHeight: '1.6', flex: 1 }}>
+                  {val.desc}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* 6. Executive Leadership & Profile Callout (Page 2 of PDF) */}
-      <section className="section" style={{ backgroundColor: '#0A2415', borderTop: '1px solid rgba(255, 255, 255, 0.06)' }}>
+      {/* 7. Executive Leadership & Governance — Clean Editorial Profile */}
+      <section className="section section-editorial-light" aria-label="Executive Leadership">
         <div className="container">
           <div className="section-title-wrap reveal-on-scroll">
             <span className="section-tag">
@@ -426,47 +531,77 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '28px', maxWidth: '850px', margin: '0 auto' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: '28px', maxWidth: '880px', margin: '0 auto' }}>
             
             {/* Managing Director */}
-            <div className="card" style={{ padding: '28px', backgroundColor: '#0E291A', border: '1px solid rgba(255, 255, 255, 0.09)', display: 'flex', gap: '20px', alignItems: 'center' }}>
-              <div style={{ width: '84px', height: '100px', borderRadius: '10px', overflow: 'hidden', flexShrink: 0, background: '#FFFFFF' }}>
+            <div className="card card-light reveal-on-scroll stagger-1" style={{ padding: 'clamp(20px, 3.5vw, 28px)', display: 'flex', gap: '20px', alignItems: 'center' }}>
+              <div style={{ 
+                width: '96px', 
+                height: '100px', 
+                borderRadius: '14px', 
+                overflow: 'hidden', 
+                flexShrink: 0, 
+                background: 'linear-gradient(135deg, #FFFFFF 0%, #F5F7F4 100%)', 
+                boxShadow: '0 4px 16px rgba(14, 107, 56, 0.08), 0 2px 6px rgba(0, 0, 0, 0.05)',
+                border: '1px solid rgba(212, 175, 55, 0.45)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '3px',
+                boxSizing: 'border-box'
+              }}>
                 <img 
                   src="/images/branding/indus/md-narendranath-dut.png" 
                   alt="K. Narendranath Dut - Managing Director" 
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                  loading="lazy"
                 />
               </div>
               <div>
-                <h3 style={{ fontSize: '1.2rem', color: '#F4F8F3', marginBottom: '4px' }}>
+                <h3 style={{ fontSize: '1.22rem', color: 'var(--color-charcoal-950)', marginBottom: '4px', fontWeight: 800 }}>
                   K. Narendranath Dut
                 </h3>
-                <div style={{ fontSize: '0.88rem', color: '#25D366', fontWeight: 600, marginBottom: '2px' }}>
+                <div style={{ fontSize: '0.88rem', color: 'var(--color-primary-green)', fontWeight: 700, marginBottom: '2px' }}>
                   M. Sc (Ag)
                 </div>
-                <div style={{ fontSize: '0.84rem', color: '#FFE082', fontWeight: 600 }}>
+                <div style={{ fontSize: '0.84rem', color: 'var(--color-charcoal-700)', fontWeight: 600 }}>
                   Managing Director
                 </div>
               </div>
             </div>
 
             {/* Director Sales & Marketing */}
-            <div className="card" style={{ padding: '28px', backgroundColor: '#0E291A', border: '1px solid rgba(255, 255, 255, 0.09)', display: 'flex', gap: '20px', alignItems: 'center' }}>
-              <div style={{ width: '84px', height: '100px', borderRadius: '10px', overflow: 'hidden', flexShrink: 0, background: '#FFFFFF' }}>
+            <div className="card card-light reveal-on-scroll stagger-2" style={{ padding: 'clamp(20px, 3.5vw, 28px)', display: 'flex', gap: '20px', alignItems: 'center' }}>
+              <div style={{ 
+                width: '96px', 
+                height: '100px', 
+                borderRadius: '14px', 
+                overflow: 'hidden', 
+                flexShrink: 0, 
+                background: 'linear-gradient(135deg, #FFFFFF 0%, #F5F7F4 100%)', 
+                boxShadow: '0 4px 16px rgba(14, 107, 56, 0.08), 0 2px 6px rgba(0, 0, 0, 0.05)',
+                border: '1px solid rgba(212, 175, 55, 0.45)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '3px',
+                boxSizing: 'border-box'
+              }}>
                 <img 
                   src="/images/branding/indus/director-anoopkumar.png" 
                   alt="K. Anoopkumar - Director Sales & Marketing" 
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                  loading="lazy"
                 />
               </div>
               <div>
-                <h3 style={{ fontSize: '1.2rem', color: '#F4F8F3', marginBottom: '4px' }}>
+                <h3 style={{ fontSize: '1.22rem', color: 'var(--color-charcoal-950)', marginBottom: '4px', fontWeight: 800 }}>
                   K. Anoopkumar
                 </h3>
-                <div style={{ fontSize: '0.88rem', color: '#25D366', fontWeight: 600, marginBottom: '2px' }}>
+                <div style={{ fontSize: '0.88rem', color: 'var(--color-primary-green)', fontWeight: 700, marginBottom: '2px' }}>
                   B. Sc (Ag) APMP, IIMC Kolkatta
                 </div>
-                <div style={{ fontSize: '0.84rem', color: '#FFE082', fontWeight: 600 }}>
+                <div style={{ fontSize: '0.84rem', color: 'var(--color-charcoal-700)', fontWeight: 600 }}>
                   Director, Sales & Marketing
                 </div>
               </div>
@@ -476,17 +611,17 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
         </div>
       </section>
 
-      {/* 7. WhatsApp & Corporate Hotline CTA Banner */}
-      <section style={{ background: 'linear-gradient(180deg, #092113 0%, #05160C 100%)', color: '#FFFFFF', padding: '70px 0', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
+      {/* 8. WhatsApp & Corporate Hotline CTA Banner */}
+      <section style={{ background: 'radial-gradient(circle at 50% 50%, #0C331E 0%, #05180C 100%)', color: '#FFFFFF', padding: 'clamp(60px, 8vw, 84px) 0', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
         <div className="container">
-          <div style={{ maxWidth: '820px', margin: '0 auto', textAlign: 'center' }}>
-            <span className="badge badge-gold" style={{ marginBottom: '16px' }}>
+          <div style={{ maxWidth: '820px', margin: '0 auto', textAlign: 'center' }} className="reveal-on-scroll">
+            <span className="badge badge-gold" style={{ marginBottom: '18px' }}>
               Farmer & Dealership Advisory Desk
             </span>
-            <h2 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.7rem)', color: '#FFFFFF', marginBottom: '16px' }}>
+            <h2 style={{ fontSize: 'clamp(2rem, 4vw, 2.8rem)', color: '#FFFFFF', marginBottom: '16px', letterSpacing: '-0.02em' }}>
               Direct Formulation & Dealership Enquiry
             </h2>
-            <p style={{ fontSize: '1.05rem', color: '#C6DEC9', lineHeight: '1.6', marginBottom: '32px' }}>
+            <p style={{ fontSize: '1.05rem', color: 'var(--color-sage-200)', lineHeight: '1.7', marginBottom: '32px' }}>
               Connect directly with Indus Crop Care technical advisors on WhatsApp. Enquire about product specifications, batch availability, dealer pricing, and recommendation schedules.
             </p>
             <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '16px' }}>

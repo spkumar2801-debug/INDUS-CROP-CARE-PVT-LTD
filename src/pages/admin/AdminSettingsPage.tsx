@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Save, CheckCircle2, Shield, Phone, Mail, Building, MapPin } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Save, CheckCircle2, Shield, Phone, Mail, Building, MapPin, Sparkles, ArrowRight } from 'lucide-react';
 import { AdminNav } from '../../components/admin/AdminNav';
 import { SiteSettings } from '../../types/settings';
 import { getSiteSettings, updateSiteSettings } from '../../services/settingsService';
@@ -70,6 +71,53 @@ export const AdminSettingsPage: React.FC = () => {
               <span>Settings updated successfully and applied across all public touchpoints!</span>
             </div>
           )}
+
+          {/* Quick Access Card to Hero Media Manager */}
+          <div style={{
+            background: 'linear-gradient(135deg, #0A522A 0%, #06381C 100%)',
+            color: '#FFFFFF',
+            borderRadius: 'var(--radius-lg)',
+            padding: '24px 28px',
+            marginBottom: '26px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '16px',
+            boxShadow: '0 8px 24px rgba(6, 56, 28, 0.25)'
+          }}>
+            <div>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(37, 211, 102, 0.2)', padding: '3px 10px', borderRadius: '20px', color: 'var(--color-action-green)', fontSize: '0.75rem', fontWeight: 700, marginBottom: '8px' }}>
+                <Sparkles size={13} />
+                <span>HOMEPAGE HERO CONTROLS</span>
+              </div>
+              <h3 style={{ color: '#FFFFFF', fontSize: '1.25rem', margin: '0 0 6px 0', fontWeight: 800 }}>
+                Hero Media & Visual Experience Manager
+              </h3>
+              <p style={{ color: 'var(--color-sage-200)', fontSize: '0.88rem', margin: 0, maxWidth: '580px', lineHeight: '1.5' }}>
+                Switch between photorealistic agricultural image and video, adjust mobile/desktop positioning, preview on devices, and customize headline text without writing code.
+              </p>
+            </div>
+
+            <Link 
+              to="/admin/hero" 
+              className="btn" 
+              style={{ 
+                backgroundColor: 'var(--color-action-green)', 
+                color: '#061E11', 
+                fontWeight: 800, 
+                padding: '12px 22px', 
+                borderRadius: 'var(--radius-pill)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                boxShadow: '0 4px 16px rgba(37, 211, 102, 0.4)'
+              }}
+            >
+              <span>Manage Hero Media</span>
+              <ArrowRight size={16} />
+            </Link>
+          </div>
 
           <form onSubmit={handleSubmit} className="card" style={{ padding: '36px', backgroundColor: '#FFFFFF' }}>
             

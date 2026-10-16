@@ -1,4 +1,5 @@
 import { Product } from '../types/product';
+import { SiteSettings } from '../types/settings';
 import { INDUS_CATALOG_PRODUCTS } from './indusProducts';
 
 const SEED_PRODUCTS: Product[] = [
@@ -935,7 +936,7 @@ export const INITIAL_PRODUCTS: Product[] = [
   }))
 ];
 
-export const INITIAL_SETTINGS = {
+export const INITIAL_SETTINGS: SiteSettings = {
   companyName: 'Indus Crop Care Pvt. Ltd.',
   tagline: 'Science For Sustainability',
   teluguTagline: 'రైతన్నకు భరోసా.. ఇండస్ ఉత్పాదనలు',
@@ -954,5 +955,29 @@ export const INITIAL_SETTINGS = {
   isoCertification: 'ISO 9001:2015 Certified Company',
   operationalStates: ['Telangana', 'Andhra Pradesh', 'Karnataka', 'Maharashtra', 'Tamil Nadu', 'Across India'],
   logoUrl: '/images/branding/indus/indus-logo.png',
-  updatedAt: '2026-10-14T08:00:00Z'
+  hero: {
+    mediaType: 'image',
+    imageUrl: '/assets/indus-crop-hero.webp',
+    imageMobileUrl: '/assets/indus-crop-hero-mobile.webp',
+    imagePositionDesktop: 'center 36%',
+    imagePositionMobile: 'center center',
+    imageFit: 'cover',
+    videoUrl: '/videos/hero-cinematic.mp4',
+    videoPosterUrl: '/assets/indus-crop-hero.webp',
+    videoLoop: true,
+    videoMuted: true,
+    overlayDarkness: 0.65,
+    gradientStrength: 0.8,
+    heroHeightPreset: 'standard',
+    badgeText: 'Over 15 Years of Agri-Input Leadership & Innovation',
+    titleLine1: 'Advancing Crop Health.',
+    titleLine2: 'Growing Tomorrow.',
+    teluguMotto: 'రైతన్నకు భరోసా.. ఇండస్ ఉత్పాదనలు',
+    description: 'Indus Crop Care Pvt. Ltd. is a renowned agri-input enterprise with an established track record across Organic & Water-Soluble Fertilizers, Plant Micronutrients, Biofertilizers, Crop Protection Chemicals, Biopesticides, and Biostimulants — empowering farmers to maximize yields and enhance sustainability.',
+    primaryCtaText: 'Explore Products',
+    primaryCtaLink: '/products',
+    secondaryCtaText: 'Contact Us',
+    secondaryCtaLink: '/contact'
+  },
+  updatedAt: '2026-10-16T12:00:00Z'
 };

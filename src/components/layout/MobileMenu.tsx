@@ -1,6 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { X, Home, Info, Sprout, Image, Phone, MessageSquareShare } from 'lucide-react';
+import { 
+  X, 
+  Home, 
+  Info, 
+  Sprout, 
+  Image as ImageIcon, 
+  Phone, 
+  MessageSquareShare, 
+  ShieldCheck, 
+  Lock,
+  ChevronRight
+} from 'lucide-react';
+import { useSiteSettings } from '../../context/SettingsContext';
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -10,6 +22,30 @@ interface MobileMenuProps {
 
 export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onOpenQuoteModal }) => {
   const location = useLocation();
+  const { customerCareNumber, displayFormattedNumber } = useSiteSettings();
+
+  // Lock background scrolling when menu is open & handle Escape key
+  useEffect(() => {
+    if (isOpen) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      document.body.classList.add('mobile-menu-open');
+
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          onClose();
+        }
+      };
+
+      window.addEventListener('keydown', handleKeyDown);
+
+      return () => {
+        document.body.style.overflow = originalOverflow;
+        document.body.classList.remove('mobile-menu-open');
+        window.removeEventListener('keydown', handleKeyDown);
+      };
+    }
+  }, [isOpen, onClose]);
 
   const isActive = (path: string) => {
     if (path === '/' && location.pathname === '/') return true;
@@ -17,93 +53,118 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onOpenQ
     return false;
   };
 
+  const navLinks = [
+    { to: '/', label: 'Home', icon: <Home size={19} /> },
+    { to: '/about', label: 'About Us', icon: <Info size={19} /> },
+    { to: '/products', label: 'Product Portfolio', icon: <Sprout size={19} /> },
+    { to: '/gallery', label: 'Field Gallery', icon: <ImageIcon size={19} /> },
+    { to: '/contact', label: 'Contact & Network', icon: <Phone size={19} /> },
+  ];
+
   return (
-    <>
-      <div 
-        className={`mobile-drawer-overlay ${isOpen ? 'open' : ''}`} 
-        onClick={onClose}
-        aria-hidden="true"
-      />
-      <div className={`mobile-drawer ${isOpen ? 'open' : ''}`} role="dialog" aria-modal="true" aria-label="Mobile Navigation">
-        <div className="mobile-drawer-header">
-          <div className="brand-logo-frame" style={{ padding: '4px 10px', background: '#FFFFFF', borderRadius: '8px' }}>
-            <img 
-              src="/images/branding/indus/indus-logo.png" 
-              alt="Indus Crop Care Logo" 
-              style={{ height: '36px', width: 'auto', objectFit: 'contain', display: 'block' }}
-            />
-          </div>
+    <div 
+      className={`mobile-menu-overlay ${isOpen ? 'is-open' : ''}`}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Mobile Navigation Menu"
+    >
+      {/* Backdrop blur click target */}
+      <div className="mobile-menu-backdrop" onClick={onClose} aria-hidden="true" />
+
+      {/* Drawer Container with safe-area insets */}
+      <div className="mobile-menu-container">
+        
+        {/* Drawer Header */}
+        <div className="mobile-menu-header">
+          <Link to="/" onClick={onClose} className="mobile-brand-link">
+            <div className="brand-logo-frame">
+              <img 
+                src="/images/branding/indus/indus-logo.png" 
+                alt="Indus Crop Care Logo" 
+                style={{ height: '36px', width: 'auto', objectFit: 'contain', display: 'block' }}
+              />
+            </div>
+          </Link>
+
           <button 
             type="button" 
             onClick={onClose} 
-            className="modal-close-btn"
-            aria-label="Close menu"
+            className="mobile-close-btn"
+            aria-label="Close navigation menu"
           >
-            <X size={20} />
+            <X size={22} />
           </button>
         </div>
 
-        <nav className="mobile-nav-links">
-          <Link 
-            to="/" 
-            className={`mobile-nav-link ${isActive('/') ? 'active' : ''}`}
-            onClick={onClose}
-          >
-            <Home size={18} />
-            <span>Home</span>
-          </Link>
-          <Link 
-            to="/about" 
-            className={`mobile-nav-link ${isActive('/about') ? 'active' : ''}`}
-            onClick={onClose}
-          >
-            <Info size={18} />
-            <span>About Us</span>
-          </Link>
-          <Link 
-            to="/products" 
-            className={`mobile-nav-link ${isActive('/products') ? 'active' : ''}`}
-            onClick={onClose}
-          >
-            <Sprout size={18} />
-            <span>Products</span>
-          </Link>
-          <Link 
-            to="/gallery" 
-            className={`mobile-nav-link ${isActive('/gallery') ? 'active' : ''}`}
-            onClick={onClose}
-          >
-            <Image size={18} />
-            <span>Gallery</span>
-          </Link>
-          <Link 
-            to="/contact" 
-            className={`mobile-nav-link ${isActive('/contact') ? 'active' : ''}`}
-            onClick={onClose}
-          >
-            <Phone size={18} />
-            <span>Contact</span>
-          </Link>
+        {/* Telugu Brand Motto Banner */}
+        <div className="mobile-menu-telugu-banner">
+          <span>రైతన్నకు భరోసా.. ఇండస్ ఉత్పాదనలు</span>
+        </div>
+
+        {/* Staggered Navigation Links */}
+        <nav className="mobile-menu-nav" aria-label="Mobile Links">
+          {navLinks.map((link, idx) => (
+            <Link
+              key={link.to}
+              to={link.to}
+              onClick={onClose}
+              className={`mobile-nav-item ${isActive(link.to) ? 'active' : ''} stagger-${idx + 1}`}
+            >
+              <div className="mobile-nav-item-icon">
+                {link.icon}
+              </div>
+              <span className="mobile-nav-item-label">{link.label}</span>
+              <ChevronRight size={16} className="mobile-nav-item-arrow" />
+            </Link>
+          ))}
         </nav>
 
-        <div className="mobile-drawer-footer">
+        {/* Contact & Advisory Desk Actions */}
+        <div className="mobile-menu-footer">
+          <a 
+            href={`tel:+${customerCareNumber || '918886069143'}`}
+            className="mobile-call-action"
+          >
+            <div className="mobile-call-icon">
+              <Phone size={16} />
+            </div>
+            <div>
+              <div className="mobile-call-sub">Direct Customer Support</div>
+              <div className="mobile-call-num">{displayFormattedNumber || '+91 88860 69143'}</div>
+            </div>
+          </a>
+
           <button 
             type="button" 
             className="btn btn-whatsapp" 
-            style={{ width: '100%' }}
+            style={{ width: '100%', minHeight: '48px' }}
             onClick={onOpenQuoteModal}
           >
             <MessageSquareShare size={18} />
-            <span>Customer Care & WhatsApp</span>
+            <span>WhatsApp Agronomy Desk</span>
           </button>
-          
-          <div style={{ textAlign: 'center', marginTop: '10px' }}>
-            <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
-              Indus Crop Care Pvt. Ltd. (15+ Years)
-            </span>
+
+          {/* Trust Footnote & Admin Link */}
+          <div className="mobile-menu-sublinks">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: 'var(--color-sage-300)' }}>
+              <ShieldCheck size={14} style={{ color: 'var(--color-action-green)' }} />
+              <span>ISO 9001:2015 Certified &bull; 15+ Years</span>
+            </div>
+
+            <Link 
+              to="/admin/login" 
+              onClick={onClose}
+              className="mobile-admin-link"
+              title="Admin Portal Login"
+            >
+              <Lock size={12} />
+              <span>Admin Portal</span>
+            </Link>
           </div>
+
         </div>
+
       </div>
-    </>
+    </div>
   );
 };
