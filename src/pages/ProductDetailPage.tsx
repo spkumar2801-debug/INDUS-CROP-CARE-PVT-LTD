@@ -14,7 +14,7 @@ import {
   BookOpen
 } from 'lucide-react';
 import { Product } from '../types/product';
-import { getProductById } from '../services/productService';
+import { getProductById, subscribeToProducts } from '../services/productService';
 
 interface ProductDetailPageProps {
   onOpenQuote: (product: Product) => void;
@@ -27,16 +27,30 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ onOpenQuot
   const [activeTab, setActiveTab] = useState<'english' | 'telugu' | 'sheet'>('english');
 
   useEffect(() => {
-    if (id) {
+    if (!id) return;
+    let isMounted = true;
+
+    const fetchProduct = () => {
       getProductById(id)
         .then(p => {
-          setProduct(p);
-          if (p && !p.sheetImageUrl && !p.teluguDescription && (!p.specifications || p.specifications.every(s => !s.labelTelugu))) {
-            setActiveTab('english');
+          if (isMounted) {
+            setProduct(p);
+            if (p && !p.sheetImageUrl && !p.teluguDescription && (!p.specifications || p.specifications.every(s => !s.labelTelugu))) {
+              setActiveTab('english');
+            }
           }
         })
-        .finally(() => setLoading(false));
-    }
+        .finally(() => {
+          if (isMounted) setLoading(false);
+        });
+    };
+
+    fetchProduct();
+    const unsubscribe = subscribeToProducts(fetchProduct);
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
   }, [id]);
 
   if (loading) {

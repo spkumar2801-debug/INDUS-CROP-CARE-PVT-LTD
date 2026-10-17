@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { SiteSettings } from '../types/settings';
-import { getSiteSettings } from '../services/settingsService';
+import { getSiteSettings, subscribeToSiteSettings, getLocalSettings } from '../services/settingsService';
 import { normalizePhoneNumber, getDirectProductWhatsAppUrl } from '../lib/whatsapp';
 import { Product } from '../types/product';
 
@@ -17,7 +17,7 @@ interface SettingsContextType {
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
 
 export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [settings, setSettings] = useState<SiteSettings | null>(null);
+  const [settings, setSettings] = useState<SiteSettings>(getLocalSettings);
 
   const loadSettings = async () => {
     try {
@@ -29,8 +29,13 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   useEffect(() => {
-    loadSettings();
+    // Initial fetch and real-time subscription for live cross-device synchronization
+    const unsubscribe = subscribeToSiteSettings((updatedSettings) => {
+      setSettings(updatedSettings);
+    });
+    return () => unsubscribe();
   }, []);
+
 
   const rawNumber = settings?.customerCareWhatsAppNumber || settings?.whatsappNumber || '';
   const cleanNumber = normalizePhoneNumber(rawNumber);

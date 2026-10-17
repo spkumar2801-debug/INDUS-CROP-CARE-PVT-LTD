@@ -31,7 +31,7 @@ import { AdminHeroMediaPage } from './pages/admin/AdminHeroMediaPage';
 
 // Data & Types
 import { Product } from './types/product';
-import { getPublishedProducts } from './services/productService';
+import { getPublishedProducts, subscribeToProducts } from './services/productService';
 
 // Styles
 import './styles/index.css';
@@ -101,7 +101,18 @@ export const AppContent: React.FC = () => {
   const [detailsProduct, setDetailsProduct] = useState<Product | null>(null);
 
   useEffect(() => {
-    getPublishedProducts().then(setProducts);
+    let isMounted = true;
+    const fetchProducts = () => {
+      getPublishedProducts().then(prods => {
+        if (isMounted) setProducts(prods);
+      });
+    };
+    fetchProducts();
+    const unsubscribe = subscribeToProducts(fetchProducts);
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
   }, []);
 
   // Agency-grade subtle scroll-reveal animations across all pages

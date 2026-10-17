@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Save, Plus, Trash2, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Save, Plus, Trash2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { AdminNav } from '../../components/admin/AdminNav';
 import { ImageUploader } from '../../components/admin/ImageUploader';
 import { Product, ProductSpecification } from '../../types/product';
@@ -14,6 +14,7 @@ export const AdminProductEditorPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [successMsg, setSuccessMsg] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<Partial<Product>>({
     name: '',
@@ -75,8 +76,19 @@ export const AdminProductEditorPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSaving(true);
+    setErrorMsg(null);
     setSuccessMsg(false);
+
+    if (!formData.name?.trim()) {
+      setErrorMsg('Product / Crop Name is required.');
+      return;
+    }
+    if (!formData.code?.trim()) {
+      setErrorMsg('Variety / Product Code is required.');
+      return;
+    }
+
+    setSaving(true);
 
     try {
       const slug = formData.slug || `${formData.name}-${formData.code}`.toLowerCase().replace(/[^a-z0-9]+/g, '-');
@@ -85,6 +97,8 @@ export const AdminProductEditorPage: React.FC = () => {
 
       const payload: Partial<Product> = {
         ...formData,
+        name: formData.name.trim(),
+        code: formData.code.trim(),
         slug,
         features: cleanFeatures,
         specifications: cleanSpecs
@@ -93,9 +107,9 @@ export const AdminProductEditorPage: React.FC = () => {
       await saveProduct(payload, id);
       setSuccessMsg(true);
       setTimeout(() => navigate('/admin/products'), 1200);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error saving product:', err);
-      alert('Failed to save product. Please check entries.');
+      setErrorMsg(err?.message || 'Failed to save product to database. Please check your connection and administrator permissions.');
     } finally {
       setSaving(false);
     }
@@ -135,6 +149,13 @@ export const AdminProductEditorPage: React.FC = () => {
 
         <div className="admin-content" style={{ maxWidth: '960px' }}>
           
+          {errorMsg && (
+            <div style={{ backgroundColor: '#FFEBEE', border: '1px solid #FFCDD2', padding: '14px 20px', borderRadius: 'var(--radius-md)', color: '#C62828', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <AlertCircle size={18} />
+              <span>{errorMsg}</span>
+            </div>
+          )}
+
           {successMsg && (
             <div style={{ backgroundColor: '#E8F5E9', border: '1px solid #A5D6A7', padding: '14px 20px', borderRadius: 'var(--radius-md)', color: '#2E7D32', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <CheckCircle2 size={18} />

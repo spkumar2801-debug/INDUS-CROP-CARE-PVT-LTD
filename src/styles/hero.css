@@ -57,7 +57,7 @@
 .hero-cinematic-bg {
   position: absolute;
   inset: 0;
-  background-image: url('/assets/indus-crop-hero.webp');
+  background-color: #0b1c10;
   background-size: cover;
   background-position: center 36%;
   background-repeat: no-repeat;
@@ -96,6 +96,12 @@
   z-index: 1;
 }
 
+@media (max-width: 768px) {
+  .hero-video-element {
+    object-position: center center;
+  }
+}
+
 @keyframes heroSubtlePan {
   0% {
     transform: scale(1.03) translate3d(0, 0, 0);
@@ -115,14 +121,12 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-video-element {
-    display: none !important;
-  }
   .hero-cinematic-bg {
     animation: none !important;
     transform: none !important;
   }
 }
+
 
 /* Multi-stop Editorial Gradient Overlays for High Legibility & Cinematic Visibility */
 .hero-overlay {

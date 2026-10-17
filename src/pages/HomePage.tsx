@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Sprout, 
@@ -9,7 +9,6 @@ import {
   ArrowRight,
   Sparkles,
   PhoneCall,
-  Leaf,
   Layers,
   FlaskConical,
   HeartHandshake,
@@ -18,7 +17,7 @@ import {
   TrendingUp
 } from 'lucide-react';
 import { Product } from '../types/product';
-import { getPublishedProducts } from '../services/productService';
+import { getPublishedProducts, subscribeToProducts } from '../services/productService';
 import { ProductCard } from '../components/products/ProductCard';
 import { CountUpNumber } from '../components/common/CountUpNumber';
 import { useSiteSettings } from '../context/SettingsContext';
@@ -31,32 +30,81 @@ interface HomePageProps {
 export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [videoPlaybackError, setVideoPlaybackError] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const { settings } = useSiteSettings();
 
   useEffect(() => {
     document.documentElement.classList.add('page-home');
-    getPublishedProducts()
-      .then(data => setProducts(data))
-      .finally(() => setLoading(false));
+    let isMounted = true;
+
+    const fetchProducts = () => {
+      getPublishedProducts()
+        .then(data => {
+          if (isMounted) {
+            setProducts(data);
+            setLoading(false);
+          }
+        });
+    };
+
+    fetchProducts();
+    const unsubscribe = subscribeToProducts(fetchProducts);
 
     return () => {
       document.documentElement.classList.remove('page-home');
+      isMounted = false;
+      unsubscribe();
     };
   }, []);
 
   const hero = settings?.hero;
 
-  const heroMediaType = hero?.mediaType || 'image';
-  const heroImageUrl = hero?.imageUrl || '/assets/indus-crop-hero.webp';
-  const heroImageMobileUrl = hero?.imageMobileUrl || '/assets/indus-crop-hero-mobile.webp';
+  const heroMediaType = hero?.mediaType === 'video' ? 'video' : 'image';
+  
+  // Guard against any temporary or stale browser blob: URLs
+  const rawImageUrl = hero?.imageUrl || '';
+  const heroImageUrl = (rawImageUrl && !rawImageUrl.startsWith('blob:')) 
+    ? rawImageUrl 
+    : '/assets/indus-crop-hero.webp';
+
+  const rawMobileUrl = hero?.imageMobileUrl || '';
+  const heroImageMobileUrl = (rawMobileUrl && !rawMobileUrl.startsWith('blob:')) 
+    ? rawMobileUrl 
+    : '/assets/indus-crop-hero-mobile.webp';
+
   const heroPositionDesktop = hero?.imagePositionDesktop || 'center 36%';
   const heroPositionMobile = hero?.imagePositionMobile || 'center center';
   const heroFit = hero?.imageFit || 'cover';
   
-  const heroVideoUrl = hero?.videoUrl || '/videos/hero-cinematic.mp4';
-  const heroVideoPoster = hero?.videoPosterUrl || heroImageUrl;
+  const rawVideoUrl = hero?.videoUrl || '';
+  const heroVideoUrl = (rawVideoUrl && !rawVideoUrl.startsWith('blob:')) 
+    ? rawVideoUrl 
+    : '/videos/hero-cinematic.mp4';
+
+  const autoDerivedPoster = (rawVideoUrl && !rawVideoUrl.startsWith('blob:'))
+    ? rawVideoUrl.replace(/\.(mp4|webm)$/i, '.jpg')
+    : '';
+
+  const rawPosterUrl = hero?.videoPosterUrl || '';
+  const heroVideoPoster = (rawPosterUrl && !rawPosterUrl.startsWith('blob:') && !rawPosterUrl.includes('indus-crop-hero.webp')) 
+    ? rawPosterUrl 
+    : (autoDerivedPoster || '');
+
   const heroVideoLoop = hero?.videoLoop !== false;
   const heroVideoMuted = hero?.videoMuted !== false;
+
+  // Guarantee mobile browser autoplay (iOS Safari and Android Chrome) by setting DOM attributes directly
+  useEffect(() => {
+    if (heroMediaType === 'video' && videoRef.current) {
+      setVideoPlaybackError(false);
+      videoRef.current.defaultMuted = true;
+      videoRef.current.muted = heroVideoMuted;
+      videoRef.current.play().catch((err) => {
+        console.info('[Indus Hero Video] Autoplay handled by browser:', err);
+      });
+    }
+  }, [heroMediaType, heroVideoUrl, heroVideoMuted]);
 
   const overlayDarkness = typeof hero?.overlayDarkness === 'number' ? hero.overlayDarkness : 0.65;
   const gradientStrength = typeof hero?.gradientStrength === 'number' ? hero.gradientStrength : 0.8;
@@ -89,30 +137,57 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
           className="hero-cinematic-bg" 
           aria-hidden="true"
           style={{
-            backgroundImage: heroMediaType === 'image' ? `url('${heroImageUrl}')` : undefined,
+            backgroundImage: heroMediaType === 'image' 
+              ? `url('${heroImageUrl}')` 
+              : (heroVideoPoster ? `url('${heroVideoPoster}')` : undefined),
             backgroundPosition: heroPositionDesktop,
             ['--hero-pos-desktop' as string]: heroPositionDesktop,
             ['--hero-pos-mobile' as string]: heroPositionMobile,
             ['--hero-fit' as string]: heroFit
           } as React.CSSProperties}
         >
-          {heroMediaType === 'video' ? (
+          {heroMediaType === 'video' && !videoPlaybackError ? (
             <video
+              ref={(node) => {
+                videoRef.current = node;
+                if (node) {
+                  node.defaultMuted = true;
+                  node.muted = heroVideoMuted;
+                }
+              }}
+              key={heroVideoUrl}
               className="hero-video-element"
               autoPlay
               muted={heroVideoMuted}
               loop={heroVideoLoop}
               playsInline
-              poster={heroVideoPoster}
+              preload="auto"
+              poster={heroVideoPoster || undefined}
               aria-hidden="true"
-              onError={(e) => {
-                // Seamlessly fallback to high-resolution photorealistic poster
-                (e.target as HTMLVideoElement).style.display = 'none';
+              onError={() => {
+                console.warn('[Indus Hero Video] Playback encountered an issue, showing fallback poster smoothly.');
+                setVideoPlaybackError(true);
               }}
             >
-              <source src={heroVideoUrl} type="video/mp4" />
-              {hero?.videoMobileUrl && <source src={hero.videoMobileUrl} type="video/mp4" />}
+              <source 
+                src={heroVideoUrl} 
+                type={heroVideoUrl.toLowerCase().includes('.webm') ? 'video/webm' : 'video/mp4'} 
+              />
+              {hero?.videoMobileUrl && !hero.videoMobileUrl.startsWith('blob:') && (
+                <source 
+                  src={hero.videoMobileUrl} 
+                  type={hero.videoMobileUrl.toLowerCase().includes('.webm') ? 'video/webm' : 'video/mp4'} 
+                />
+              )}
             </video>
+          ) : heroMediaType === 'video' && videoPlaybackError ? (
+            <img 
+              src={heroVideoPoster} 
+              alt="Indus Crop Care Agricultural Landscape" 
+              className="hero-image-element"
+              loading="eager"
+              decoding="async"
+            />
           ) : (
             <picture>
               {heroImageMobileUrl && (
@@ -481,32 +556,36 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
           {/* 4 Balanced Benefit Cards Spanning Full Width */}
           <div className="homepage-benefits-grid" style={{ marginTop: '48px' }}>
             {[
-              { label: 'High Yield', desc: 'Proven agronomic formulations for maximum fruit and grain output.', icon: <TrendingUp size={22} style={{ color: 'var(--color-gold-400)' }} /> },
-              { label: 'Cost Effective', desc: 'Optimized dosage rates ensuring higher profitability per acre.', icon: <Award size={22} style={{ color: 'var(--color-gold-400)' }} /> },
-              { label: 'ECO Friendly', desc: 'Biological consortia reducing soil degradation and chemical runoff.', icon: <Sprout size={22} style={{ color: 'var(--color-gold-400)' }} /> },
-              { label: 'Sustainability', desc: 'Long-term environmental and rural community resilience.', icon: <ShieldCheck size={22} style={{ color: 'var(--color-gold-400)' }} /> }
+              { label: 'High Yield', desc: 'Proven agronomic formulations for maximum fruit and grain output.', icon: <TrendingUp size={22} style={{ color: '#168547' }} /> },
+              { label: 'Cost Effective', desc: 'Optimized dosage rates ensuring higher profitability per acre.', icon: <Award size={22} style={{ color: '#168547' }} /> },
+              { label: 'ECO Friendly', desc: 'Biological consortia reducing soil degradation and chemical runoff.', icon: <Sprout size={22} style={{ color: '#168547' }} /> },
+              { label: 'Sustainability', desc: 'Long-term environmental and rural community resilience.', icon: <ShieldCheck size={22} style={{ color: '#168547' }} /> }
             ].map((val, idx) => (
               <div 
                 key={idx}
-                className={`card card-dark reveal-on-scroll stagger-${idx + 1}`}
+                className={`card reveal-on-scroll stagger-${idx + 1}`}
                 style={{ 
+                  backgroundColor: '#FFFFFF',
                   padding: '24px 20px', 
-                  borderLeft: '4px solid var(--color-gold-400)',
+                  borderRadius: '12px',
+                  border: '1px solid #E2E8F0',
+                  borderLeft: '4px solid #168547',
+                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.12)',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '10px',
+                  gap: '12px',
                   height: '100%'
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'rgba(245, 199, 78, 0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(22, 133, 71, 0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     {val.icon}
                   </div>
-                  <h4 style={{ color: 'var(--color-gold-400, #F5C74E)', fontSize: '1.18rem', margin: 0, fontWeight: 700 }}>
+                  <h4 style={{ color: '#06381C', fontSize: '1.18rem', margin: 0, fontWeight: 700 }}>
                     {val.label}
                   </h4>
                 </div>
-                <p style={{ color: '#E8F2EA', fontSize: '0.9rem', margin: 0, lineHeight: '1.6', flex: 1 }}>
+                <p style={{ color: '#2D3748', fontSize: '0.92rem', margin: 0, lineHeight: '1.6', flex: 1, fontWeight: 500 }}>
                   {val.desc}
                 </p>
               </div>
@@ -537,23 +616,21 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
             <div className="card card-light reveal-on-scroll stagger-1" style={{ padding: 'clamp(20px, 3.5vw, 28px)', display: 'flex', gap: '20px', alignItems: 'center' }}>
               <div style={{ 
                 width: '96px', 
-                height: '100px', 
-                borderRadius: '14px', 
+                height: '106px', 
+                borderRadius: '12px', 
                 overflow: 'hidden', 
                 flexShrink: 0, 
-                background: 'linear-gradient(135deg, #FFFFFF 0%, #F5F7F4 100%)', 
                 boxShadow: '0 4px 16px rgba(14, 107, 56, 0.08), 0 2px 6px rgba(0, 0, 0, 0.05)',
-                border: '1px solid rgba(212, 175, 55, 0.45)',
+                border: '2px solid rgba(212, 175, 55, 0.55)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                padding: '3px',
                 boxSizing: 'border-box'
               }}>
                 <img 
                   src="/images/branding/indus/md-narendranath-dut.png" 
                   alt="K. Narendranath Dut - Managing Director" 
-                  style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 15%' }}
                   loading="lazy"
                 />
               </div>
@@ -574,23 +651,21 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
             <div className="card card-light reveal-on-scroll stagger-2" style={{ padding: 'clamp(20px, 3.5vw, 28px)', display: 'flex', gap: '20px', alignItems: 'center' }}>
               <div style={{ 
                 width: '96px', 
-                height: '100px', 
-                borderRadius: '14px', 
+                height: '106px', 
+                borderRadius: '12px', 
                 overflow: 'hidden', 
                 flexShrink: 0, 
-                background: 'linear-gradient(135deg, #FFFFFF 0%, #F5F7F4 100%)', 
                 boxShadow: '0 4px 16px rgba(14, 107, 56, 0.08), 0 2px 6px rgba(0, 0, 0, 0.05)',
-                border: '1px solid rgba(212, 175, 55, 0.45)',
+                border: '2px solid rgba(212, 175, 55, 0.55)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                padding: '3px',
                 boxSizing: 'border-box'
               }}>
                 <img 
                   src="/images/branding/indus/director-anoopkumar.png" 
                   alt="K. Anoopkumar - Director Sales & Marketing" 
-                  style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 15%' }}
                   loading="lazy"
                 />
               </div>

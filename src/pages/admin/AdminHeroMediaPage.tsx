@@ -16,18 +16,19 @@ import {
   PhoneCall, 
   Sliders, 
   Eye, 
-  Layers, 
   HelpCircle,
   Undo2
 } from 'lucide-react';
 import { AdminNav } from '../../components/admin/AdminNav';
 import { HeroSettings, SiteSettings } from '../../types/settings';
 import { getSiteSettings, updateSiteSettings } from '../../services/settingsService';
-import { uploadToCloudinary, isCloudinaryConfigured } from '../../lib/cloudinary';
+import { uploadToCloudinary, uploadVideoToCloudinary, isCloudinaryConfigured } from '../../lib/cloudinary';
+import { useSiteSettings } from '../../context/SettingsContext';
 
 const DRAFT_STORAGE_KEY = 'indus_hero_draft_v1';
 
 export const AdminHeroMediaPage: React.FC = () => {
+  const { refreshSettings } = useSiteSettings();
   const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [heroForm, setHeroForm] = useState<HeroSettings | null>(null);
   const [publishedHero, setPublishedHero] = useState<HeroSettings | null>(null);
@@ -67,6 +68,16 @@ export const AdminHeroMediaPage: React.FC = () => {
         secondaryCtaText: 'Contact Us',
         secondaryCtaLink: '/contact'
       };
+      // Ensure activeHero contains only persistent URLs, discarding stale session blobs
+      if (activeHero.videoUrl?.startsWith('blob:')) {
+        activeHero.videoUrl = '/videos/hero-cinematic.mp4';
+      }
+      if (activeHero.imageUrl?.startsWith('blob:')) {
+        activeHero.imageUrl = '/assets/indus-crop-hero.webp';
+      }
+      if (activeHero.videoPosterUrl?.startsWith('blob:')) {
+        activeHero.videoPosterUrl = '/assets/indus-crop-hero.webp';
+      }
       setPublishedHero(activeHero);
 
       // Check if there is an unsaved draft
@@ -74,6 +85,16 @@ export const AdminHeroMediaPage: React.FC = () => {
       if (savedDraft) {
         try {
           const parsed = JSON.parse(savedDraft);
+          // Purge session-local blob URLs from draft
+          if (parsed.videoUrl?.startsWith('blob:')) {
+            parsed.videoUrl = activeHero.videoUrl;
+          }
+          if (parsed.imageUrl?.startsWith('blob:')) {
+            parsed.imageUrl = activeHero.imageUrl;
+          }
+          if (parsed.videoPosterUrl?.startsWith('blob:')) {
+            parsed.videoPosterUrl = activeHero.videoPosterUrl;
+          }
           setHeroForm(parsed);
           setStatusMessage({ type: 'info', text: 'Loaded your previous saved draft. You can preview or publish it.' });
         } catch {
@@ -100,81 +121,88 @@ export const AdminHeroMediaPage: React.FC = () => {
     });
   };
 
-  // Image Upload handler (Desktop & Mobile)
-  const handleImageFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, target: 'desktop' | 'mobile' | 'poster') => {
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  // Unified Media Upload handler: auto-detects image vs video, optimizes, and stores persistently
+  const handleUnifiedMediaUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate size (max 15MB)
-    if (file.size > 15 * 1024 * 1024) {
-      showNotification('error', 'Image is too large. Maximum allowed size is 15MB.');
+    // Reset input value so re-selecting the same file works
+    e.target.value = '';
+
+    const isVideo = file.type.startsWith('video/') || /\.(mp4|webm)$/i.test(file.name);
+    const isImage = file.type.startsWith('image/') || /\.(jpe?g|png|webp|avif)$/i.test(file.name);
+
+    if (!isVideo && !isImage) {
+      showNotification('error', 'Unsupported file format. Please select an image (JPG, PNG, WebP) or video (MP4, WebM).');
+      return;
+    }
+
+    if (isVideo && file.size > 25 * 1024 * 1024) {
+      showNotification('error', 'Video file exceeds 25MB. Please upload a video under 25MB for smooth loading on mobile devices.');
+      return;
+    }
+
+    if (isImage && file.size > 15 * 1024 * 1024) {
+      showNotification('error', 'Image file exceeds 15MB. Please upload an image under 15MB.');
       return;
     }
 
     setIsUploading(true);
-    setUploadProgress(10);
+    setUploadProgress(5);
 
-    // Immediate preview using object URL
-    const localUrl = URL.createObjectURL(file);
-    if (target === 'desktop') handleFieldChange('imageUrl', localUrl);
-    else if (target === 'mobile') handleFieldChange('imageMobileUrl', localUrl);
-    else if (target === 'poster') handleFieldChange('videoPosterUrl', localUrl);
+    try {
+      if (isVideo) {
+        if (!isCloudinaryConfigured()) {
+          throw new Error('Persistent cloud storage is not configured.');
+        }
 
-    if (isCloudinaryConfigured()) {
-      try {
+        const res = await uploadVideoToCloudinary(file, 'hero', (percent) => setUploadProgress(percent));
+        // Automatically derive high-definition frame poster from the video URL on CDN
+        const autoPoster = res.secureUrl.replace(/\.(mp4|webm)$/i, '.jpg');
+
+        setHeroForm((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            mediaType: 'video',
+            videoUrl: res.secureUrl,
+            videoPosterUrl: autoPoster,
+            imageUrl: autoPoster,
+            videoLoop: true,
+            videoMuted: true
+          };
+        });
+
+        showNotification('success', `Video "${file.name}" uploaded successfully! The hero is now set to Video. Click "Publish to Live Homepage" to update the live website.`);
+      } else {
+        if (!isCloudinaryConfigured()) {
+          throw new Error('Persistent cloud storage is not configured.');
+        }
+
         const res = await uploadToCloudinary(file, 'branding', (percent) => setUploadProgress(percent));
-        if (target === 'desktop') handleFieldChange('imageUrl', res.secureUrl);
-        else if (target === 'mobile') handleFieldChange('imageMobileUrl', res.secureUrl);
-        else if (target === 'poster') handleFieldChange('videoPosterUrl', res.secureUrl);
-        showNotification('success', `High-resolution ${target} image uploaded to cloud storage successfully!`);
-      } catch (err: any) {
-        console.warn('Cloud storage upload warning:', err);
-        // Fallback: convert to optimized base64 for persistent offline/local storage
-        const reader = new FileReader();
-        reader.onload = () => {
-          const base64 = reader.result as string;
-          if (target === 'desktop') handleFieldChange('imageUrl', base64);
-          else if (target === 'mobile') handleFieldChange('imageMobileUrl', base64);
-          else if (target === 'poster') handleFieldChange('videoPosterUrl', base64);
-          showNotification('info', `Image loaded locally and ready to publish.`);
-        };
-        reader.readAsDataURL(file);
-      } finally {
-        setIsUploading(false);
+
+        setHeroForm((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            mediaType: 'image',
+            imageUrl: res.secureUrl,
+            imageMobileUrl: res.secureUrl,
+            videoPosterUrl: res.secureUrl
+          };
+        });
+
+        showNotification('success', `Image "${file.name}" uploaded successfully! The hero is now set to Image. Click "Publish to Live Homepage" to update the live website.`);
       }
-    } else {
-      // Local persistent Base64
-      const reader = new FileReader();
-      reader.onload = () => {
-        const base64 = reader.result as string;
-        if (target === 'desktop') handleFieldChange('imageUrl', base64);
-        else if (target === 'mobile') handleFieldChange('imageMobileUrl', base64);
-        else if (target === 'poster') handleFieldChange('videoPosterUrl', base64);
-        setIsUploading(false);
-        showNotification('success', `${target.toUpperCase()} image loaded and ready for live preview.`);
-      };
-      reader.readAsDataURL(file);
+    } catch (err: any) {
+      console.error('Media upload error:', err);
+      showNotification('error', 'Upload failed: ' + (err?.message || 'Please check your connection and try again.'));
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0);
     }
-  };
-
-  // Video Upload handler
-  const handleVideoFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!file.type.includes('mp4') && !file.type.includes('webm')) {
-      showNotification('error', 'Invalid video format. Please upload MP4 (H.264) or WebM video.');
-      return;
-    }
-
-    if (file.size > 25 * 1024 * 1024) {
-      showNotification('error', 'Video file exceeds 25MB. Please compress your video to under 25MB for optimal mobile loading.');
-      return;
-    }
-
-    const localUrl = URL.createObjectURL(file);
-    handleFieldChange('videoUrl', localUrl);
-    showNotification('success', `Video "${file.name}" loaded for preview! Remember to enter an official cloud video URL or publish.`);
   };
 
   // Save Draft (Local only)
@@ -187,6 +215,26 @@ export const AdminHeroMediaPage: React.FC = () => {
   // Publish to Live Website
   const handlePublish = async () => {
     if (!heroForm || !settings) return;
+
+    // Strict guard: Never allow temporary browser-session blob: URLs to be published
+    if (heroForm.videoUrl?.startsWith('blob:')) {
+      showNotification('error', 'Video is still uploading or has a temporary session blob URL. Please wait for upload to complete before publishing.');
+      return;
+    }
+    if (heroForm.imageUrl?.startsWith('blob:')) {
+      showNotification('error', 'Image is still uploading or has a temporary session blob URL. Please wait for upload to complete before publishing.');
+      return;
+    }
+    if (heroForm.videoPosterUrl?.startsWith('blob:')) {
+      showNotification('error', 'Poster image has a temporary session blob URL. Please wait for upload to complete before publishing.');
+      return;
+    }
+
+    if (heroForm.mediaType === 'video' && !heroForm.videoUrl) {
+      showNotification('error', 'Please configure or upload a video asset before publishing Video Hero.');
+      return;
+    }
+
     setSaving(true);
     try {
       const updatedHero: HeroSettings = {
@@ -199,6 +247,9 @@ export const AdminHeroMediaPage: React.FC = () => {
         ...settings,
         hero: updatedHero
       });
+
+      // Synchronize in-memory settings context across the application
+      await refreshSettings();
 
       setPublishedHero(updatedHero);
       localStorage.removeItem(DRAFT_STORAGE_KEY);
@@ -424,305 +475,228 @@ export const AdminHeroMediaPage: React.FC = () => {
             {/* LEFT COLUMN: Controls & Settings */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
               
-              {/* Card 1: Media Type Selection */}
+              {/* Card 1: Unified Hero Media Manager (Image or Video) */}
               <div className="card" style={{ padding: '24px', backgroundColor: '#FFFFFF' }}>
-                <h3 style={{ fontSize: '1.05rem', color: 'var(--color-charcoal-900)', margin: '0 0 12px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Layers size={18} style={{ color: 'var(--color-primary-green)' }} />
-                  <span>1. Choose Hero Media Type</span>
-                </h3>
-                <p style={{ fontSize: '0.82rem', color: 'var(--color-charcoal-600)', margin: '0 0 16px 0' }}>
-                  Switch between high-impact photorealistic photography and cinematic video without breaking public layout.
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  <h3 style={{ fontSize: '1.05rem', color: 'var(--color-charcoal-900)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Sparkles size={18} style={{ color: 'var(--color-primary-green)' }} />
+                    <span>1. Hero Media (Image or Video)</span>
+                  </h3>
+                  <span style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    padding: '3px 10px',
+                    borderRadius: '12px',
+                    fontSize: '0.75rem',
+                    fontWeight: 700,
+                    backgroundColor: heroForm.mediaType === 'video' ? '#E8F5E9' : '#E3F2FD',
+                    color: heroForm.mediaType === 'video' ? '#1B5E20' : '#0D47A1'
+                  }}>
+                    {heroForm.mediaType === 'video' ? <VideoIcon size={13} /> : <ImageIcon size={13} />}
+                    <span>{heroForm.mediaType === 'video' ? 'Video Hero Active' : 'Image Hero Active'}</span>
+                  </span>
+                </div>
+
+                <p style={{ fontSize: '0.82rem', color: 'var(--color-charcoal-600)', margin: '0 0 16px 0', lineHeight: '1.5' }}>
+                  Upload a photo or video to display as the homepage hero. The system automatically detects your file format, optimizes it, and renders it across desktop, tablet, and mobile screens.
                 </p>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                {/* Media Preview Box */}
+                <div style={{
+                  position: 'relative',
+                  width: '100%',
+                  height: '190px',
+                  borderRadius: 'var(--radius-md)',
+                  overflow: 'hidden',
+                  backgroundColor: '#0A180E',
+                  marginBottom: '16px',
+                  border: '1px solid var(--color-border-light)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  {heroForm.mediaType === 'video' && heroForm.videoUrl ? (
+                    <video
+                      key={heroForm.videoUrl}
+                      src={heroForm.videoUrl}
+                      poster={heroForm.videoPosterUrl || heroForm.imageUrl}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  ) : (
+                    <img
+                      src={heroForm.imageUrl || '/assets/indus-crop-hero.webp'}
+                      alt="Current hero preview"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  )}
+
+                  {/* Overlay Type Badge */}
+                  <div style={{
+                    position: 'absolute',
+                    top: '10px',
+                    left: '10px',
+                    background: 'rgba(0, 0, 0, 0.75)',
+                    backdropFilter: 'blur(4px)',
+                    color: '#FFFFFF',
+                    padding: '4px 10px',
+                    borderRadius: '6px',
+                    fontSize: '0.74rem',
+                    fontWeight: 600,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}>
+                    {heroForm.mediaType === 'video' ? <VideoIcon size={12} /> : <ImageIcon size={12} />}
+                    <span>{heroForm.mediaType === 'video' ? 'Video Hero' : 'Image Hero'}</span>
+                  </div>
+
+                  {/* Publish Status Indicator */}
+                  <div style={{
+                    position: 'absolute',
+                    bottom: '10px',
+                    left: '10px',
+                    right: '10px',
+                    background: 'rgba(0, 0, 0, 0.75)',
+                    backdropFilter: 'blur(4px)',
+                    color: '#FFFFFF',
+                    padding: '6px 12px',
+                    borderRadius: '6px',
+                    fontSize: '0.74rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
+                  }}>
+                    <span>
+                      {publishedHero?.mediaType === heroForm.mediaType &&
+                       publishedHero?.videoUrl === heroForm.videoUrl &&
+                       publishedHero?.imageUrl === heroForm.imageUrl ? (
+                        <span style={{ color: '#69F0AE', fontWeight: 600 }}>✓ Published & Live on Website</span>
+                      ) : (
+                        <span style={{ color: '#FFD54F', fontWeight: 600 }}>⚠️ Unsaved Changes (Click Publish above)</span>
+                      )}
+                    </span>
+                    <span style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.7rem' }}>
+                      {heroForm.mediaType === 'video' ? 'MP4 / WebM' : 'WebP / JPG'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Single Unified Upload / Replace Button */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/jpg,video/mp4,video/webm"
+                  onChange={handleUnifiedMediaUpload}
+                  style={{ display: 'none' }}
+                />
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '16px' }}>
                   <button
                     type="button"
-                    onClick={() => handleFieldChange('mediaType', 'image')}
+                    className="btn btn-primary"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploading}
                     style={{
-                      padding: '14px',
-                      borderRadius: 'var(--radius-md)',
-                      border: heroForm.mediaType === 'image' ? '2px solid var(--color-primary-green)' : '1px solid var(--color-border-light)',
-                      backgroundColor: heroForm.mediaType === 'image' ? 'var(--color-primary-green-surface)' : '#FAFCFA',
-                      color: heroForm.mediaType === 'image' ? 'var(--color-primary-green-dark)' : 'var(--color-charcoal-700)',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      gap: '6px',
+                      width: '100%',
+                      justifyContent: 'center',
+                      padding: '12px 20px',
+                      fontSize: '0.92rem',
                       fontWeight: 700,
-                      fontSize: '0.9rem',
-                      transition: 'all 0.2s'
+                      gap: '8px'
                     }}
                   >
-                    <ImageIcon size={22} />
-                    <span>Image Hero</span>
-                    <span style={{ fontSize: '0.72rem', fontWeight: 500, color: 'var(--color-charcoal-500)' }}>
-                      Recommended (Ultra Fast)
+                    <Upload size={16} />
+                    <span>
+                      {isUploading
+                        ? `Uploading to Cloud Storage... (${uploadProgress}%)`
+                        : (heroForm.imageUrl || heroForm.videoUrl)
+                        ? 'Replace Media (Upload New Image or Video)'
+                        : 'Upload Hero Image or Video'}
                     </span>
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={() => handleFieldChange('mediaType', 'video')}
-                    style={{
-                      padding: '14px',
-                      borderRadius: 'var(--radius-md)',
-                      border: heroForm.mediaType === 'video' ? '2px solid var(--color-primary-green)' : '1px solid var(--color-border-light)',
-                      backgroundColor: heroForm.mediaType === 'video' ? 'var(--color-primary-green-surface)' : '#FAFCFA',
-                      color: heroForm.mediaType === 'video' ? 'var(--color-primary-green-dark)' : 'var(--color-charcoal-700)',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      gap: '6px',
-                      fontWeight: 700,
-                      fontSize: '0.9rem',
-                      transition: 'all 0.2s'
-                    }}
-                  >
-                    <VideoIcon size={22} />
-                    <span>Video Hero</span>
-                    <span style={{ fontSize: '0.72rem', fontWeight: 500, color: 'var(--color-charcoal-500)' }}>
-                      HTML5 MP4 / WebM
-                    </span>
-                  </button>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--color-charcoal-500)', margin: 0, textAlign: 'center', lineHeight: '1.4' }}>
+                    Select an image (JPG, PNG, WebP up to 15MB) or video (MP4, WebM up to 25MB). Auto-detected and stored permanently.
+                  </p>
                 </div>
+
+                {/* Quick Display Switcher (if both formats are available) */}
+                <div style={{ borderTop: '1px solid var(--color-border-light)', paddingTop: '14px', marginTop: '4px' }}>
+                  <label className="form-label" style={{ fontSize: '0.78rem', marginBottom: '8px', display: 'block', color: 'var(--color-charcoal-600)' }}>
+                    Active Hero Display Mode:
+                  </label>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                    <button
+                      type="button"
+                      onClick={() => handleFieldChange('mediaType', 'image')}
+                      style={{
+                        padding: '8px 12px',
+                        borderRadius: 'var(--radius-sm)',
+                        border: heroForm.mediaType === 'image' ? '2px solid var(--color-primary-green)' : '1px solid var(--color-border-light)',
+                        backgroundColor: heroForm.mediaType === 'image' ? 'var(--color-primary-green-surface)' : '#FAFCFA',
+                        color: heroForm.mediaType === 'image' ? 'var(--color-primary-green-dark)' : 'var(--color-charcoal-700)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        fontSize: '0.82rem',
+                        fontWeight: 600
+                      }}
+                    >
+                      <ImageIcon size={15} />
+                      <span>Display Image</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleFieldChange('mediaType', 'video')}
+                      style={{
+                        padding: '8px 12px',
+                        borderRadius: 'var(--radius-sm)',
+                        border: heroForm.mediaType === 'video' ? '2px solid var(--color-primary-green)' : '1px solid var(--color-border-light)',
+                        backgroundColor: heroForm.mediaType === 'video' ? 'var(--color-primary-green-surface)' : '#FAFCFA',
+                        color: heroForm.mediaType === 'video' ? 'var(--color-primary-green-dark)' : 'var(--color-charcoal-700)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        fontSize: '0.82rem',
+                        fontWeight: 600
+                      }}
+                    >
+                      <VideoIcon size={15} />
+                      <span>Display Video</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Additional Playback Options for Video */}
+                {heroForm.mediaType === 'video' && (
+                  <div style={{ marginTop: '12px', padding: '10px 12px', backgroundColor: '#F8FAF8', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border-light)' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem', cursor: 'pointer', margin: 0 }}>
+                      <input
+                        type="checkbox"
+                        checked={heroForm.videoLoop !== false}
+                        onChange={(e) => handleFieldChange('videoLoop', e.target.checked)}
+                      />
+                      <span><strong>Loop video continuously</strong> (Muted autoplay on all devices)</span>
+                    </label>
+                  </div>
+                )}
               </div>
 
-              {/* Card 2: Image Media Settings (Shown if Image Hero) */}
-              {heroForm.mediaType === 'image' && (
-                <div className="card" style={{ padding: '24px', backgroundColor: '#FFFFFF' }}>
-                  <h3 style={{ fontSize: '1.05rem', color: 'var(--color-charcoal-900)', margin: '0 0 12px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <ImageIcon size={18} style={{ color: 'var(--color-primary-green)' }} />
-                    <span>2. Image Asset & Positioning</span>
-                  </h3>
-
-                  {/* Desktop Image Upload */}
-                  <div className="form-group" style={{ marginBottom: '16px' }}>
-                    <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span>Desktop Landscape Image (16:9)</span>
-                      <span style={{ color: 'var(--color-primary-green)', fontWeight: 600 }}>WebP / JPG</span>
-                    </label>
-                    <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
-                      <input 
-                        type="text" 
-                        className="form-control"
-                        value={heroForm.imageUrl}
-                        onChange={(e) => handleFieldChange('imageUrl', e.target.value)}
-                        placeholder="/assets/indus-crop-hero.webp or https://..."
-                        style={{ fontSize: '0.85rem' }}
-                      />
-                      <label 
-                        className="btn btn-outline" 
-                        style={{ padding: '0 14px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}
-                      >
-                        <Upload size={14} />
-                        <span>Upload</span>
-                        <input 
-                          type="file" 
-                          accept="image/jpeg,image/png,image/webp,image/jpg" 
-                          onChange={(e) => handleImageFileUpload(e, 'desktop')} 
-                          style={{ display: 'none' }} 
-                        />
-                      </label>
-                    </div>
-                  </div>
-
-                  {/* Mobile Image Upload (Optional separate crop) */}
-                  <div className="form-group" style={{ marginBottom: '16px' }}>
-                    <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span>Mobile Portrait Crop (Optional)</span>
-                      <span style={{ color: 'var(--color-charcoal-500)', fontWeight: 500 }}>375px+ screens</span>
-                    </label>
-                    <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
-                      <input 
-                        type="text" 
-                        className="form-control"
-                        value={heroForm.imageMobileUrl || ''}
-                        onChange={(e) => handleFieldChange('imageMobileUrl', e.target.value)}
-                        placeholder="e.g. /assets/indus-crop-hero-mobile.webp"
-                        style={{ fontSize: '0.85rem' }}
-                      />
-                      <label 
-                        className="btn btn-outline" 
-                        style={{ padding: '0 14px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}
-                      >
-                        <Upload size={14} />
-                        <span>Upload</span>
-                        <input 
-                          type="file" 
-                          accept="image/jpeg,image/png,image/webp,image/jpg" 
-                          onChange={(e) => handleImageFileUpload(e, 'mobile')} 
-                          style={{ display: 'none' }} 
-                        />
-                      </label>
-                    </div>
-                  </div>
-
-                  {/* Desktop Horizon & Vertical Positioning */}
-                  <div className="form-group" style={{ marginBottom: '16px' }}>
-                    <label className="form-label">
-                      Desktop Focal Point & Horizon Alignment
-                    </label>
-                    <select 
-                      className="form-control"
-                      value={heroForm.imagePositionDesktop || 'center 36%'}
-                      onChange={(e) => handleFieldChange('imagePositionDesktop', e.target.value)}
-                    >
-                      <option value="center 36%">Golden Horizon (Recommended: 36% from top)</option>
-                      <option value="center center">Dead Center (50% 50%)</option>
-                      <option value="center top">High Horizon (Top of field)</option>
-                      <option value="center bottom">Close Foliage (Bottom crop leaves)</option>
-                      <option value="left center">Focus on Left Foliage</option>
-                      <option value="right center">Focus on Right Sunlit Rows</option>
-                    </select>
-                  </div>
-
-                  {/* Mobile Focal Point Positioning */}
-                  <div className="form-group" style={{ marginBottom: '16px' }}>
-                    <label className="form-label">
-                      Mobile Focal Point Alignment
-                    </label>
-                    <select 
-                      className="form-control"
-                      value={heroForm.imagePositionMobile || 'center center'}
-                      onChange={(e) => handleFieldChange('imagePositionMobile', e.target.value)}
-                    >
-                      <option value="center center">Center Crop (Recommended for mobile)</option>
-                      <option value="center 30%">Upper Horizon (30% vertical)</option>
-                      <option value="42% center">Left-Center Crop (Balanced for text)</option>
-                      <option value="right center">Right Sunlit Rows Focus</option>
-                    </select>
-                  </div>
-
-                  {/* Image Fit Mode */}
-                  <div className="form-group" style={{ margin: 0 }}>
-                    <label className="form-label">
-                      Image Fit Sizing
-                    </label>
-                    <div style={{ display: 'flex', gap: '12px' }}>
-                      <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.86rem', cursor: 'pointer' }}>
-                        <input 
-                          type="radio" 
-                          name="imageFit" 
-                          checked={heroForm.imageFit === 'cover'} 
-                          onChange={() => handleFieldChange('imageFit', 'cover')} 
-                        />
-                        <span>Cover (Full Bleed Hero Background)</span>
-                      </label>
-                      <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.86rem', cursor: 'pointer' }}>
-                        <input 
-                          type="radio" 
-                          name="imageFit" 
-                          checked={heroForm.imageFit === 'contain'} 
-                          onChange={() => handleFieldChange('imageFit', 'contain')} 
-                        />
-                        <span>Contain (Show full unaltered frame)</span>
-                      </label>
-                    </div>
-                  </div>
-
-                </div>
-              )}
-
-              {/* Card 3: Video Media Settings (Shown if Video Hero) */}
-              {heroForm.mediaType === 'video' && (
-                <div className="card" style={{ padding: '24px', backgroundColor: '#FFFFFF' }}>
-                  <h3 style={{ fontSize: '1.05rem', color: 'var(--color-charcoal-900)', margin: '0 0 12px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <VideoIcon size={18} style={{ color: 'var(--color-primary-green)' }} />
-                    <span>2. Video Stream & Poster Controls</span>
-                  </h3>
-
-                  {/* Video URL & File Upload */}
-                  <div className="form-group" style={{ marginBottom: '16px' }}>
-                    <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span>Desktop Video Asset (MP4 / WebM)</span>
-                      <span style={{ color: 'var(--color-charcoal-500)', fontSize: '0.78rem' }}>Under 25MB</span>
-                    </label>
-                    <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
-                      <input 
-                        type="text" 
-                        className="form-control"
-                        value={heroForm.videoUrl || ''}
-                        onChange={(e) => handleFieldChange('videoUrl', e.target.value)}
-                        placeholder="/videos/hero-cinematic.mp4 or https://..."
-                        style={{ fontSize: '0.85rem' }}
-                      />
-                      <label 
-                        className="btn btn-outline" 
-                        style={{ padding: '0 14px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}
-                      >
-                        <Upload size={14} />
-                        <span>Upload</span>
-                        <input 
-                          type="file" 
-                          accept="video/mp4,video/webm" 
-                          onChange={handleVideoFileUpload} 
-                          style={{ display: 'none' }} 
-                        />
-                      </label>
-                    </div>
-                  </div>
-
-                  {/* Video Fallback Poster Image */}
-                  <div className="form-group" style={{ marginBottom: '16px' }}>
-                    <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span>Fallback Poster Photograph</span>
-                      <span style={{ color: 'var(--color-primary-green)', fontWeight: 600 }}>Zero layout shift</span>
-                    </label>
-                    <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
-                      <input 
-                        type="text" 
-                        className="form-control"
-                        value={heroForm.videoPosterUrl || ''}
-                        onChange={(e) => handleFieldChange('videoPosterUrl', e.target.value)}
-                        placeholder="/assets/indus-crop-hero.webp"
-                        style={{ fontSize: '0.85rem' }}
-                      />
-                      <label 
-                        className="btn btn-outline" 
-                        style={{ padding: '0 14px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}
-                      >
-                        <Upload size={14} />
-                        <span>Upload</span>
-                        <input 
-                          type="file" 
-                          accept="image/*" 
-                          onChange={(e) => handleImageFileUpload(e, 'poster')} 
-                          style={{ display: 'none' }} 
-                        />
-                      </label>
-                    </div>
-                  </div>
-
-                  {/* Video Playback Flags */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.86rem', cursor: 'pointer' }}>
-                      <input 
-                        type="checkbox" 
-                        checked={heroForm.videoMuted !== false} 
-                        disabled 
-                      />
-                      <span><strong>Always Muted (Locked):</strong> Required for browser autoplay policies & farmer friendliness.</span>
-                    </label>
-
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.86rem', cursor: 'pointer' }}>
-                      <input 
-                        type="checkbox" 
-                        checked={heroForm.videoLoop !== false} 
-                        onChange={(e) => handleFieldChange('videoLoop', e.target.checked)} 
-                      />
-                      <span>Loop Video Continuously</span>
-                    </label>
-                  </div>
-                </div>
-              )}
-
-              {/* Card 4: Presentation & Overlay Sliders */}
+              {/* Card 2: Presentation & Legibility Overlays */}
               <div className="card" style={{ padding: '24px', backgroundColor: '#FFFFFF' }}>
                 <h3 style={{ fontSize: '1.05rem', color: 'var(--color-charcoal-900)', margin: '0 0 12px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Sliders size={18} style={{ color: 'var(--color-primary-green)' }} />
-                  <span>3. Presentation & Legibility Overlays</span>
+                  <span>2. Presentation & Legibility Overlays</span>
                 </h3>
 
                 {/* Darkness Slider */}
@@ -767,11 +741,11 @@ export const AdminHeroMediaPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Card 5: Editable Hero Copy & CTAs */}
+              {/* Card 3: Editable Hero Copy & CTAs */}
               <div className="card" style={{ padding: '24px', backgroundColor: '#FFFFFF' }}>
                 <h3 style={{ fontSize: '1.05rem', color: 'var(--color-charcoal-900)', margin: '0 0 12px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Sparkles size={18} style={{ color: 'var(--color-harvest-gold)' }} />
-                  <span>4. Editable Headline & Call-to-Actions</span>
+                  <span>3. Editable Headline & Call-to-Actions</span>
                 </h3>
 
                 <div className="form-group" style={{ marginBottom: '14px' }}>
@@ -1025,13 +999,16 @@ export const AdminHeroMediaPage: React.FC = () => {
                         position: 'absolute',
                         inset: 0,
                         zIndex: 1,
-                        backgroundImage: heroForm.mediaType === 'image' ? `url('${previewDevice === 'mobile' && heroForm.imageMobileUrl ? heroForm.imageMobileUrl : heroForm.imageUrl}')` : undefined,
+                        backgroundImage: heroForm.mediaType === 'image' 
+                          ? `url('${previewDevice === 'mobile' && heroForm.imageMobileUrl ? heroForm.imageMobileUrl : heroForm.imageUrl}')` 
+                          : `url('${heroForm.videoPosterUrl || heroForm.imageUrl}')`,
                         backgroundSize: heroForm.imageFit || 'cover',
                         backgroundPosition: previewDevice === 'mobile' ? (heroForm.imagePositionMobile || 'center center') : (heroForm.imagePositionDesktop || 'center 36%'),
                         backgroundRepeat: 'no-repeat'
                       }}>
                         {heroForm.mediaType === 'video' && heroForm.videoUrl && (
                           <video
+                            key={heroForm.videoUrl}
                             autoPlay
                             muted
                             loop
@@ -1039,7 +1016,10 @@ export const AdminHeroMediaPage: React.FC = () => {
                             poster={heroForm.videoPosterUrl || heroForm.imageUrl}
                             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                           >
-                            <source src={heroForm.videoUrl} type="video/mp4" />
+                            <source 
+                              src={heroForm.videoUrl} 
+                              type={heroForm.videoUrl.toLowerCase().includes('.webm') ? 'video/webm' : 'video/mp4'} 
+                            />
                           </video>
                         )}
                       </div>

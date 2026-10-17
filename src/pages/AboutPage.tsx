@@ -113,23 +113,21 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onOpenQuote }) => {
               }}>
                 <div style={{ 
                   width: '96px', 
-                  height: '100px', 
-                  borderRadius: '14px', 
+                  height: '106px', 
+                  borderRadius: '12px', 
                   overflow: 'hidden', 
                   flexShrink: 0, 
-                  background: 'linear-gradient(135deg, #FFFFFF 0%, #F5F7F4 100%)', 
                   boxShadow: '0 4px 16px rgba(14, 107, 56, 0.08), 0 2px 6px rgba(0, 0, 0, 0.05)',
-                  border: '1px solid rgba(212, 175, 55, 0.45)',
+                  border: '2px solid rgba(212, 175, 55, 0.55)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  padding: '3px',
                   boxSizing: 'border-box'
                 }}>
                   <img 
                     src="/images/branding/indus/md-narendranath-dut.png" 
                     alt="K. Narendranath Dut"
-                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 15%' }}
                     loading="lazy"
                   />
                 </div>
@@ -158,23 +156,21 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onOpenQuote }) => {
               }}>
                 <div style={{ 
                   width: '96px', 
-                  height: '100px', 
-                  borderRadius: '14px', 
+                  height: '106px', 
+                  borderRadius: '12px', 
                   overflow: 'hidden', 
                   flexShrink: 0, 
-                  background: 'linear-gradient(135deg, #FFFFFF 0%, #F5F7F4 100%)', 
                   boxShadow: '0 4px 16px rgba(14, 107, 56, 0.08), 0 2px 6px rgba(0, 0, 0, 0.05)',
-                  border: '1px solid rgba(212, 175, 55, 0.45)',
+                  border: '2px solid rgba(212, 175, 55, 0.55)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  padding: '3px',
                   boxSizing: 'border-box'
                 }}>
                   <img 
                     src="/images/branding/indus/director-anoopkumar.png" 
                     alt="K. Anoopkumar"
-                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 15%' }}
                     loading="lazy"
                   />
                 </div>

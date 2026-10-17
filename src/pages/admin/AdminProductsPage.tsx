@@ -1,14 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { PlusCircle, Edit3, Trash2, Eye, EyeOff, Search } from 'lucide-react';
+import { PlusCircle, Edit3, Trash2, Eye, EyeOff, Search, AlertCircle, CheckCircle2, X } from 'lucide-react';
 import { AdminNav } from '../../components/admin/AdminNav';
 import { Product } from '../../types/product';
-import { getAllProductsAdmin, saveProduct, deleteProduct } from '../../services/productService';
+import { getAllProductsAdmin, saveProduct, deleteProduct, subscribeToProducts } from '../../services/productService';
 
 export const AdminProductsPage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [actionSuccess, setActionSuccess] = useState<string | null>(null);
 
   const loadProducts = () => {
     setLoading(true);
@@ -18,27 +20,82 @@ export const AdminProductsPage: React.FC = () => {
   };
 
   useEffect(() => {
-    loadProducts();
+    let isMounted = true;
+    getAllProductsAdmin()
+      .then(prods => {
+        if (isMounted) {
+          setProducts(prods);
+          setLoading(false);
+        }
+      });
+
+    const unsubscribe = subscribeToProducts(() => {
+      getAllProductsAdmin().then(prods => {
+        if (isMounted) {
+          setProducts(prods);
+        }
+      });
+    });
+
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
   }, []);
 
   const handleTogglePublish = async (product: Product) => {
+    setActionError(null);
     const updated = !product.isPublished;
-    await saveProduct({ isPublished: updated }, product.id);
-    setProducts(prev => prev.map(p => p.id === product.id ? { ...p, isPublished: updated } : p));
-  };
-
-  const handleDelete = async (id: string, name: string) => {
-    if (window.confirm(`Are you sure you want to delete product "${name}"? This action cannot be undone.`)) {
-      await deleteProduct(id);
-      setProducts(prev => prev.filter(p => p.id !== id));
+    try {
+      await saveProduct({ isPublished: updated }, product.id);
+      setProducts(prev => prev.map(p => p.id === product.id ? { ...p, isPublished: updated } : p));
+      setActionSuccess(`Product "${product.name}" is now marked as ${updated ? 'Published' : 'Draft'}.`);
+      setTimeout(() => setActionSuccess(null), 3500);
+    } catch (err: any) {
+      console.error('Toggle publish failed:', err);
+      setActionError(`Failed to update publication status: ${err?.message || 'Database operation failed'}`);
     }
   };
 
-  const filtered = products.filter(p => 
-    p.name.toLowerCase().includes(search.toLowerCase()) ||
-    p.code.toLowerCase().includes(search.toLowerCase()) ||
-    p.category.toLowerCase().includes(search.toLowerCase())
-  );
+  const handleDelete = async (id: string, name: string) => {
+    setActionError(null);
+    if (window.confirm(`Are you sure you want to delete product "${name}"? This action cannot be undone.`)) {
+      try {
+        await deleteProduct(id);
+        setProducts(prev => prev.filter(p => p.id !== id));
+        setActionSuccess(`Product "${name}" was permanently removed.`);
+        setTimeout(() => setActionSuccess(null), 3500);
+      } catch (err: any) {
+        console.error('Delete product failed:', err);
+        setActionError(`Failed to delete product: ${err?.message || 'Database operation failed'}`);
+      }
+    }
+  };
+
+  const searchTerms = useMemo(() => {
+    return search.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  }, [search]);
+
+  const filtered = useMemo(() => {
+    if (searchTerms.length === 0) return products;
+
+    return products.filter(p => {
+      const targetText = [
+        p.name || '',
+        p.code || '',
+        p.category || '',
+        p.formulation || '',
+        p.composition || '',
+        p.broadGroup || '',
+        p.categoryTelugu || '',
+        p.shortDescription || '',
+        p.description || '',
+        p.sourcePage ? `page ${p.sourcePage}` : ''
+      ].join(' ').toLowerCase();
+
+      return searchTerms.every(term => targetText.includes(term));
+    });
+  }, [products, searchTerms]);
 
   return (
     <div className="admin-layout">
@@ -62,22 +119,64 @@ export const AdminProductsPage: React.FC = () => {
 
         <div className="admin-content">
           
+          {actionError && (
+            <div style={{ backgroundColor: '#FFEBEE', border: '1px solid #FFCDD2', padding: '12px 18px', borderRadius: 'var(--radius-md)', color: '#C62828', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <AlertCircle size={18} />
+              <span>{actionError}</span>
+            </div>
+          )}
+
+          {actionSuccess && (
+            <div style={{ backgroundColor: '#E8F5E9', border: '1px solid #A5D6A7', padding: '12px 18px', borderRadius: 'var(--radius-md)', color: '#2E7D32', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <CheckCircle2 size={18} />
+              <span>{actionSuccess}</span>
+            </div>
+          )}
+
           <div className="admin-table-card">
             <div className="admin-table-header" style={{ flexWrap: 'wrap', gap: '16px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--color-text-title)' }}>
-                  Total Catalog Items: {products.length}
+                  {search.trim() ? (
+                    <>Showing <strong>{filtered.length}</strong> of {products.length} products</>
+                  ) : (
+                    <>Total Catalog Items: {products.length}</>
+                  )}
                 </span>
               </div>
 
-              <div className="product-search-input" style={{ minWidth: '240px' }}>
-                <Search size={16} className="search-icon" />
+              <div className="product-search-input" style={{ minWidth: '260px', position: 'relative' }}>
+                <Search size={16} className="search-icon" aria-hidden="true" />
                 <input 
                   type="text" 
-                  placeholder="Filter by name, formulation, category..."
+                  placeholder="Search by code, formulation, crop, category..."
                   value={search}
                   onChange={e => setSearch(e.target.value)}
+                  style={{ paddingRight: search ? '36px' : '16px' }}
+                  aria-label="Filter products catalogue"
                 />
+                {search && (
+                  <button
+                    type="button"
+                    onClick={() => setSearch('')}
+                    style={{
+                      position: 'absolute',
+                      right: '10px',
+                      background: 'none',
+                      border: 'none',
+                      color: 'var(--color-text-muted)',
+                      cursor: 'pointer',
+                      padding: '4px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                    title="Clear search filter"
+                    aria-label="Clear search filter"
+                  >
+                    <X size={15} />
+                  </button>
+                )}
               </div>
             </div>
 
@@ -86,8 +185,17 @@ export const AdminProductsPage: React.FC = () => {
                 Loading product records...
               </div>
             ) : filtered.length === 0 ? (
-              <div style={{ padding: '60px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
-                No products found matching "{search}".
+              <div style={{ padding: '60px 20px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
+                <p style={{ margin: '0 0 16px 0', fontSize: '1rem' }}>
+                  No products found matching &ldquo;<strong>{search}</strong>&rdquo;.
+                </p>
+                <button 
+                  type="button"
+                  className="btn btn-outline btn-sm"
+                  onClick={() => setSearch('')}
+                >
+                  Clear Search Filter
+                </button>
               </div>
             ) : (
               <div className="admin-table-responsive">

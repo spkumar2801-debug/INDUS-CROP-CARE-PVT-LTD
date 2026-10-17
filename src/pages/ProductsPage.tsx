@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Search, Sprout, RotateCcw, Filter, CheckCircle2, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { Product } from '../types/product';
-import { getPublishedProducts } from '../services/productService';
+import { getPublishedProducts, subscribeToProducts } from '../services/productService';
 import { ProductCard } from '../components/products/ProductCard';
 import { 
   MAIN_CATEGORIES, 
@@ -46,11 +46,25 @@ export const ProductsPage: React.FC<ProductsPageProps> = ({ onOpenQuote, onOpenD
     return isNaN(p) || p < 1 ? 1 : p;
   }, [searchParams]);
 
-  // Load published catalogue
+  // Load published catalogue & listen for live reactive updates
   useEffect(() => {
-    getPublishedProducts()
-      .then(data => setProducts(data))
-      .finally(() => setLoading(false));
+    let isMounted = true;
+    const fetchProducts = () => {
+      getPublishedProducts()
+        .then(data => {
+          if (isMounted) {
+            setProducts(data);
+            setLoading(false);
+          }
+        });
+    };
+
+    fetchProducts();
+    const unsubscribe = subscribeToProducts(fetchProducts);
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
   }, []);
 
   // Compute exact product counts across all 12 main categories
