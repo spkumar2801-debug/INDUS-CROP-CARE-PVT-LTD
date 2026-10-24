@@ -10,53 +10,58 @@ export const BrandedPageLoader: React.FC<BrandedPageLoaderProps> = () => {
   const isInitialMount = useRef(true);
   const previousPath = useRef(location.pathname);
 
-  // Check if session has already displayed initial cinematic logo reveal
+  // Check if session has already displayed initial cinematic logo reveal or prefers reduced motion
   const [showInitial, setShowInitial] = useState(() => {
     try {
-      if (typeof window !== 'undefined' && sessionStorage.getItem('indus_intro_played')) {
-        return false;
+      if (typeof window !== 'undefined') {
+        if (sessionStorage.getItem('indus_intro_played')) {
+          return false;
+        }
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          sessionStorage.setItem('indus_intro_played', 'true');
+          return false;
+        }
       }
     } catch {}
     return true;
   });
 
-  const [showRouteTransition, setShowRouteTransition] = useState(false);
-  const [fadingOut, setFadingOut] = useState(false);
+  const [initialFadingOut, setInitialFadingOut] = useState(false);
+  const [showTransition, setShowTransition] = useState(false);
+  const [transitionFadingOut, setTransitionFadingOut] = useState(false);
 
   // Skip handler on click or keypress
   const handleSkip = () => {
-    setFadingOut(true);
-    setTimeout(() => {
-      setShowInitial(false);
-      setShowRouteTransition(false);
-      try {
-        sessionStorage.setItem('indus_intro_played', 'true');
-      } catch {}
-    }, 280);
+    if (showInitial) {
+      setInitialFadingOut(true);
+      setTimeout(() => {
+        setShowInitial(false);
+        try {
+          sessionStorage.setItem('indus_intro_played', 'true');
+        } catch {}
+      }, 200);
+    }
+    if (showTransition) {
+      setTransitionFadingOut(true);
+      setTimeout(() => {
+        setShowTransition(false);
+      }, 150);
+    }
   };
 
-  // Initial load intro animation (~1.1s total, non-blocking)
+  // 1. Initial entry intro animation (~1.9s total: ~1.55s active + 0.35s fade transition)
   useEffect(() => {
     if (!showInitial) return;
 
-    // Respect reduced motion immediately
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion) {
-      setShowInitial(false);
-      try { sessionStorage.setItem('indus_intro_played', 'true'); } catch {}
-      return;
-    }
-
-    // Smooth sequence: card emerges -> progress bar shines -> fade-out transition into hero
     const fadeTimer = setTimeout(() => {
-      setFadingOut(true);
-    }, 1050);
+      setInitialFadingOut(true);
+    }, 1550);
 
     const doneTimer = setTimeout(() => {
       setShowInitial(false);
-      setFadingOut(false);
+      setInitialFadingOut(false);
       try { sessionStorage.setItem('indus_intro_played', 'true'); } catch {}
-    }, 1380);
+    }, 1950);
 
     return () => {
       clearTimeout(fadeTimer);
@@ -64,93 +69,143 @@ export const BrandedPageLoader: React.FC<BrandedPageLoaderProps> = () => {
     };
   }, [showInitial]);
 
-  // Subtle lightweight route transition (About, Products, Gallery, Contact)
+  // 2. Page-Transition animation on public navigation options (~1.0s brief transition)
   useEffect(() => {
+    // Skip on initial mount
     if (isInitialMount.current) {
       isInitialMount.current = false;
       previousPath.current = location.pathname;
       return;
     }
 
+    // Skip if pathname has not changed (e.g. query params, hash changes, component rerenders)
     if (location.pathname === previousPath.current) {
       return;
     }
 
-    previousPath.current = location.pathname;
+    const prev = previousPath.current;
+    const next = location.pathname;
+    previousPath.current = next;
 
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion) {
+    // Do not trigger public page transition inside admin portal routes
+    if (prev.startsWith('/admin') && next.startsWith('/admin')) {
       return;
     }
 
-    // Ultra-light 280ms transition for page-to-page navigation
-    setShowRouteTransition(true);
-    setFadingOut(false);
+    // Do not trigger if initial intro is currently running
+    if (showInitial) {
+      return;
+    }
+
+    // Respect reduced-motion preferences
+    try {
+      if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        return;
+      }
+    } catch {}
+
+    // Trigger brief 1.0s page transition
+    setShowTransition(true);
+    setTransitionFadingOut(false);
 
     const fadeTimer = setTimeout(() => {
-      setFadingOut(true);
-    }, 220);
+      setTransitionFadingOut(true);
+    }, 750);
 
     const doneTimer = setTimeout(() => {
-      setShowRouteTransition(false);
-      setFadingOut(false);
-    }, 360);
+      setShowTransition(false);
+      setTransitionFadingOut(false);
+    }, 1000);
 
     return () => {
       clearTimeout(fadeTimer);
       clearTimeout(doneTimer);
     };
-  }, [location.pathname]);
+  }, [location.pathname, showInitial]);
 
-  const isVisible = showInitial || showRouteTransition;
-  if (!isVisible) return null;
+  // If initial intro is active
+  if (showInitial) {
+    return (
+      <div 
+        className={`branded-loader-overlay ${initialFadingOut ? 'fade-out' : ''}`}
+        onClick={handleSkip}
+        title="Click anywhere to continue"
+        aria-live="polite"
+        aria-label="Loading Indus Crop Care Pvt. Ltd."
+        role="status"
+      >
+        <div className="branded-loader-card">
+          {/* Official Indus Crop Care Logo Frame */}
+          <div className="branded-loader-logo-frame">
+            <img 
+              src="/images/branding/indus/indus-logo.png" 
+              alt="Indus Crop Care Pvt. Ltd. Official Logo" 
+              className="branded-loader-logo"
+              loading="eager"
+              decoding="async"
+            />
+          </div>
 
-  return (
-    <div 
-      className={`branded-loader-overlay ${showRouteTransition ? 'route-transition' : ''} ${fadingOut ? 'fade-out' : ''}`}
-      onClick={handleSkip}
-      title={showInitial ? "Click anywhere to continue" : undefined}
-      aria-live="polite"
-      aria-label="Loading Indus Crop Care Pvt. Ltd."
-      role="status"
-    >
-      <div className={`branded-loader-card ${showRouteTransition ? 'card-compact' : ''}`}>
-        
-        {/* Official Indus Crop Care Logo Frame */}
-        <div className="branded-loader-logo-frame">
-          <img 
-            src="/images/branding/indus/indus-logo.png" 
-            alt="Indus Crop Care Pvt. Ltd. Official Logo" 
-            className="branded-loader-logo"
-            loading="eager"
-            decoding="async"
-          />
-        </div>
-
-        {/* Company Title Eyebrow */}
-        {!showRouteTransition && (
+          {/* Company Title Eyebrow */}
           <span className="branded-loader-company-name">
             Indus Crop Care Pvt. Ltd.
           </span>
-        )}
 
-        {/* Animated Emerald & Gold Shimmer Bar */}
-        <div className="branded-loader-progress-track">
-          <div className="branded-loader-progress-bar" />
+          {/* Animated Emerald & Gold Shimmer Bar */}
+          <div className="branded-loader-progress-track">
+            <div className="branded-loader-progress-bar" />
+          </div>
+
+          {/* Telugu Brand Motto */}
+          <p className="branded-loader-motto">
+            రైతన్నకు భరోసా.. ఇండస్ ఉత్పాదనలు
+          </p>
+
+          <span className="branded-loader-skip-hint">
+            Click anywhere to skip
+          </span>
         </div>
-
-        {/* Telugu Brand Motto */}
-        {!showRouteTransition && (
-          <>
-            <p className="branded-loader-motto">
-              రైతన్నకు భరోసా.. ఇండస్ ఉత్పాదనలు
-            </p>
-            <span className="branded-loader-skip-hint">
-              Click anywhere to skip
-            </span>
-          </>
-        )}
       </div>
-    </div>
-  );
+    );
+  }
+
+  // If page transition is active
+  if (showTransition) {
+    return (
+      <div 
+        className={`branded-loader-overlay is-page-transition ${transitionFadingOut ? 'fade-out' : ''}`}
+        onClick={handleSkip}
+        title="Loading page..."
+        aria-live="polite"
+        aria-label="Loading page"
+        role="status"
+      >
+        <div className="branded-loader-card card-transition">
+          {/* Official Indus Crop Care Logo Frame */}
+          <div className="branded-loader-logo-frame">
+            <img 
+              src="/images/branding/indus/indus-logo.png" 
+              alt="Indus Crop Care Pvt. Ltd." 
+              className="branded-loader-logo"
+              loading="eager"
+              decoding="async"
+            />
+          </div>
+
+          {/* Animated Emerald & Gold Shimmer Bar */}
+          <div className="branded-loader-progress-track">
+            <div className="branded-loader-progress-bar" />
+          </div>
+
+          {/* Clean Navigation Indicator Label */}
+          <span className="page-transition-label">
+            Indus Crop Care
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  return null;
 };
+

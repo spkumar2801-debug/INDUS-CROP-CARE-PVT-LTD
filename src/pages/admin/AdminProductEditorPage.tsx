@@ -224,6 +224,7 @@ export const AdminProductEditorPage: React.FC = () => {
                     <option value="Biofertilizers">Biofertilizers</option>
                     <option value="Bio Stimulants">Bio Stimulants</option>
                     <option value="Micronutrients / Nutrients">Micronutrients / Nutrients</option>
+                    <option value="Micronutrients Combo">Micronutrients Combo</option>
                     <option value="Antibiotic Products">Antibiotic Products</option>
                   </optgroup>
                   <optgroup label="INDAS Seeds Division Crops">
@@ -261,6 +262,7 @@ export const AdminProductEditorPage: React.FC = () => {
                   <option value="Water-Soluble Fertilizers">Water-Soluble Fertilizers</option>
                   <option value="Biofertilizers">Biofertilizers</option>
                   <option value="Micronutrients / Nutrients">Micronutrients / Nutrients</option>
+                  <option value="Micronutrients Combo">Micronutrients Combo</option>
                   <option value="Biostimulants">Biostimulants</option>
                   <option value="PGR">PGR</option>
                   <option value="Antibiotics">Antibiotics</option>

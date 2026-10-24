@@ -470,13 +470,13 @@ export const AdminHeroMediaPage: React.FC = () => {
           </div>
 
           {/* TWO COLUMN WORKSPACE: Controls on Left, Device Preview on Right */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(340px, 480px) 1fr', gap: '28px', alignItems: 'start' }}>
+          <div className="hero-media-workspace">
             
             {/* LEFT COLUMN: Controls & Settings */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', minWidth: 0, width: '100%' }}>
               
               {/* Card 1: Unified Hero Media Manager (Image or Video) */}
-              <div className="card" style={{ padding: '24px', backgroundColor: '#FFFFFF' }}>
+              <div className="card hero-media-card" style={{ backgroundColor: '#FFFFFF' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                   <h3 style={{ fontSize: '1.05rem', color: 'var(--color-charcoal-900)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <Sparkles size={18} style={{ color: 'var(--color-primary-green)' }} />
@@ -556,21 +556,7 @@ export const AdminHeroMediaPage: React.FC = () => {
                   </div>
 
                   {/* Publish Status Indicator */}
-                  <div style={{
-                    position: 'absolute',
-                    bottom: '10px',
-                    left: '10px',
-                    right: '10px',
-                    background: 'rgba(0, 0, 0, 0.75)',
-                    backdropFilter: 'blur(4px)',
-                    color: '#FFFFFF',
-                    padding: '6px 12px',
-                    borderRadius: '6px',
-                    fontSize: '0.74rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between'
-                  }}>
+                  <div className="hero-media-status-banner">
                     <span>
                       {publishedHero?.mediaType === heroForm.mediaType &&
                        publishedHero?.videoUrl === heroForm.videoUrl &&
@@ -630,7 +616,7 @@ export const AdminHeroMediaPage: React.FC = () => {
                   <label className="form-label" style={{ fontSize: '0.78rem', marginBottom: '8px', display: 'block', color: 'var(--color-charcoal-600)' }}>
                     Active Hero Display Mode:
                   </label>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '10px' }}>
                     <button
                       type="button"
                       onClick={() => handleFieldChange('mediaType', 'image')}
@@ -693,7 +679,7 @@ export const AdminHeroMediaPage: React.FC = () => {
               </div>
 
               {/* Card 2: Presentation & Legibility Overlays */}
-              <div className="card" style={{ padding: '24px', backgroundColor: '#FFFFFF' }}>
+              <div className="card hero-media-card" style={{ backgroundColor: '#FFFFFF' }}>
                 <h3 style={{ fontSize: '1.05rem', color: 'var(--color-charcoal-900)', margin: '0 0 12px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Sliders size={18} style={{ color: 'var(--color-primary-green)' }} />
                   <span>2. Presentation & Legibility Overlays</span>
@@ -742,7 +728,7 @@ export const AdminHeroMediaPage: React.FC = () => {
               </div>
 
               {/* Card 3: Editable Hero Copy & CTAs */}
-              <div className="card" style={{ padding: '24px', backgroundColor: '#FFFFFF' }}>
+              <div className="card hero-media-card" style={{ backgroundColor: '#FFFFFF' }}>
                 <h3 style={{ fontSize: '1.05rem', color: 'var(--color-charcoal-900)', margin: '0 0 12px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Sparkles size={18} style={{ color: 'var(--color-harvest-gold)' }} />
                   <span>3. Editable Headline & Call-to-Actions</span>
@@ -847,11 +833,11 @@ export const AdminHeroMediaPage: React.FC = () => {
             </div>
 
             {/* RIGHT COLUMN: Live Interactive Device Preview Window */}
-            <div style={{ position: 'sticky', top: '90px' }}>
-              <div className="card" style={{ padding: '20px', backgroundColor: '#FFFFFF', boxShadow: '0 8px 30px rgba(0,0,0,0.08)' }}>
+            <div className="hero-media-preview-col">
+              <div className="card hero-media-card" style={{ backgroundColor: '#FFFFFF', boxShadow: '0 8px 30px rgba(0,0,0,0.08)' }}>
                 
                 {/* Device Switcher Header */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', borderBottom: '1px solid var(--color-border-light)', paddingBottom: '14px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', borderBottom: '1px solid var(--color-border-light)', paddingBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <Eye size={18} style={{ color: 'var(--color-primary-green)' }} />
                     <span style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--color-charcoal-900)' }}>
@@ -860,7 +846,7 @@ export const AdminHeroMediaPage: React.FC = () => {
                   </div>
 
                   {/* Responsive Switcher Buttons */}
-                  <div style={{ display: 'inline-flex', background: 'var(--color-sage-100)', borderRadius: 'var(--radius-pill)', padding: '3px' }}>
+                  <div style={{ display: 'inline-flex', background: 'var(--color-sage-100)', borderRadius: 'var(--radius-pill)', padding: '3px', flexWrap: 'wrap', gap: '3px', maxWidth: '100%' }}>
                     <button
                       type="button"
                       onClick={() => setPreviewDevice('desktop')}
@@ -930,19 +916,11 @@ export const AdminHeroMediaPage: React.FC = () => {
                 </div>
 
                 {/* Simulated Device Frame */}
-                <div style={{ 
-                  display: 'flex', 
-                  justifyContent: 'center', 
-                  backgroundColor: '#0F1A12', 
-                  padding: previewDevice === 'mobile' ? '20px 10px' : previewDevice === 'tablet' ? '16px' : '0', 
-                  borderRadius: 'var(--radius-md)', 
-                  overflow: 'hidden' 
+                <div className="hero-device-frame-container" style={{ 
+                  padding: previewDevice === 'mobile' ? '20px 10px' : previewDevice === 'tablet' ? '16px' : '0' 
                 }}>
-                  <div style={{
+                  <div className="hero-device-frame" style={{
                     width: previewWidths[previewDevice],
-                    transition: 'width 0.3s ease',
-                    position: 'relative',
-                    overflow: 'hidden',
                     borderRadius: previewDevice === 'mobile' ? '28px' : previewDevice === 'tablet' ? '16px' : '0',
                     border: previewDevice !== 'desktop' ? '6px solid #2A3B30' : 'none',
                     boxShadow: previewDevice !== 'desktop' ? '0 12px 40px rgba(0,0,0,0.6)' : 'none'

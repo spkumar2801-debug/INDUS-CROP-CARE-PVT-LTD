@@ -35,14 +35,22 @@ export const AdminGalleryPage: React.FC = () => {
 
   const handleTogglePublish = async (item: GalleryItem) => {
     const updated = !item.isPublished;
-    await saveGalleryItem({ isPublished: updated }, item.id);
-    setItems(prev => prev.map(i => i.id === item.id ? { ...i, isPublished: updated } : i));
+    try {
+      await saveGalleryItem({ isPublished: updated }, item.id);
+      setItems(prev => prev.map(i => i.id === item.id ? { ...i, isPublished: updated } : i));
+    } catch (err: any) {
+      alert(`Could not update visual: ${err?.message || 'Permission denied'}`);
+    }
   };
 
   const handleDelete = async (id: string, title: string) => {
     if (window.confirm(`Are you sure you want to delete visual "${title}"?`)) {
-      await deleteGalleryItem(id);
-      setItems(prev => prev.filter(i => i.id !== id));
+      try {
+        await deleteGalleryItem(id);
+        setItems(prev => prev.filter(i => i.id !== id));
+      } catch (err: any) {
+        alert(`Could not delete visual: ${err?.message || 'Permission denied'}`);
+      }
     }
   };
 

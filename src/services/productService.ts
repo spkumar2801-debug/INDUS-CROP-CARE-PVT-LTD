@@ -11,12 +11,12 @@ import {
   arrayUnion,
   onSnapshot
 } from 'firebase/firestore';
-import { db, auth, isFirebaseConfigured } from '../lib/firebase';
+import { db, isFirebaseConfigured } from '../lib/firebase';
 import { Product } from '../types/product';
 import { INITIAL_PRODUCTS } from '../data/initialProducts';
 
 const PRODUCTS_COLLECTION = 'products';
-const LOCAL_STORAGE_KEY = 'indus_products_cache_v8';
+const LOCAL_STORAGE_KEY = 'indus_products_cache_v11';
 const DELETED_PRODUCTS_KEY = 'indus_deleted_products_v2';
 
 // In-memory event bus for live website reactivity without full page reload

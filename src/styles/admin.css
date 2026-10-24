@@ -212,6 +212,14 @@
   box-sizing: border-box;
 }
 
+@media (min-width: 992px) {
+  .admin-layout {
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+  }
+}
+
 /* 1. Mobile Header (Compact 58px bar, < 992px) */
 .admin-mobile-header {
   display: none;
@@ -422,9 +430,6 @@
 /* 3. Desktop Left Sidebar (>= 992px) */
 .admin-sidebar {
   width: 260px;
-  min-height: 100vh;
-  position: sticky;
-  top: 0;
   background-color: #072312;
   color: #FFFFFF;
   display: flex;
@@ -434,6 +439,55 @@
   z-index: 100;
   border-right: 1px solid rgba(255, 255, 255, 0.08);
   box-sizing: border-box;
+}
+
+@media (min-width: 992px) {
+  .admin-sidebar {
+    height: 100vh;
+    height: 100dvh;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .admin-sidebar .admin-brand {
+    flex-shrink: 0;
+  }
+
+  .admin-sidebar .admin-nav {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-right: 2px;
+  }
+
+  .admin-sidebar .admin-nav::-webkit-scrollbar {
+    width: 4px;
+  }
+  .admin-sidebar .admin-nav::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.16);
+    border-radius: 4px;
+  }
+
+  .admin-sidebar .admin-sidebar-footer {
+    flex-shrink: 0;
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .admin-main {
+    flex: 1;
+    height: 100vh;
+    height: 100dvh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-width: 0;
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 .admin-brand {
@@ -728,6 +782,78 @@
   gap: 12px;
 }
 
+/* Admin Table Product Search Bar (Icon + Text + Clear button isolated without overlap) */
+.admin-table-header .product-search-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 380px;
+  min-width: 260px;
+  box-sizing: border-box;
+}
+
+.admin-layout .admin-table-header .product-search-input input[type="text"] {
+  width: 100% !important;
+  height: 42px !important;
+  padding: 8px 38px 8px 44px !important;
+  font-size: 0.92rem !important;
+  line-height: 1.4 !important;
+  border: 1.5px solid #D1D5DB !important;
+  border-radius: var(--radius-md) !important;
+  background-color: #FFFFFF !important;
+  color: #111827 !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  box-sizing: border-box !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admin-layout .admin-table-header .product-search-input input[type="text"]:focus {
+  border-color: #0E6B38 !important;
+  box-shadow: 0 0 0 3px rgba(14, 107, 56, 0.2) !important;
+  outline: none !important;
+}
+
+.admin-layout .admin-table-header .product-search-input input[type="text"]::placeholder {
+  color: #6B7280 !important;
+  font-size: 0.88rem;
+  opacity: 1;
+}
+
+.admin-table-header .product-search-input .search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6B7280;
+  pointer-events: none;
+  z-index: 2;
+  flex-shrink: 0;
+}
+
+.admin-table-header .product-search-input .search-clear-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #6B7280;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.15s ease;
+  z-index: 2;
+}
+
+.admin-table-header .product-search-input .search-clear-btn:hover {
+  background-color: #F3F4F6;
+  color: #111827;
+}
+
 .admin-table-responsive {
   width: 100%;
   overflow-x: auto;
@@ -978,11 +1104,16 @@
   .admin-layout {
     flex-direction: column;
     width: 100%;
+    height: auto !important;
+    min-height: 100vh;
+    overflow: visible !important;
   }
 
   .admin-main {
     width: 100%;
     min-width: 0;
+    height: auto !important;
+    overflow: visible !important;
   }
 
   .admin-topbar {
@@ -1021,6 +1152,7 @@
   .admin-table-header .product-search-input {
     width: 100%;
     min-width: 100% !important;
+    max-width: 100% !important;
   }
 
   .integration-item {
@@ -1039,4 +1171,85 @@
     padding: 10px 12px;
     font-size: 0.85rem;
   }
+}
+
+/* 9. Hero Media Manager Responsive Workspace & Mobile Overflow Prevention */
+.hero-media-workspace {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  align-items: start;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+@media (min-width: 1025px) {
+  .hero-media-workspace {
+    grid-template-columns: minmax(340px, 480px) 1fr;
+    gap: 28px;
+  }
+}
+
+.hero-media-preview-col {
+  position: static;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+@media (min-width: 1025px) {
+  .hero-media-preview-col {
+    position: sticky;
+    top: 90px;
+  }
+}
+
+.hero-media-card {
+  padding: clamp(16px, 4vw, 24px) !important;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.hero-media-status-banner {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(4px);
+  color: #FFFFFF;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.74rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px;
+  box-sizing: border-box;
+}
+
+.hero-device-frame-container {
+  display: flex;
+  justify-content: center;
+  background-color: #0F1A12;
+  padding: 16px 10px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.hero-device-frame {
+  max-width: 100% !important;
+  transition: width 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
 }

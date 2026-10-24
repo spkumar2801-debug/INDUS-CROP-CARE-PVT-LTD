@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { AdminUser } from '../types/settings';
-import { loginAdmin, logoutAdmin, subscribeToAuthChanges } from '../services/authService';
+import { loginAdmin, logoutAdmin, subscribeToAuthChanges, verifyCurrentSessionFreshness } from '../services/authService';
 
 interface AuthContextType {
   user: AdminUser | null;
@@ -20,7 +20,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(currentUser);
       setLoading(false);
     });
-    return () => unsubscribe();
+
+    // Recheck session freshness on tab visibility change or focus
+    const handleRecheck = async () => {
+      if (document.visibilityState === 'visible') {
+        const freshUser = await verifyCurrentSessionFreshness();
+        setUser(freshUser);
+      }
+    };
+
+    window.addEventListener('visibilitychange', handleRecheck);
+    window.addEventListener('focus', handleRecheck);
+
+    return () => {
+      unsubscribe();
+      window.removeEventListener('visibilitychange', handleRecheck);
+      window.removeEventListener('focus', handleRecheck);
+    };
   }, []);
 
   const login = async (email: string, password: string) => {

@@ -9,6 +9,7 @@ export const MAIN_CATEGORIES = [
   'Water-Soluble Fertilizers',
   'Biofertilizers',
   'Micronutrients / Nutrients',
+  'Micronutrients Combo',
   'Biostimulants',
   'Seeds',
   'Antibiotic Products',
@@ -59,6 +60,16 @@ export function normalizeCategory(raw?: string | null): MainCategory {
 
   if (lower === 'biofertilizers' || lower === 'biofertilizer' || lower === 'biologicals') {
     return 'Biofertilizers';
+  }
+
+  if (
+    lower === 'micronutrientscombo' || 
+    lower === 'micronutrientcombo' || 
+    lower === 'microcombo' ||
+    lower.includes('micronutrientcombo') ||
+    lower.includes('micronutrientscombo')
+  ) {
+    return 'Micronutrients Combo';
   }
 
   if (
@@ -171,7 +182,17 @@ export function getProductMainCategory(product: Product): Exclude<MainCategory, 
     return 'Water-Soluble Fertilizers';
   }
 
-  // 8. Micronutrients / Nutrients
+  // 8. Micronutrients Combo
+  if (
+    product.category === 'Micronutrients Combo' ||
+    product.category === 'Micronutrient Combo' ||
+    product.broadGroup === 'Micronutrients Combo' ||
+    product.broadGroup === 'Micronutrient Combo'
+  ) {
+    return 'Micronutrients Combo';
+  }
+
+  // 9. Micronutrients / Nutrients
   if (
     product.category === 'Micronutrients / Nutrients' ||
     product.category === 'Micro Nutrient' ||
@@ -286,6 +307,7 @@ export function computeCategoryCounts(products: Product[]): Record<MainCategory,
     'Water-Soluble Fertilizers': 0,
     'Biofertilizers': 0,
     'Micronutrients / Nutrients': 0,
+    'Micronutrients Combo': 0,
     'Biostimulants': 0,
     'Seeds': 0,
     'Antibiotic Products': 0,

@@ -2,11 +2,15 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper functions
-    function isAuthenticated() {
-      return request.auth != null;
-    }
+    // ---------------------------------------------------------
+    // AUTHENTICATION & ROLE-BASED ACCESS CONTROL (RBAC) HELPERS
+    // ---------------------------------------------------------
     
+    function isAuthenticated() {
+      return request.auth != null && request.auth.uid != null;
+    }
+
+    // Master administrative emails (fail-safe authorization matching production accounts)
     function isSuperAdminEmail() {
       return isAuthenticated() && 
              request.auth.token.email != null &&
@@ -17,51 +21,120 @@ service cloud.firestore {
              ];
     }
 
+    function hasAdminDoc() {
+      return isAuthenticated() &&
+             exists(/databases/$(database)/documents/adminUsers/$(request.auth.uid));
+    }
+
+    function getAdminData() {
+      return get(/databases/$(database)/documents/adminUsers/$(request.auth.uid)).data;
+    }
+
+    // Verified Administrator
     function isAdmin() {
       return isAuthenticated() && (
         isSuperAdminEmail() ||
         request.auth.token.admin == true ||
-        (exists(/databases/$(database)/documents/adminUsers/$(request.auth.uid)) &&
-         (!('role' in get(/databases/$(database)/documents/adminUsers/$(request.auth.uid)).data) ||
-          get(/databases/$(database)/documents/adminUsers/$(request.auth.uid)).data.role in ['admin', 'superadmin', 'editor']))
+        (hasAdminDoc() &&
+         (!('disabled' in getAdminData()) || getAdminData().disabled != true) &&
+         ('role' in getAdminData()) &&
+         (getAdminData().role in ['admin', 'superadmin', 'editor']))
       );
     }
 
-    // Site Settings: Public read, Admin write
+    // Only an explicitly authorized Superadmin can manage administrator accounts and privilege levels
+    function isSuperAdmin() {
+      return isAuthenticated() && (
+        isSuperAdminEmail() ||
+        request.auth.token.admin == true ||
+        (hasAdminDoc() &&
+         (!('disabled' in getAdminData()) || getAdminData().disabled != true) &&
+         ('role' in getAdminData()) &&
+         getAdminData().role == 'superadmin')
+      );
+    }
+
+    // ---------------------------------------------------------
+    // SITE SETTINGS: Public Read, Verified Admin Write
+    // ---------------------------------------------------------
     match /siteSettings/{docId} {
       allow read: if true;
       allow write: if isAdmin();
     }
 
-    // Products: Public read for published products, Admin write
+    // ---------------------------------------------------------
+    // PRODUCTS: Public read for published products; Admin full access
+    // ---------------------------------------------------------
     match /products/{productId} {
       allow read: if resource.data.isPublished == true || isAdmin();
       allow write: if isAdmin();
     }
 
-    // Gallery: Public read for published items, Admin write
+    // ---------------------------------------------------------
+    // GALLERY: Public read for published visuals; Admin full access
+    // ---------------------------------------------------------
     match /gallery/{imageId} {
       allow read: if resource.data.isPublished == true || isAdmin();
       allow write: if isAdmin();
     }
 
-    // Customer Enquiries: Public can create with validated fields and size limits; only Admins can read, update, or delete
+    // ---------------------------------------------------------
+    // CUSTOMER ENQUIRIES: Public Create with Strict Validation;
+    // Only verified Admins can read, update, or delete.
+    // ---------------------------------------------------------
+    function isValidEnquiryCreate() {
+      let data = request.resource.data;
+      let allowedKeys = [
+        'name', 'fullName', 'customerName', 'phone', 
+        'state', 'district', 'interestedProduct', 'productName', 
+        'quantity', 'message', 'status', 'createdAt'
+      ];
+      
+      return data.keys().hasOnly(allowedKeys) &&
+             // Name validation: must provide at least one valid name field
+             (
+               (('name' in data) && data.name is string && data.name.size() >= 2 && request.resource.data.name.size() <= 100) ||
+               (('fullName' in data) && data.fullName is string && data.fullName.size() >= 2 && data.fullName.size() <= 100) ||
+               (('customerName' in data) && data.customerName is string && data.customerName.size() >= 2 && data.customerName.size() <= 100)
+             ) &&
+             // Phone validation: required 10 to 20 chars
+             ('phone' in data) &&
+             data.phone is string &&
+             data.phone.size() >= 10 &&
+             request.resource.data.phone.size() <= 20 &&
+             // Status must strictly be initialized to 'new'
+             ('status' in data) &&
+             data.status == 'new' &&
+             // Bounded optional fields
+             (!('state' in data) || (data.state is string && data.state.size() <= 100)) &&
+             (!('district' in data) || (data.district is string && data.district.size() <= 100)) &&
+             (!('interestedProduct' in data) || (data.interestedProduct is string && data.interestedProduct.size() <= 200)) &&
+             (!('productName' in data) || (data.productName is string && data.productName.size() <= 200)) &&
+             (!('quantity' in data) || (data.quantity is string && data.quantity.size() <= 100)) &&
+             (!('message' in data) || (data.message is string && data.message.size() <= 2000));
+    }
+
     match /enquiries/{enquiryId} {
-      allow create: if (
-                      (request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 100) ||
-                      (request.resource.data.fullName is string && request.resource.data.fullName.size() > 0 && request.resource.data.fullName.size() <= 100) ||
-                      (request.resource.data.customerName is string && request.resource.data.customerName.size() > 0 && request.resource.data.customerName.size() <= 100)
-                    )
-                    && request.resource.data.phone is string
-                    && request.resource.data.phone.size() >= 10
-                    && request.resource.data.phone.size() <= 20;
+      allow create: if isValidEnquiryCreate();
       allow read, update, delete: if isAdmin();
     }
 
-    // Admin Profiles: Authenticated users can read their own profile; Admins can read and write all
+    // ---------------------------------------------------------
+    // ADMIN PROFILES & ROLES:
+    // Authenticated users can read their own profile;
+    // Only verified Superadmins can create, update, or delete admin accounts
+    // (Prevents privilege escalation, self-promotion, or tampering by editors/admins)
+    // ---------------------------------------------------------
     match /adminUsers/{userId} {
       allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
-      allow write: if isAdmin() || (isAuthenticated() && request.auth.uid == userId && isSuperAdminEmail());
+      allow write: if isSuperAdmin();
+    }
+
+    // ---------------------------------------------------------
+    // DEFAULT-DENY: Explicitly block all unmatched document paths
+    // ---------------------------------------------------------
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

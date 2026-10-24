@@ -500,17 +500,21 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
       </section>
 
       {/* 6. Crop Production System (Page 20 of PDF) */}
-      <section className="section section-dark-botanical" aria-label="Crop Production System">
+      <section 
+        id="crop-production-system"
+        className="section section-dark-botanical" 
+        aria-label="Crop Production System"
+      >
         <div className="container">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: '44px', alignItems: 'center' }}>
+          <div className="crop-system-grid">
             
             {/* Left Column: Integrated System Description */}
             <div className="reveal-on-scroll">
-              <span className="section-tag">
+              <span className="section-tag" style={{ marginBottom: '16px' }}>
                 <Sparkles size={14} />
                 <span>Integrated Crop Production System</span>
               </span>
-              <h2 className="section-title">
+              <h2 className="section-title" style={{ marginTop: '4px', marginBottom: '18px' }}>
                 Best Partner for Quality Agri Inputs
               </h2>
               <p style={{ fontSize: '1.05rem', lineHeight: '1.7', color: 'var(--color-sage-200)', marginBottom: '26px' }}>
@@ -542,19 +546,25 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
             </div>
 
             {/* Right Column: Official Cycle Artwork */}
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px 0' }} className="reveal-on-scroll">
-              <img 
-                src="/images/branding/indus/indus-hero-circle.png" 
-                alt="Indus Crop Care - Sustainable Agriculture Cycle" 
-                style={{ maxWidth: '280px', width: '100%', borderRadius: '50%', border: '2px solid rgba(37, 211, 102, 0.35)', boxShadow: '0 12px 36px rgba(0,0,0,0.45)' }}
-                loading="lazy"
-              />
+            <div className="crop-system-artwork-col reveal-on-scroll">
+              <div className="crop-system-artwork-wrapper">
+                <img 
+                  src="/images/branding/indus/indus-hero-circle.png" 
+                  alt="Indus Crop Care - Sustainable Agriculture Cycle" 
+                  className="crop-system-artwork-img"
+                  loading="lazy"
+                  decoding="async"
+                  width={340}
+                  height={340}
+                />
+              </div>
             </div>
 
           </div>
 
           {/* 4 Balanced Benefit Cards Spanning Full Width */}
-          <div className="homepage-benefits-grid" style={{ marginTop: '48px' }}>
+          <div className="homepage-benefits-grid" style={{ marginTop: 'clamp(36px, 5vw, 56px)' }}>
+
             {[
               { label: 'High Yield', desc: 'Proven agronomic formulations for maximum fruit and grain output.', icon: <TrendingUp size={22} style={{ color: '#168547' }} /> },
               { label: 'Cost Effective', desc: 'Optimized dosage rates ensuring higher profitability per acre.', icon: <Award size={22} style={{ color: '#168547' }} /> },

@@ -8,55 +8,67 @@ import { doc, getDoc } from 'firebase/firestore';
 import { auth, db, isFirebaseConfigured } from '../lib/firebase';
 import { AdminUser } from '../types/settings';
 
+// Storage session key for local state sync
 const LOCAL_ADMIN_KEY = 'indas_admin_auth_session';
-
-// Whitelist of authorized administrator emails for fallback role resolution
-const AUTHORIZED_SUPERADMIN_EMAILS = [
-  'admin@induscropcare.com',
-  'info@induscropcare.com',
-  'indusagriseedspl@gmail.com'
-];
 
 /**
  * Validates whether an authenticated Firebase user has verified administrator privileges.
- * Checks:
- * 1. Custom token claims (admin === true)
- * 2. Firestore collection adminUsers/{uid} with role in ['admin', 'superadmin', 'editor']
- * 3. Whitelisted superadmin email
+ * STRICT PRODUCTION RBAC RULES:
+ * 1. Checks custom token claims (admin === true)
+ * 2. Checks Firestore document adminUsers/{uid} where UID strictly matches fbUser.uid
+ * 3. Enforces that account is not disabled (disabled != true)
+ * 4. Enforces explicit approved role in ['admin', 'superadmin', 'editor']
+ * 5. Rejects missing document, missing role, invalid role, or disabled status.
+ * 6. Email allowlists are NEVER used as a standalone or fallback authorization mechanism.
  */
-async function resolveAdminRole(fbUser: FirebaseUser): Promise<'admin' | 'superadmin' | 'editor' | null> {
-  const cleanEmail = (fbUser.email || '').trim().toLowerCase();
-
+export async function resolveAdminRole(fbUser: FirebaseUser): Promise<'admin' | 'superadmin' | 'editor' | null> {
   // 1. Check custom token claims if available
   try {
     const idTokenResult = await fbUser.getIdTokenResult();
     if (idTokenResult?.claims?.admin === true) {
-      return (idTokenResult.claims.role as any) || 'admin';
+      const claimRole = idTokenResult.claims.role as string;
+      if (['admin', 'superadmin', 'editor'].includes(claimRole)) {
+        return claimRole as 'admin' | 'superadmin' | 'editor';
+      }
+      return 'admin';
     }
   } catch {
     // Non-blocking claim check
   }
 
-  // 2. Check Firestore adminUsers collection
+  // 2. Check Firestore adminUsers collection matching authenticated UID
   if (db) {
     try {
       const userDoc = await getDoc(doc(db, 'adminUsers', fbUser.uid));
       if (userDoc.exists()) {
         const data = userDoc.data();
-        if (data && ['admin', 'superadmin', 'editor'].includes(data.role)) {
+        
+        // Reject disabled accounts
+        if (data?.disabled === true || data?.status === 'disabled') {
+          console.warn('[authService] Admin account is disabled:', fbUser.uid);
+          return null;
+        }
+
+        // Verify UID match if document explicitly specifies uid
+        if (data?.uid && data.uid !== fbUser.uid) {
+          console.warn('[authService] Admin document UID mismatch:', data.uid, '!=', fbUser.uid);
+          return null;
+        }
+
+        // Explicit role must be one of the approved roles
+        if (data?.role && ['admin', 'superadmin', 'editor'].includes(data.role)) {
           return data.role as 'admin' | 'superadmin' | 'editor';
         }
+        
+        console.warn('[authService] Admin document missing valid role field for user:', fbUser.uid);
+        return null;
       }
     } catch (e) {
       console.warn('[authService] Could not read admin profile doc:', e);
     }
   }
 
-  // 3. Check designated superadmin email whitelist
-  if (cleanEmail && AUTHORIZED_SUPERADMIN_EMAILS.includes(cleanEmail)) {
-    return 'superadmin';
-  }
-
+  // Unauthenticated, missing document, missing role, or unverified: strictly denied
   return null;
 }
 
@@ -216,4 +228,40 @@ export function subscribeToAuthChanges(callback: (user: AdminUser | null) => voi
   localStorage.removeItem(LOCAL_ADMIN_KEY);
   callback(null);
   return () => {};
+}
+
+/**
+ * Re-validates the current authenticated user's authorization directly against Firestore.
+ * If the user's role was revoked, document deleted, or account disabled, signs them out immediately.
+ */
+export async function verifyCurrentSessionFreshness(): Promise<AdminUser | null> {
+  if (!isFirebaseConfigured || !auth || !auth.currentUser) {
+    localStorage.removeItem(LOCAL_ADMIN_KEY);
+    return null;
+  }
+
+  try {
+    const role = await resolveAdminRole(auth.currentUser);
+    if (!role) {
+      console.warn('[authService] Admin privileges revoked or document absent. Revoking session.');
+      try {
+        await firebaseSignOut(auth);
+      } catch {}
+      localStorage.removeItem(LOCAL_ADMIN_KEY);
+      return null;
+    }
+
+    const admin: AdminUser = {
+      uid: auth.currentUser.uid,
+      email: auth.currentUser.email || '',
+      displayName: auth.currentUser.displayName || 'INDAS Administrator',
+      role,
+      lastLoginAt: new Date().toISOString()
+    };
+    localStorage.setItem(LOCAL_ADMIN_KEY, JSON.stringify(admin));
+    return admin;
+  } catch (err) {
+    console.warn('[authService] Session freshness verification caught error:', err);
+    return getCurrentAdmin();
+  }
 }

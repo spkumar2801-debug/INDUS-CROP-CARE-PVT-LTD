@@ -92,6 +92,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenQuoteModal: _onOpenQuoteMo
                 'Water-Soluble Fertilizers', 
                 'Biofertilizers', 
                 'Micronutrients / Nutrients', 
+                'Micronutrients Combo', 
                 'Biostimulants', 
                 'Seeds', 
                 'Antibiotic Products', 

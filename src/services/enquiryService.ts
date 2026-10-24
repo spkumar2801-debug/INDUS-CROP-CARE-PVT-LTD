@@ -163,8 +163,9 @@ export async function updateEnquiryStatus(
         status,
         updatedAt: serverTimestamp()
       });
-    } catch (e) {
+    } catch (e: any) {
       console.error('Error updating enquiry status in Firestore:', e);
+      throw new Error(`Failed to update status: ${e?.message || 'Permission denied'}`);
     }
   }
 
@@ -187,8 +188,9 @@ export async function deleteEnquiry(enquiryId: string): Promise<boolean> {
     try {
       const ref = doc(db, ENQUIRIES_COLLECTION, enquiryId);
       await deleteDoc(ref);
-    } catch (e) {
+    } catch (e: any) {
       console.error('Error deleting enquiry in Firestore:', e);
+      throw new Error(`Failed to delete enquiry: ${e?.message || 'Permission denied'}`);
     }
   }
 

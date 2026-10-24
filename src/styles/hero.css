@@ -32,11 +32,12 @@
   min-height: 100vh;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .hero-section {
     min-height: auto;
-    padding-top: clamp(86px, 18vw, 108px);
-    padding-bottom: clamp(68px, 12vw, 92px); /* Generous clearance ensures floating WhatsApp never covers hero CTAs */
+    padding-top: max(88px, calc(env(safe-area-inset-top, 0px) + 82px));
+    padding-bottom: clamp(56px, 10vw, 84px);
+    overflow: hidden;
   }
 }
 
@@ -53,7 +54,7 @@
   pointer-events: none;
 }
 
-/* Cinematic Agricultural Landscape & Media Layer */
+/* Cinematic Agricultural Landscape & Media Layer - 100% Stable, No Pan/Zoom Jitter */
 .hero-cinematic-bg {
   position: absolute;
   inset: 0;
@@ -61,8 +62,8 @@
   background-size: cover;
   background-position: center 36%;
   background-repeat: no-repeat;
-  transform: scale(1.02);
-  will-change: transform;
+  transform: none !important;
+  animation: none !important;
   z-index: 1;
   overflow: hidden;
 }
@@ -94,36 +95,12 @@
   object-position: center 36%;
   pointer-events: none;
   z-index: 1;
+  transform: none;
 }
 
 @media (max-width: 768px) {
   .hero-video-element {
     object-position: center center;
-  }
-}
-
-@keyframes heroSubtlePan {
-  0% {
-    transform: scale(1.03) translate3d(0, 0, 0);
-  }
-  50% {
-    transform: scale(1.06) translate3d(-10px, -6px, 0);
-  }
-  100% {
-    transform: scale(1.03) translate3d(0, 0, 0);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .hero-cinematic-bg {
-    animation: heroSubtlePan 32s ease-in-out infinite alternate;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hero-cinematic-bg {
-    animation: none !important;
-    transform: none !important;
   }
 }
 
@@ -167,7 +144,7 @@
   box-sizing: border-box;
 }
 
-/* 1. Introductory Eyebrow Badge */
+/* 1. Introductory Eyebrow Badge (Step 1: subtle fade-in) */
 .hero-badge {
   display: inline-flex;
   align-items: center;
@@ -185,7 +162,7 @@
   margin-bottom: clamp(14px, 2.5vw, 18px);
   max-width: 100%;
   box-sizing: border-box;
-  animation: heroSequencedFade 0.65s var(--ease-out-expo) 0.05s both;
+  animation: heroBadgeFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.08s both;
 }
 
 .hero-badge-rule {
@@ -212,7 +189,7 @@
   100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
 }
 
-/* 2. Editorial Hero Headline */
+/* 2. Editorial Hero Headline (Step 2: smooth fade-in with slight upward movement) */
 .hero-title {
   font-size: clamp(2.1rem, 5.4vw, 4.1rem);
   font-weight: 800;
@@ -223,17 +200,19 @@
   max-width: 780px;
   overflow-wrap: break-word;
   text-wrap: balance;
-  animation: heroSequencedFade 0.7s var(--ease-out-expo) 0.15s both;
+  animation: heroHeadingFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.20s both;
 }
 
+/* 3. Highlighted heading text (Step 3: elegant, restrained reveal) */
 .hero-gradient-text {
   background: linear-gradient(135deg, #4ADE80 15%, #FDE047 88%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   display: inline-block;
+  animation: heroHighlightReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.34s both;
 }
 
-/* 3. Telugu Brand Motto Banner */
+/* 4. Telugu Brand Motto Banner (Step 4: soft fade-in) */
 .hero-telugu-banner {
   display: inline-flex;
   align-items: center;
@@ -253,10 +232,10 @@
   font-weight: 600;
   color: #FFF5DD;
   line-height: 1.4;
-  animation: heroSequencedFade 0.7s var(--ease-out-expo) 0.25s both;
+  animation: heroBannerFadeIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.46s both;
 }
 
-/* 4. Hero Supporting Paragraph */
+/* 5. Hero Supporting Paragraph (Step 5: fade-in after heading) */
 .hero-desc {
   font-size: clamp(0.92rem, 2vw, 1.05rem);
   line-height: 1.68;
@@ -265,10 +244,10 @@
   max-width: 620px;
   box-sizing: border-box;
   text-wrap: pretty;
-  animation: heroSequencedFade 0.75s var(--ease-out-expo) 0.35s both;
+  animation: heroDescFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.58s both;
 }
 
-/* 5. Refined Primary/Secondary Hero CTA System */
+/* Refined Primary/Secondary Hero CTA Container */
 .hero-actions {
   display: flex;
   flex-direction: column;
@@ -276,7 +255,6 @@
   width: 100%;
   max-width: 520px;
   box-sizing: border-box;
-  animation: heroSequencedFade 0.8s var(--ease-out-expo) 0.45s both;
 }
 
 @media (min-width: 480px) {
@@ -312,12 +290,13 @@
   line-height: 1;
 }
 
-/* Primary Button — Refined forest-green accent, compact silhouette, subtle controlled shadow */
+/* 6. Primary Button (Step 6: "Explore Products" subtle entrance) */
 .hero-btn-primary {
   background: linear-gradient(135deg, #0E6B38 0%, #0A522A 100%);
   color: #FFFFFF;
   border: 1px solid rgba(255, 255, 255, 0.16);
   box-shadow: 0 4px 16px rgba(4, 24, 12, 0.35);
+  animation: heroBtnEntrance 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.70s both;
 }
 
 .hero-btn-primary:hover {
@@ -342,7 +321,7 @@
   transform: translateX(4px);
 }
 
-/* Secondary Button — Subtly translucent over hero, refined light border, readable text */
+/* 7. Secondary Button (Step 7: "Contact Us" subtle entrance after primary button) */
 .hero-btn-secondary {
   background: rgba(255, 255, 255, 0.08);
   color: #FFFFFF;
@@ -350,6 +329,7 @@
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+  animation: heroBtnEntrance 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.80s both;
 }
 
 .hero-btn-secondary:hover {
@@ -457,11 +437,80 @@
   object-fit: contain;
 }
 
-/* Sequenced CSS Entrance Animation */
+/* Sequenced CSS Entrance Animations for Hero (Items 1 - 7) */
+@keyframes heroBadgeFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes heroHeadingFadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes heroHighlightReveal {
+  0% {
+    opacity: 0;
+    filter: brightness(0.92);
+    transform: translateY(4px);
+  }
+  100% {
+    opacity: 1;
+    filter: brightness(1);
+    transform: translateY(0);
+  }
+}
+
+@keyframes heroBannerFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes heroDescFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes heroBtnEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Fallback for other elements */
 @keyframes heroSequencedFade {
   0% {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(14px);
   }
   100% {
     opacity: 1;
@@ -477,11 +526,13 @@
   position: relative;
   background: linear-gradient(180deg, #030C07 0%, #061B10 50%, #030C07 100%);
   color: #FFFFFF;
-  padding: clamp(50px, 7vw, 84px) 0;
+  padding: clamp(72px, 8vw, 96px) 0;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   overflow: hidden;
+  scroll-margin-top: 100px;
 }
+
 
 .credentials-ambient {
   position: absolute;
@@ -592,12 +643,19 @@
 @media (prefers-reduced-motion: reduce) {
   .hero-badge,
   .hero-title,
+  .hero-gradient-text,
   .hero-telugu-banner,
   .hero-desc,
   .hero-actions,
+  .hero-btn-primary,
+  .hero-btn-secondary,
   .hero-card-showcase,
+  .hero-cinematic-bg,
   .credential-item {
     animation: none !important;
+    opacity: 1 !important;
     transform: none !important;
+    filter: none !important;
+    transition: none !important;
   }
 }

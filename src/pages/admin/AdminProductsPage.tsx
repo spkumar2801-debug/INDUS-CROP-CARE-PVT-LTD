@@ -12,12 +12,6 @@ export const AdminProductsPage: React.FC = () => {
   const [actionError, setActionError] = useState<string | null>(null);
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
 
-  const loadProducts = () => {
-    setLoading(true);
-    getAllProductsAdmin()
-      .then(prods => setProducts(prods))
-      .finally(() => setLoading(false));
-  };
 
   useEffect(() => {
     let isMounted = true;
@@ -145,32 +139,20 @@ export const AdminProductsPage: React.FC = () => {
                 </span>
               </div>
 
-              <div className="product-search-input" style={{ minWidth: '260px', position: 'relative' }}>
+              <div className="product-search-input">
                 <Search size={16} className="search-icon" aria-hidden="true" />
                 <input 
                   type="text" 
                   placeholder="Search by code, formulation, crop, category..."
                   value={search}
                   onChange={e => setSearch(e.target.value)}
-                  style={{ paddingRight: search ? '36px' : '16px' }}
                   aria-label="Filter products catalogue"
                 />
                 {search && (
                   <button
                     type="button"
                     onClick={() => setSearch('')}
-                    style={{
-                      position: 'absolute',
-                      right: '10px',
-                      background: 'none',
-                      border: 'none',
-                      color: 'var(--color-text-muted)',
-                      cursor: 'pointer',
-                      padding: '4px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}
+                    className="search-clear-btn"
                     title="Clear search filter"
                     aria-label="Clear search filter"
                   >

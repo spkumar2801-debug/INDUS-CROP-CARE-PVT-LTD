@@ -49,8 +49,12 @@ export const AdminEnquiriesPage: React.FC = () => {
     if (!window.confirm('Are you sure you want to delete this customer enquiry record?')) {
       return;
     }
-    await deleteEnquiry(id);
-    setEnquiries(prev => prev.filter(e => e.id !== id));
+    try {
+      await deleteEnquiry(id);
+      setEnquiries(prev => prev.filter(e => e.id !== id));
+    } catch (err: any) {
+      alert(`Could not delete enquiry: ${err?.message || 'Permission denied'}`);
+    }
   };
 
   const filteredEnquiries = enquiries.filter(e => {

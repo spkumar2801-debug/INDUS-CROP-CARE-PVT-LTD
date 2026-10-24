@@ -24,27 +24,62 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onOpenQ
   const location = useLocation();
   const { customerCareNumber, displayFormattedNumber } = useSiteSettings();
 
-  // Lock background scrolling when menu is open & handle Escape key
+  // Lock background scrolling reliably when menu is open & restore exact position on close
   useEffect(() => {
-    if (isOpen) {
-      const originalOverflow = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
-      document.body.classList.add('mobile-menu-open');
+    if (!isOpen) return;
 
-      const handleKeyDown = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') {
-          onClose();
-        }
-      };
+    // Capture current vertical scroll position before locking
+    const scrollY = window.scrollY || document.documentElement.scrollTop;
 
-      window.addEventListener('keydown', handleKeyDown);
+    // Save previous styles
+    const originalPosition = document.body.style.position;
+    const originalTop = document.body.style.top;
+    const originalLeft = document.body.style.left;
+    const originalRight = document.body.style.right;
+    const originalWidth = document.body.style.width;
+    const originalOverflow = document.body.style.overflow;
 
-      return () => {
-        document.body.style.overflow = originalOverflow;
-        document.body.classList.remove('mobile-menu-open');
-        window.removeEventListener('keydown', handleKeyDown);
-      };
-    }
+    // Lock body in place at the exact current scroll offset
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.width = '100%';
+    document.body.style.overflow = 'hidden';
+    document.body.classList.add('mobile-menu-open');
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    const handleResize = () => {
+      // Auto-close mobile drawer if viewport is resized to desktop width
+      if (window.innerWidth >= 1024) {
+        onClose();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      // Restore previous body styles
+      document.body.style.position = originalPosition;
+      document.body.style.top = originalTop;
+      document.body.style.left = originalLeft;
+      document.body.style.right = originalRight;
+      document.body.style.width = originalWidth;
+      document.body.style.overflow = originalOverflow;
+      document.body.classList.remove('mobile-menu-open');
+
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('resize', handleResize);
+
+      // Restore exact scroll position
+      window.scrollTo(0, scrollY);
+    };
   }, [isOpen, onClose]);
 
   const isActive = (path: string) => {

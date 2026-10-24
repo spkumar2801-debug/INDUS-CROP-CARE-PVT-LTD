@@ -111,8 +111,9 @@ export async function saveGalleryItem(itemData: Partial<GalleryItem>, id?: strin
         updateLocalGalleryCopy({ ...itemData, id: docRef.id, createdAt: now, updatedAt: now } as GalleryItem);
         return docRef.id;
       }
-    } catch (error) {
-      console.warn('[galleryService] Firestore write failed:', error);
+    } catch (error: any) {
+      console.error('[galleryService] Firestore write failed:', error);
+      throw new Error(`Database save failed: ${error?.message || 'Permission denied or network unreachable'}`);
     }
   }
 
@@ -160,8 +161,9 @@ export async function deleteGalleryItem(id: string): Promise<void> {
   if (isFirebaseConfigured && db) {
     try {
       await deleteDoc(doc(db, GALLERY_COLLECTION, id));
-    } catch (error) {
-      console.warn('[galleryService] Firestore delete failed:', error);
+    } catch (error: any) {
+      console.error('[galleryService] Firestore delete failed:', error);
+      throw new Error(`Database delete failed: ${error?.message || 'Permission denied or network unreachable'}`);
     }
   }
 
