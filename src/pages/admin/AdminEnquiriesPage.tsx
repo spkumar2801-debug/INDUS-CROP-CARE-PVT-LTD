@@ -30,7 +30,9 @@ export const AdminEnquiriesPage: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchEnquiries();
+    getAllEnquiriesAdmin()
+      .then(setEnquiries)
+      .finally(() => setLoading(false));
   }, []);
 
   const handleStatusChange = async (id: string, newStatus: CustomerEnquiry['status']) => {

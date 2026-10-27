@@ -25,14 +25,19 @@ export const ProductEnquirySection: React.FC<ProductEnquirySectionProps> = ({
   const [submittedId, setSubmittedId] = useState<string | null>(null);
 
   // Sync when selectedProductId changes from parent click
+  const prevSelectedRef = React.useRef(selectedProductId);
   React.useEffect(() => {
-    if (selectedProductId) {
+    if (selectedProductId && selectedProductId !== prevSelectedRef.current) {
+      prevSelectedRef.current = selectedProductId;
       setInterestedProduct(selectedProductId);
     }
   }, [selectedProductId]);
 
+  const isSubmittingRef = React.useRef(false);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmittingRef.current || loading) return;
     setError(null);
 
     // Validation
@@ -47,6 +52,7 @@ export const ProductEnquirySection: React.FC<ProductEnquirySectionProps> = ({
       return;
     }
 
+    isSubmittingRef.current = true;
     setLoading(true);
 
     try {
@@ -78,6 +84,7 @@ export const ProductEnquirySection: React.FC<ProductEnquirySectionProps> = ({
     } catch (err: any) {
       setError(err?.message || 'A network error occurred. Please try again.');
     } finally {
+      isSubmittingRef.current = false;
       setLoading(false);
     }
   };

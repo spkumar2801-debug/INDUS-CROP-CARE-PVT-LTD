@@ -29,3 +29,5 @@ dist-ssr
 # Local development resources and calibration scripts
 resources/
 scripts/
+gallery images/
+gallery_red_arrows_crop.png

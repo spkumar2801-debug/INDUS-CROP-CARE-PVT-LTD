@@ -4,13 +4,13 @@ import { Search, Sprout, RotateCcw, Filter, CheckCircle2, ChevronLeft, ChevronRi
 import { Product } from '../types/product';
 import { getPublishedProducts, subscribeToProducts } from '../services/productService';
 import { ProductCard } from '../components/products/ProductCard';
-import { 
-  MAIN_CATEGORIES, 
-  MainCategory, 
-  normalizeCategory, 
-  matchesCategory, 
-  matchesProductSearch, 
-  computeCategoryCounts 
+import {
+  MAIN_CATEGORIES,
+  MainCategory,
+  normalizeCategory,
+  matchesCategory,
+  matchesProductSearch,
+  computeCategoryCounts
 } from '../utils/categoryUtils';
 
 interface ProductsPageProps {
@@ -35,10 +35,11 @@ export const ProductsPage: React.FC<ProductsPageProps> = ({ onOpenQuote, onOpenD
   const urlSearchQuery = searchParams.get('q') || '';
   const [searchInput, setSearchInput] = useState(urlSearchQuery);
 
-  // Keep local search input synced with URL when user navigates
-  useEffect(() => {
+  const [prevUrlQuery, setPrevUrlQuery] = useState(urlSearchQuery);
+  if (prevUrlQuery !== urlSearchQuery) {
+    setPrevUrlQuery(urlSearchQuery);
     setSearchInput(urlSearchQuery);
-  }, [urlSearchQuery]);
+  }
 
   // Read current page from URL
   const currentPage = useMemo(() => {
@@ -104,21 +105,39 @@ export const ProductsPage: React.FC<ProductsPageProps> = ({ onOpenQuote, onOpenD
     setSearchParams(newParams);
   };
 
-  // Search input handler
+  const searchTimeoutRef = React.useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (searchTimeoutRef.current !== null) {
+        window.clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Search input handler with debounced URL synchronization
   const handleSearchChange = (value: string) => {
     setSearchInput(value);
-    const newParams = new URLSearchParams(searchParams);
-    const trimmed = value.trim();
-    if (trimmed) {
-      newParams.set('q', trimmed);
-    } else {
-      newParams.delete('q');
+    if (searchTimeoutRef.current !== null) {
+      window.clearTimeout(searchTimeoutRef.current);
     }
-    newParams.delete('page');
-    setSearchParams(newParams, { replace: true });
+    searchTimeoutRef.current = window.setTimeout(() => {
+      const newParams = new URLSearchParams(searchParams);
+      const trimmed = value.trim();
+      if (trimmed) {
+        newParams.set('q', trimmed);
+      } else {
+        newParams.delete('q');
+      }
+      newParams.delete('page');
+      setSearchParams(newParams, { replace: true });
+    }, 250);
   };
 
   const handleClearSearch = () => {
+    if (searchTimeoutRef.current !== null) {
+      window.clearTimeout(searchTimeoutRef.current);
+    }
     setSearchInput('');
     const newParams = new URLSearchParams(searchParams);
     newParams.delete('q');
@@ -158,14 +177,14 @@ export const ProductsPage: React.FC<ProductsPageProps> = ({ onOpenQuote, onOpenD
 
   return (
     <div style={{ backgroundColor: 'var(--color-sage-50)', minHeight: '85vh', color: 'var(--color-charcoal-800)' }}>
-      
+
       {/* Page Header — Deep Forest Botanical */}
-      <section style={{ 
-        backgroundColor: 'var(--color-forest-900)', 
-        color: '#FFFFFF', 
-        paddingTop: 'clamp(48px, 7vw, 72px)', 
-        paddingBottom: 'clamp(48px, 7vw, 72px)', 
-        borderBottom: '1px solid rgba(255, 255, 255, 0.08)' 
+      <section style={{
+        backgroundColor: 'var(--color-forest-900)',
+        color: '#FFFFFF',
+        paddingTop: 'clamp(48px, 7vw, 72px)',
+        paddingBottom: 'clamp(48px, 7vw, 72px)',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
       }}>
         <div className="container" style={{ textAlign: 'center', maxWidth: '850px' }}>
           <span className="badge badge-gold" style={{ marginBottom: '16px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
@@ -184,7 +203,7 @@ export const ProductsPage: React.FC<ProductsPageProps> = ({ onOpenQuote, onOpenD
       {/* Main Filter & Listing Section */}
       <section className="section" id="catalogue-content" style={{ paddingTop: '36px', paddingBottom: '70px' }}>
         <div className="container">
-          
+
           {/* Consolidated Category Navigation Bar */}
           <div className="products-category-bar">
             <div className="category-nav-header">
@@ -196,7 +215,7 @@ export const ProductsPage: React.FC<ProductsPageProps> = ({ onOpenQuote, onOpenD
                 {products.length} Total Formulations Available
               </span>
             </div>
-            
+
             <div className="category-nav-scroll" role="tablist" aria-label="Product Categories">
               {MAIN_CATEGORIES.map(cat => {
                 const count = categoryCounts[cat] ?? 0;
@@ -223,13 +242,13 @@ export const ProductsPage: React.FC<ProductsPageProps> = ({ onOpenQuote, onOpenD
 
           {/* Consolidated Search & Results Toolbar */}
           <div className="products-toolbar">
-            
+
             {/* Search Input Box */}
             <div className="product-search-box">
               <Search size={18} className="search-icon" aria-hidden="true" />
-              <input 
+              <input
                 id="product-search-input"
-                type="text" 
+                type="text"
                 placeholder="Search formulation, active ingredient, or product code (e.g., Abola, ICC-001, Cartap)..."
                 value={searchInput}
                 onChange={e => handleSearchChange(e.target.value)}
@@ -267,15 +286,15 @@ export const ProductsPage: React.FC<ProductsPageProps> = ({ onOpenQuote, onOpenD
               </div>
 
               {isFiltered && (
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   onClick={resetFilters}
-                  style={{ 
-                    display: 'inline-flex', 
-                    alignItems: 'center', 
-                    gap: '6px', 
-                    color: 'var(--color-primary-green-dark)', 
-                    fontWeight: 700, 
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    color: 'var(--color-primary-green-dark)',
+                    fontWeight: 700,
                     cursor: 'pointer',
                     background: 'none',
                     border: 'none',
@@ -305,8 +324,8 @@ export const ProductsPage: React.FC<ProductsPageProps> = ({ onOpenQuote, onOpenD
               <p style={{ color: 'var(--color-charcoal-600)', marginBottom: '24px', lineHeight: '1.6' }}>
                 We could not find any products matching your current category filter or search query. Try clearing your search or browsing all categories.
               </p>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="btn btn-outline"
                 onClick={resetFilters}
                 id="empty-state-reset-btn"
@@ -318,7 +337,7 @@ export const ProductsPage: React.FC<ProductsPageProps> = ({ onOpenQuote, onOpenD
             <>
               <div className="products-grid">
                 {paginatedProducts.map(product => (
-                  <ProductCard 
+                  <ProductCard
                     key={product.id}
                     product={product}
                     onOpenQuote={onOpenQuote}

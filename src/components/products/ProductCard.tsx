@@ -8,7 +8,7 @@ interface ProductCardProps {
   onOpenDetails: (product: Product) => void;
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({ product, onOpenQuote, onOpenDetails }) => {
+const ProductCardComponent: React.FC<ProductCardProps> = ({ product, onOpenQuote, onOpenDetails }) => {
   return (
     <article className="product-card" id={`product-${product.code.toLowerCase().replace(/\s+/g, '-')}`}>
       {/* Studio Crop Photography & Badges */}
@@ -135,3 +135,5 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onOpenQuote, 
     </article>
   );
 };
+
+export const ProductCard = React.memo(ProductCardComponent);

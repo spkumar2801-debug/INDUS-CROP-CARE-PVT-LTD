@@ -307,21 +307,31 @@
 }
 
 /* 2. Mobile Drawer & Backdrop (< 992px) */
+html.admin-drawer-open,
+body.admin-drawer-open {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+}
+
 .admin-drawer-overlay {
   position: fixed;
   inset: 0;
   background-color: rgba(3, 15, 8, 0.7);
   backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   z-index: 1099;
+  touch-action: none;
+  will-change: opacity;
 }
 
 .admin-mobile-drawer {
   position: fixed;
   top: 0;
-  right: -300px;
+  right: 0;
   width: 280px;
   max-width: 85vw;
   height: 100vh;
+  height: 100dvh;
   background-color: #072312;
   color: #FFFFFF;
   z-index: 1100;
@@ -330,12 +340,16 @@
   flex-direction: column;
   padding: 20px 16px;
   border-left: 1px solid rgba(255, 255, 255, 0.1);
-  transition: right 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translate3d(100%, 0, 0);
+  will-change: transform;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
   box-sizing: border-box;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .admin-mobile-drawer.open {
-  right: 0;
+  transform: translate3d(0, 0, 0);
 }
 
 .admin-drawer-header {
@@ -345,6 +359,7 @@
   padding-bottom: 16px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   margin-bottom: 18px;
+  flex-shrink: 0;
 }
 
 .admin-drawer-user-badge {
@@ -397,8 +412,12 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding-right: 4px;
 }
 
 .admin-drawer-footer {
@@ -407,6 +426,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  flex-shrink: 0;
 }
 
 .admin-drawer-link-site {

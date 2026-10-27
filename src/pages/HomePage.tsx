@@ -233,8 +233,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
 
             {/* Editorial Hero Headline */}
             <h1 className="hero-title">
-              {titleLine1}<br />
-              <span className="hero-gradient-text">{titleLine2}</span>
+              <span className="hero-title-line hero-title-line1">{titleLine1}</span>
+              <span className="hero-title-line hero-title-line2 hero-gradient-text">{titleLine2}</span>
             </h1>
 
             {/* Telugu Brand Motto Banner */}

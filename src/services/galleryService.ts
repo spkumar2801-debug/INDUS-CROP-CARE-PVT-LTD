@@ -14,25 +14,29 @@ import { GalleryItem } from '../types/gallery';
 import { INITIAL_GALLERY_ITEMS } from '../data/initialProducts';
 
 const GALLERY_COLLECTION = 'gallery';
-const LOCAL_STORAGE_KEY = 'indas_gallery_cache_v5';
+const LOCAL_STORAGE_KEY = 'indas_gallery_cache_v7';
 
 function deduplicateGalleryItems(list: GalleryItem[]): GalleryItem[] {
   const map = new Map<string, GalleryItem>();
   list.forEach(i => {
-    if (i && i.id) {
+    // Exclude legacy seed-related items
+    if (i && i.id && !i.id.startsWith('gallery-ias-')) {
       map.set(i.id, i);
     }
   });
   return Array.from(map.values());
 }
 
-function getLocalGallery(): GalleryItem[] {
+export function getLocalGallery(): GalleryItem[] {
   try {
     const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        return deduplicateGalleryItems(parsed);
+        const clean = deduplicateGalleryItems(parsed);
+        if (clean.length > 0 && !clean.some(item => item.id.startsWith('gallery-ias-'))) {
+          return clean;
+        }
       }
     }
   } catch (e) {

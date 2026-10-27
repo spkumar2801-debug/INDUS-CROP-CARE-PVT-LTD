@@ -8,7 +8,7 @@ interface ContactPageProps {
 }
 
 export const ContactPage: React.FC<ContactPageProps> = () => {
-  const { handleCustomerCareWhatsApp } = useSiteSettings();
+  const { customerCareNumber, displayFormattedNumber, handleCustomerCareWhatsApp } = useSiteSettings();
 
   const [enquiryType, setEnquiryType] = useState<'dealership' | 'quotation' | 'agronomy'>('dealership');
   const [formData, setFormData] = useState({
@@ -23,10 +23,12 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
   });
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const isSubmittingRef = React.useRef(false);
   const [formError, setFormError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmittingRef.current || isSubmitting) return;
     setFormError(null);
 
     if (!formData.name.trim()) {
@@ -39,12 +41,13 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
       return;
     }
 
+    isSubmittingRef.current = true;
     setIsSubmitting(true);
     try {
-      const typeLabel = 
+      const typeLabel =
         enquiryType === 'quotation' ? 'Product Availability & Bulk Order Quotation' :
-        enquiryType === 'agronomy' ? 'Technical Agronomy & Field Consultation' :
-        'Dealership & Distributorship Application';
+          enquiryType === 'agronomy' ? 'Technical Agronomy & Field Consultation' :
+            'Dealership & Distributorship Application';
 
       const interestedProduct = enquiryType === 'quotation' && formData.productName.trim()
         ? formData.productName.trim()
@@ -75,20 +78,21 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
     } catch (err: any) {
       setFormError(err?.message || 'A network error occurred.');
     } finally {
+      isSubmittingRef.current = false;
       setIsSubmitting(false);
     }
   };
 
   return (
     <div style={{ backgroundColor: 'var(--color-sage-50)', minHeight: '85vh', color: 'var(--color-charcoal-800)' }}>
-      
+
       {/* Page Header — Deep Forest Botanical */}
-      <section style={{ 
-        backgroundColor: 'var(--color-forest-900)', 
-        color: '#FFFFFF', 
-        paddingTop: 'clamp(48px, 7vw, 72px)', 
-        paddingBottom: 'clamp(48px, 7vw, 72px)', 
-        borderBottom: '1px solid rgba(255, 255, 255, 0.08)' 
+      <section style={{
+        backgroundColor: 'var(--color-forest-900)',
+        color: '#FFFFFF',
+        paddingTop: 'clamp(48px, 7vw, 72px)',
+        paddingBottom: 'clamp(48px, 7vw, 72px)',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
       }}>
         <div className="container" style={{ textAlign: 'center', maxWidth: '850px' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 16px', borderRadius: 'var(--radius-pill)', backgroundColor: 'rgba(37, 211, 102, 0.12)', border: '1px solid rgba(37, 211, 102, 0.3)', marginBottom: '16px' }}>
@@ -115,26 +119,26 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
       {/* Main Contact Grid */}
       <section className="section" style={{ paddingTop: '44px', paddingBottom: '76px' }}>
         <div className="container">
-          
+
           {/* Official Banner Card */}
-          <div style={{ 
-            borderRadius: 'var(--radius-lg)', 
-            overflow: 'hidden', 
-            border: '1px solid var(--color-border-light)', 
+          <div style={{
+            borderRadius: 'var(--radius-lg)',
+            overflow: 'hidden',
+            border: '1px solid var(--color-border-light)',
             marginBottom: '44px',
             backgroundColor: '#FFFFFF',
             boxShadow: 'var(--shadow-card)'
           }}>
-            <img 
-              src="/images/branding/indus/contact-official-banner.jpg" 
-              alt="Indus Crop Care Official Contact Card" 
+            <img
+              src="/images/branding/indus/contact-official-banner.jpg"
+              alt="Indus Crop Care Official Contact Card"
               style={{ width: '100%', height: 'auto', display: 'block', maxHeight: '220px', objectFit: 'contain', backgroundColor: '#FFFFFF' }}
               loading="lazy"
             />
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 360px), 1fr))', gap: '38px' }}>
-            
+
             {/* Left Column: Official Contact Details */}
             <div>
               <span className="section-tag">Official Lines</span>
@@ -147,7 +151,7 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
 
               {/* Verified Contact Cards */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '36px' }}>
-                
+
                 {/* Corporate Office */}
                 <div className="card card-light" style={{ padding: '24px', display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
                   <div style={{ width: '48px', height: '48px', borderRadius: '12px', backgroundColor: 'var(--color-primary-green-surface)', color: 'var(--color-primary-green-dark)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -186,7 +190,7 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
 
                 {/* Telephone & Mobile Cards */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px' }}>
-                  
+
                   {/* Landline Telephone */}
                   <div className="card card-light" style={{ padding: '20px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', color: 'var(--color-primary-green-dark)' }}>
@@ -205,8 +209,8 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
                       <MessageSquareShare size={18} />
                       <span style={{ fontSize: '0.78rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Mobile & WhatsApp</span>
                     </div>
-                    <a href="tel:+918886069143" style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--color-charcoal-950)', textDecoration: 'none' }}>
-                      +91 88860 69143
+                    <a href={`tel:+${customerCareNumber || '918886069143'}`} style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--color-charcoal-950)', textDecoration: 'none' }}>
+                      {displayFormattedNumber || '+91 88860 69143'}
                     </a>
                     <div style={{ fontSize: '0.78rem', color: 'var(--color-charcoal-500)', marginTop: '4px' }}>Immediate WhatsApp response</div>
                   </div>
@@ -215,7 +219,7 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
 
                 {/* Email & Website Cards */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px' }}>
-                  
+
                   {/* Email */}
                   <div className="card card-light" style={{ padding: '20px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', color: '#0284C7' }}>
@@ -244,8 +248,8 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
 
                 {/* Direct WhatsApp Action Button */}
                 <div style={{ marginTop: '8px' }}>
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     className="btn btn-whatsapp"
                     onClick={() => handleCustomerCareWhatsApp()}
                     style={{ width: '100%', minHeight: '50px', padding: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}
@@ -336,15 +340,15 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
                     <p style={{ color: 'var(--color-charcoal-700)', fontSize: '0.94rem', margin: 0, lineHeight: '1.6' }}>
                       Thank you for contacting <strong>Indus Crop Care Pvt. Ltd.</strong> Your message has been safely recorded in our official database. Our team will review your requirements and reach out to you directly.
                     </p>
-                    <button 
-                      type="button" 
-                      className="btn btn-outline" 
+                    <button
+                      type="button"
+                      className="btn btn-outline"
                       style={{ marginTop: '22px' }}
-                      onClick={() => { 
-                        setSubmitted(false); 
-                        setFormData({ 
-                          name: '', phone: '', email: '', state: '', district: '', productName: '', quantity: '', message: '' 
-                        }); 
+                      onClick={() => {
+                        setSubmitted(false);
+                        setFormData({
+                          name: '', phone: '', email: '', state: '', district: '', productName: '', quantity: '', message: ''
+                        });
                       }}
                     >
                       Submit Another Inquiry
@@ -352,7 +356,7 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
                   </div>
                 ) : (
                   <form onSubmit={handleSubmit} noValidate>
-                    
+
                     {formError && (
                       <div className="enquiry-error-alert" role="alert">
                         <AlertCircle size={16} />
@@ -364,8 +368,8 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
                       <label className="form-label" htmlFor="contact-name">
                         Full Name / Business Name <span className="req">*</span>
                       </label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         id="contact-name"
                         className="form-control"
                         placeholder="e.g. Ramesh Chandra / Agrico Traders"
@@ -381,8 +385,8 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
                         <label className="form-label" htmlFor="contact-phone">
                           Mobile / WhatsApp <span className="req">*</span>
                         </label>
-                        <input 
-                          type="tel" 
+                        <input
+                          type="tel"
                           id="contact-phone"
                           className="form-control"
                           placeholder="10-digit mobile number"
@@ -397,8 +401,8 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
                         <label className="form-label" htmlFor="contact-email">
                           Email Address
                         </label>
-                        <input 
-                          type="email" 
+                        <input
+                          type="email"
                           id="contact-email"
                           className="form-control"
                           placeholder="name@domain.com"
@@ -417,8 +421,8 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
                             <label className="form-label" htmlFor="contact-state">
                               State
                             </label>
-                            <input 
-                              type="text" 
+                            <input
+                              type="text"
                               id="contact-state"
                               className="form-control"
                               placeholder="e.g. Telangana / AP / Karnataka"
@@ -432,8 +436,8 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
                             <label className="form-label" htmlFor="contact-district">
                               District / Region
                             </label>
-                            <input 
-                              type="text" 
+                            <input
+                              type="text"
                               id="contact-district"
                               className="form-control"
                               placeholder="e.g. Warangal / Guntur / Khammam"
@@ -449,8 +453,8 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
                             <label className="form-label" htmlFor="contact-product">
                               Formulation / Product Name
                             </label>
-                            <input 
-                              type="text" 
+                            <input
+                              type="text"
                               id="contact-product"
                               className="form-control"
                               placeholder="e.g. Abola, Intron, Cartap, Hybrid Seeds"
@@ -464,8 +468,8 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
                             <label className="form-label" htmlFor="contact-quantity">
                               Required Quantity / Units
                             </label>
-                            <input 
-                              type="text" 
+                            <input
+                              type="text"
                               id="contact-quantity"
                               className="form-control"
                               placeholder="e.g. 50 Litres / 100 kg / 20 Packs"
@@ -480,18 +484,18 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
 
                     <div className="form-group">
                       <label className="form-label" htmlFor="contact-message">
-                        {enquiryType === 'dealership' ? 'Dealership Area & Commercial Details' : 
-                         enquiryType === 'quotation' ? 'Specific Requirements / Delivery Schedule' : 
-                         'Crop Symptoms / Technical Advisory Query'}
+                        {enquiryType === 'dealership' ? 'Dealership Area & Commercial Details' :
+                          enquiryType === 'quotation' ? 'Specific Requirements / Delivery Schedule' :
+                            'Crop Symptoms / Technical Advisory Query'}
                       </label>
-                      <textarea 
+                      <textarea
                         id="contact-message"
                         className="form-control"
                         rows={3}
                         placeholder={
                           enquiryType === 'dealership' ? 'State your existing distribution network, preferred mandals, and experience in agri-inputs...' :
-                          enquiryType === 'quotation' ? 'Specify packaging sizes, delivery timeline, or bulk requirements...' :
-                          'Describe crop type, pest infestation symptoms, soil characteristics, or agronomic questions...'
+                            enquiryType === 'quotation' ? 'Specify packaging sizes, delivery timeline, or bulk requirements...' :
+                              'Describe crop type, pest infestation symptoms, soil characteristics, or agronomic questions...'
                         }
                         value={formData.message}
                         onChange={e => setFormData({ ...formData, message: e.target.value })}
@@ -499,8 +503,8 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
                       />
                     </div>
 
-                    <button 
-                      type="submit" 
+                    <button
+                      type="submit"
                       className="btn btn-primary"
                       style={{ width: '100%', minHeight: '48px', fontWeight: 700 }}
                       disabled={isSubmitting}

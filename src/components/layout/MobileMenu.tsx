@@ -24,28 +24,11 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onOpenQ
   const location = useLocation();
   const { customerCareNumber, displayFormattedNumber } = useSiteSettings();
 
-  // Lock background scrolling reliably when menu is open & restore exact position on close
+  // Lock background scrolling smoothly without forcing full-page layout reflow
   useEffect(() => {
     if (!isOpen) return;
 
-    // Capture current vertical scroll position before locking
-    const scrollY = window.scrollY || document.documentElement.scrollTop;
-
-    // Save previous styles
-    const originalPosition = document.body.style.position;
-    const originalTop = document.body.style.top;
-    const originalLeft = document.body.style.left;
-    const originalRight = document.body.style.right;
-    const originalWidth = document.body.style.width;
-    const originalOverflow = document.body.style.overflow;
-
-    // Lock body in place at the exact current scroll offset
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.left = '0';
-    document.body.style.right = '0';
-    document.body.style.width = '100%';
-    document.body.style.overflow = 'hidden';
+    document.documentElement.classList.add('mobile-menu-open');
     document.body.classList.add('mobile-menu-open');
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -65,20 +48,11 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onOpenQ
     window.addEventListener('resize', handleResize);
 
     return () => {
-      // Restore previous body styles
-      document.body.style.position = originalPosition;
-      document.body.style.top = originalTop;
-      document.body.style.left = originalLeft;
-      document.body.style.right = originalRight;
-      document.body.style.width = originalWidth;
-      document.body.style.overflow = originalOverflow;
+      document.documentElement.classList.remove('mobile-menu-open');
       document.body.classList.remove('mobile-menu-open');
 
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('resize', handleResize);
-
-      // Restore exact scroll position
-      window.scrollTo(0, scrollY);
     };
   }, [isOpen, onClose]);
 
@@ -104,7 +78,12 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onOpenQ
       aria-label="Mobile Navigation Menu"
     >
       {/* Backdrop blur click target */}
-      <div className="mobile-menu-backdrop" onClick={onClose} aria-hidden="true" />
+      <div 
+        className="mobile-menu-backdrop" 
+        onClick={onClose} 
+        onTouchMove={(e) => e.preventDefault()}
+        aria-hidden="true" 
+      />
 
       {/* Drawer Container with safe-area insets */}
       <div className="mobile-menu-container">

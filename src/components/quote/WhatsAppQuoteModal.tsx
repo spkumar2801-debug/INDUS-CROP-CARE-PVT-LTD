@@ -17,7 +17,8 @@ export const WhatsAppQuoteModal: React.FC<WhatsAppQuoteModalProps> = ({
   selectedProduct,
   allProducts
 }) => {
-  const [currentProduct, setCurrentProduct] = useState<Product | null>(selectedProduct);
+  const initialProd = selectedProduct || (allProducts.length > 0 ? allProducts[0] : null);
+  const [currentProduct, setCurrentProduct] = useState<Product | null>(initialProd);
   const [businessNumber, setBusinessNumber] = useState<string>('');
   const [copied, setCopied] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -27,42 +28,49 @@ export const WhatsAppQuoteModal: React.FC<WhatsAppQuoteModalProps> = ({
     phone: '',
     state: 'Andhra Pradesh',
     district: '',
-    productId: selectedProduct?.id || '',
-    productName: selectedProduct?.name || '',
-    productCode: selectedProduct?.code || '',
+    productId: initialProd?.id || '',
+    productName: initialProd?.name || '',
+    productCode: initialProd?.code || '',
     quantity: '',
     message: ''
   });
 
-  useEffect(() => {
-    if (selectedProduct) {
-      setCurrentProduct(selectedProduct);
-      setFormData(prev => ({
-        ...prev,
-        productId: selectedProduct.id,
-        productName: selectedProduct.name,
-        productCode: selectedProduct.code
-      }));
-    } else if (allProducts.length > 0 && !currentProduct) {
-      const first = allProducts[0];
-      setCurrentProduct(first);
-      setFormData(prev => ({
-        ...prev,
-        productId: first.id,
-        productName: first.name,
-        productCode: first.code
-      }));
-    }
-  }, [selectedProduct, allProducts, currentProduct]);
+  const [prevSelectedId, setPrevSelectedId] = useState(selectedProduct?.id);
+  if (selectedProduct && selectedProduct.id !== prevSelectedId) {
+    setPrevSelectedId(selectedProduct.id);
+    setCurrentProduct(selectedProduct);
+    setFormData(prev => ({
+      ...prev,
+      productId: selectedProduct.id,
+      productName: selectedProduct.name,
+      productCode: selectedProduct.code
+    }));
+  }
 
   useEffect(() => {
+    if (!isOpen) return;
+
+    document.documentElement.classList.add('modal-open');
+    document.body.classList.add('modal-open');
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+
     // Fetch latest WhatsApp configuration from settings
     getSiteSettings().then(settings => {
       if (settings.whatsappNumber) {
         setBusinessNumber(settings.whatsappNumber);
       }
     });
-  }, [isOpen]);
+
+    return () => {
+      document.documentElement.classList.remove('modal-open');
+      document.body.classList.remove('modal-open');
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -95,7 +103,7 @@ export const WhatsAppQuoteModal: React.FC<WhatsAppQuoteModalProps> = ({
       return;
     }
     if (!formData.productName) {
-      setErrorMsg('Please select a seed product.');
+      setErrorMsg('Please select a product.');
       return;
     }
 

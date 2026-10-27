@@ -287,12 +287,16 @@ export const AppContent: React.FC = () => {
           } 
         />
         <Route 
-          path="/admin/hero" 
+          path="/admin/hero-media" 
           element={
             <ProtectedAdminRoute>
               <AdminHeroMediaPage />
             </ProtectedAdminRoute>
           } 
+        />
+        <Route 
+          path="/admin/hero" 
+          element={<Navigate to="/admin/hero-media" replace />} 
         />
 
         {/* 404 Fallback */}

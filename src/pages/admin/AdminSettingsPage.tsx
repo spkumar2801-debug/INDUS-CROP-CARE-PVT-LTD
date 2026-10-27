@@ -100,7 +100,7 @@ export const AdminSettingsPage: React.FC = () => {
             </div>
 
             <Link 
-              to="/admin/hero" 
+              to="/admin/hero-media" 
               className="btn" 
               style={{ 
                 backgroundColor: 'var(--color-action-green)', 

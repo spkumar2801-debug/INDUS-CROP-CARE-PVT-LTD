@@ -11,7 +11,7 @@ export const AdminProductEditorPage: React.FC = () => {
   const isEditing = Boolean(id);
   const navigate = useNavigate();
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(Boolean(id));
   const [saving, setSaving] = useState(false);
   const [successMsg, setSuccessMsg] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -43,7 +43,6 @@ export const AdminProductEditorPage: React.FC = () => {
 
   useEffect(() => {
     if (id) {
-      setLoading(true);
       getProductById(id).then(prod => {
         if (prod) {
           setFormData(prod);

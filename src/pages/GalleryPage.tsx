@@ -31,7 +31,7 @@ export const GalleryPage: React.FC = () => {
 
   return (
     <div style={{ backgroundColor: 'var(--color-sage-50)', minHeight: '85vh', color: 'var(--color-charcoal-800)' }}>
-      
+
       {/* Page Header — Deep Forest Botanical */}
       <section style={{ backgroundColor: 'var(--color-forest-900)', color: '#FFFFFF', paddingTop: 'clamp(48px, 7vw, 72px)', paddingBottom: 'clamp(48px, 7vw, 72px)', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
         <div className="container" style={{ textAlign: 'center', maxWidth: '850px' }}>
@@ -50,7 +50,7 @@ export const GalleryPage: React.FC = () => {
       {/* Main Gallery Grid */}
       <section className="section" style={{ paddingTop: '40px', paddingBottom: '76px' }}>
         <div className="container">
-          
+
           {/* Category Filter Chips */}
           <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '8px', marginBottom: '40px' }}>
             {categories.map(cat => (
@@ -80,8 +80,8 @@ export const GalleryPage: React.FC = () => {
           ) : (
             <div className="gallery-grid">
               {filteredItems.map(item => (
-                <article 
-                  key={item.id} 
+                <article
+                  key={item.id}
                   className="gallery-card"
                   onClick={() => setActiveItem(item)}
                   role="button"
@@ -90,14 +90,14 @@ export const GalleryPage: React.FC = () => {
                   aria-label={`View photography for ${item.title}`}
                 >
                   <div className="gallery-img-wrap">
-                    <img 
-                      src={item.imageUrl} 
-                      alt={item.altText || item.title} 
+                    <img
+                      src={item.imageUrl}
+                      alt={item.altText || item.title}
                       className="gallery-img"
                       loading="lazy"
                     />
                     <div className="gallery-overlay-sheen" />
-                    
+
                     <span className="gallery-category-pill">
                       <Tag size={11} />
                       {item.category}
@@ -129,7 +129,7 @@ export const GalleryPage: React.FC = () => {
       </section>
 
       {/* Lightbox Modal */}
-      <GalleryLightbox 
+      <GalleryLightbox
         item={activeItem}
         isOpen={Boolean(activeItem)}
         onClose={() => setActiveItem(null)}

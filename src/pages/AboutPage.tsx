@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { 
+import {
   ArrowRight,
   MessageSquareShare,
   Target,
@@ -18,13 +18,13 @@ interface AboutPageProps {
 export const AboutPage: React.FC<AboutPageProps> = ({ onOpenQuote }) => {
   return (
     <div style={{ minHeight: '85vh' }}>
-      
+
       {/* Editorial Hero Header — Deep Forest Botanical */}
-      <section style={{ 
-        backgroundColor: 'var(--color-forest-900)', 
-        color: '#FFFFFF', 
-        paddingTop: 'clamp(56px, 8vw, 84px)', 
-        paddingBottom: 'clamp(56px, 8vw, 84px)', 
+      <section style={{
+        backgroundColor: 'var(--color-forest-900)',
+        color: '#FFFFFF',
+        paddingTop: 'clamp(56px, 8vw, 84px)',
+        paddingBottom: 'clamp(56px, 8vw, 84px)',
         borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
         position: 'relative',
         overflow: 'hidden'
@@ -54,15 +54,15 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onOpenQuote }) => {
       {/* Main Corporate Overview — Warm Ivory Editorial Surface */}
       <section className="section section-editorial-light">
         <div className="container" style={{ maxWidth: '1080px' }}>
-          
-          <div className="card card-light reveal-on-scroll" style={{ 
-            padding: 'clamp(24px, 5vw, 48px)', 
+
+          <div className="card card-light reveal-on-scroll" style={{
+            padding: 'clamp(24px, 5vw, 48px)',
             marginBottom: '44px'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px', flexWrap: 'wrap' }}>
-              <img 
-                src="/images/branding/indus/indus-emblem-transparent.png" 
-                alt="Indus Tree Emblem" 
+              <img
+                src="/images/branding/indus/indus-emblem-transparent.png"
+                alt="Indus Tree Emblem"
                 style={{ width: '48px', height: '48px', objectFit: 'contain' }}
               />
               <div>
@@ -103,20 +103,18 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onOpenQuote }) => {
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '26px' }}>
-              
+
               {/* Managing Director */}
-              <div className="card card-light reveal-on-scroll stagger-1" style={{ 
-                padding: 'clamp(20px, 3.5vw, 28px)', 
-                display: 'flex',
-                gap: '20px',
-                alignItems: 'center'
+              <div className="card card-light reveal-on-scroll stagger-1 executive-profile-card" style={{
+                padding: 'clamp(20px, 3.5vw, 28px)',
+                gap: '20px'
               }}>
-                <div style={{ 
-                  width: '96px', 
-                  height: '106px', 
-                  borderRadius: '12px', 
-                  overflow: 'hidden', 
-                  flexShrink: 0, 
+                <div style={{
+                  width: '96px',
+                  height: '106px',
+                  borderRadius: '12px',
+                  overflow: 'hidden',
+                  flexShrink: 0,
                   boxShadow: '0 4px 16px rgba(14, 107, 56, 0.08), 0 2px 6px rgba(0, 0, 0, 0.05)',
                   border: '2px solid rgba(212, 175, 55, 0.55)',
                   display: 'flex',
@@ -124,8 +122,8 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onOpenQuote }) => {
                   justifyContent: 'center',
                   boxSizing: 'border-box'
                 }}>
-                  <img 
-                    src="/images/branding/indus/md-narendranath-dut.png" 
+                  <img
+                    src="/images/branding/indus/md-narendranath-dut.png"
                     alt="K. Narendranath Dut"
                     style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 15%' }}
                     loading="lazy"
@@ -148,18 +146,16 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onOpenQuote }) => {
               </div>
 
               {/* Director Sales & Marketing */}
-              <div className="card card-light reveal-on-scroll stagger-2" style={{ 
-                padding: 'clamp(20px, 3.5vw, 28px)', 
-                display: 'flex',
-                gap: '20px',
-                alignItems: 'center'
+              <div className="card card-light reveal-on-scroll stagger-2 executive-profile-card" style={{
+                padding: 'clamp(20px, 3.5vw, 28px)',
+                gap: '20px'
               }}>
-                <div style={{ 
-                  width: '96px', 
-                  height: '106px', 
-                  borderRadius: '12px', 
-                  overflow: 'hidden', 
-                  flexShrink: 0, 
+                <div style={{
+                  width: '96px',
+                  height: '106px',
+                  borderRadius: '12px',
+                  overflow: 'hidden',
+                  flexShrink: 0,
                   boxShadow: '0 4px 16px rgba(14, 107, 56, 0.08), 0 2px 6px rgba(0, 0, 0, 0.05)',
                   border: '2px solid rgba(212, 175, 55, 0.55)',
                   display: 'flex',
@@ -167,8 +163,8 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onOpenQuote }) => {
                   justifyContent: 'center',
                   boxSizing: 'border-box'
                 }}>
-                  <img 
-                    src="/images/branding/indus/director-anoopkumar.png" 
+                  <img
+                    src="/images/branding/indus/director-anoopkumar.png"
                     alt="K. Anoopkumar"
                     style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 15%' }}
                     loading="lazy"
@@ -195,10 +191,10 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onOpenQuote }) => {
 
           {/* Vision & Mission — High-Impact Split Grid */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '26px', marginBottom: '44px' }}>
-            
+
             {/* Vision */}
-            <div className="card card-light reveal-on-scroll stagger-1" style={{ 
-              padding: '34px', 
+            <div className="card card-light reveal-on-scroll stagger-1" style={{
+              padding: '34px',
               borderTop: '4px solid #0284C7',
               display: 'flex',
               flexDirection: 'column'
@@ -213,8 +209,8 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onOpenQuote }) => {
             </div>
 
             {/* Mission */}
-            <div className="card card-light reveal-on-scroll stagger-2" style={{ 
-              padding: '34px', 
+            <div className="card card-light reveal-on-scroll stagger-2" style={{
+              padding: '34px',
               borderTop: '4px solid var(--color-primary-green)',
               display: 'flex',
               flexDirection: 'column'
@@ -248,8 +244,8 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onOpenQuote }) => {
           </div>
 
           {/* 4 Core Pillars — Soft Sage Cards */}
-          <div className="card card-light reveal-on-scroll" style={{ 
-            padding: 'clamp(28px, 5vw, 42px)', 
+          <div className="card card-light reveal-on-scroll" style={{
+            padding: 'clamp(28px, 5vw, 42px)',
             marginBottom: '44px'
           }}>
             <div style={{ textAlign: 'center', marginBottom: '32px' }}>
@@ -262,7 +258,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onOpenQuote }) => {
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '20px' }}>
-              
+
               {/* Innovation */}
               <div style={{ backgroundColor: 'var(--color-sage-50)', padding: '24px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-sage-200)', textAlign: 'center' }}>
                 <div style={{ width: '56px', height: '56px', borderRadius: '50%', backgroundColor: 'rgba(251, 191, 36, 0.15)', color: '#F59E0B', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
@@ -319,9 +315,9 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onOpenQuote }) => {
           </div>
 
           {/* Seeds Division Section */}
-          <div className="card reveal-on-scroll" style={{ 
-            padding: '34px', 
-            backgroundColor: 'var(--color-primary-green-surface)', 
+          <div className="card reveal-on-scroll" style={{
+            padding: '34px',
+            backgroundColor: 'var(--color-primary-green-surface)',
             border: '1px solid rgba(14, 107, 56, 0.25)',
             marginBottom: '40px'
           }}>
@@ -346,8 +342,8 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onOpenQuote }) => {
               <span>Explore 105+ Official Products</span>
               <ArrowRight size={16} />
             </Link>
-            <button 
-              type="button" 
+            <button
+              type="button"
               className="btn btn-whatsapp"
               onClick={onOpenQuote}
             >

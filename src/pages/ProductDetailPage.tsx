@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { 
-  ArrowLeft, 
-  MessageSquareShare, 
-  CheckCircle, 
-  FileText, 
-  Languages, 
+import {
+  ArrowLeft,
+  MessageSquareShare,
+  CheckCircle,
+  FileText,
+  Languages,
   Image as ImageIcon,
   Ruler,
   Scale,
@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { Product } from '../types/product';
 import { getProductById, subscribeToProducts } from '../services/productService';
+import { useSiteSettings } from '../context/SettingsContext';
 
 interface ProductDetailPageProps {
   onOpenQuote: (product: Product) => void;
@@ -22,6 +23,7 @@ interface ProductDetailPageProps {
 
 export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ onOpenQuote }) => {
   const { id } = useParams<{ id: string }>();
+  const { displayFormattedNumber } = useSiteSettings();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'english' | 'telugu' | 'sheet'>('english');
@@ -81,7 +83,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ onOpenQuot
 
   return (
     <div style={{ backgroundColor: '#06180D', minHeight: '85vh', paddingBottom: '80px', color: '#F4F8F3' }}>
-      
+
       {/* Breadcrumb Bar */}
       <div style={{ backgroundColor: '#0A2415', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', padding: '14px 0' }}>
         <div className="container" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: '#9EB5A3', flexWrap: 'wrap' }}>
@@ -98,25 +100,25 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ onOpenQuot
       </div>
 
       <div className="container" style={{ marginTop: '36px' }}>
-        
+
         {/* Product Overview Card */}
         <div className="card" style={{ padding: 'clamp(20px, 4vw, 40px)', backgroundColor: '#0E291A', border: '1px solid rgba(255, 255, 255, 0.08)', marginBottom: '32px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '40px', alignItems: 'center' }}>
-            
+
             {/* Image Box — Studio Presentation */}
-            <div className="product-detail-hero-frame" style={{ 
-              position: 'relative', 
-              borderRadius: '16px', 
-              overflow: 'hidden', 
-              background: 'radial-gradient(circle at 50% 50%, #FFFFFF 0%, #EEF4EF 100%)', 
-              border: '1px solid rgba(255, 255, 255, 0.15)', 
+            <div className="product-detail-hero-frame" style={{
+              position: 'relative',
+              borderRadius: '16px',
+              overflow: 'hidden',
+              background: 'radial-gradient(circle at 50% 50%, #FFFFFF 0%, #EEF4EF 100%)',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
               boxShadow: '0 8px 24px rgba(0, 0, 0, 0.25)',
-              textAlign: 'center', 
-              padding: '28px' 
+              textAlign: 'center',
+              padding: '28px'
             }}>
-              <img 
-                src={product.imageUrl} 
-                alt={`${product.name} - Indus Crop Care`} 
+              <img
+                src={product.imageUrl}
+                alt={`${product.name} - Indus Crop Care`}
                 className="product-detail-hero-img"
                 style={{ maxHeight: '360px', width: 'auto', maxWidth: '100%', objectFit: 'contain', margin: '0 auto', filter: 'drop-shadow(0 6px 16px rgba(0,0,0,0.12))' }}
               />
@@ -150,15 +152,15 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ onOpenQuot
 
               {/* Formulation Pill */}
               {(product.formulation || product.composition) && (
-                <div style={{ 
-                  display: 'inline-flex', 
-                  alignItems: 'center', 
-                  gap: '8px', 
-                  backgroundColor: 'rgba(2, 132, 199, 0.15)', 
+                <div style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  backgroundColor: 'rgba(2, 132, 199, 0.15)',
                   border: '1px solid rgba(2, 132, 199, 0.35)',
-                  padding: '8px 14px', 
-                  borderRadius: '8px', 
-                  marginBottom: '20px' 
+                  padding: '8px 14px',
+                  borderRadius: '8px',
+                  marginBottom: '20px'
                 }}>
                   <FlaskConical size={16} style={{ color: '#38BDF8', flexShrink: 0 }} />
                   <span style={{ fontSize: '0.96rem', color: '#BAE6FD', fontWeight: 600 }}>
@@ -217,14 +219,14 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ onOpenQuot
                 </ul>
               )}
 
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="btn btn-whatsapp btn-lg"
                 onClick={() => onOpenQuote(product)}
                 style={{ width: '100%', maxWidth: '420px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}
               >
                 <MessageSquareShare size={20} />
-                <span>Enquire on WhatsApp (+91 88860 69143)</span>
+                <span>Enquire on WhatsApp ({displayFormattedNumber || '+91 88860 69143'})</span>
               </button>
 
             </div>
@@ -234,10 +236,10 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ onOpenQuot
 
         {/* Technical Specs Tab Card */}
         <div className="card" style={{ padding: 'clamp(20px, 4vw, 36px)', backgroundColor: '#0E291A', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-          
+
           <div className="modal-tabs">
-            <button 
-              type="button" 
+            <button
+              type="button"
               className={`modal-tab-btn ${activeTab === 'english' ? 'active' : ''}`}
               onClick={() => setActiveTab('english')}
             >
@@ -245,8 +247,8 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ onOpenQuot
               Formulation & Scientific Specifications
             </button>
             {hasTelugu && (
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className={`modal-tab-btn ${activeTab === 'telugu' ? 'active' : ''}`}
                 onClick={() => setActiveTab('telugu')}
               >
@@ -255,8 +257,8 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ onOpenQuot
               </button>
             )}
             {product.sheetImageUrl && (
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className={`modal-tab-btn ${activeTab === 'sheet' ? 'active' : ''}`}
                 onClick={() => setActiveTab('sheet')}
               >
@@ -331,13 +333,13 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ onOpenQuot
                   </tbody>
                 </table>
               ) : (
-                <div style={{ 
-                  backgroundColor: 'rgba(255, 255, 255, 0.04)', 
-                  border: '1px solid rgba(255, 255, 255, 0.1)', 
-                  borderRadius: '10px', 
-                  padding: '20px', 
-                  textAlign: 'center', 
-                  margin: '16px 0' 
+                <div style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: '10px',
+                  padding: '20px',
+                  textAlign: 'center',
+                  margin: '16px 0'
                 }}>
                   <p style={{ color: '#FFE082', fontSize: '1rem', fontFamily: 'var(--font-telugu)', margin: '0 0 8px 0', fontWeight: 600 }}>
                     ఈ ఫార్ములేషన్ వివరాలు ప్రస్తుతం అధికారిక ఆంగ్ల కేటలాగ్‌లో అందుబాటులో ఉన్నాయి.
@@ -358,9 +360,9 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ onOpenQuot
                   Indus Crop Care Records
                 </span>
               </div>
-              <img 
-                src={product.sheetImageUrl} 
-                alt={`Official sheet for ${product.name}`} 
+              <img
+                src={product.sheetImageUrl}
+                alt={`Official sheet for ${product.name}`}
               />
             </div>
           )}

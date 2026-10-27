@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
@@ -28,6 +28,51 @@ export const AdminNav: React.FC = () => {
   };
 
   const isActive = (path: string) => location.pathname === path;
+
+  // Lock background scrolling smoothly without forcing full-page layout reflow
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+
+    // Only apply on mobile viewport (< 992px)
+    if (typeof window !== 'undefined' && window.innerWidth >= 992) {
+      return;
+    }
+
+    document.documentElement.classList.add('admin-drawer-open');
+    document.body.classList.add('admin-drawer-open');
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    const handleResize = () => {
+      if (window.innerWidth >= 992) {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      document.documentElement.classList.remove('admin-drawer-open');
+      document.body.classList.remove('admin-drawer-open');
+
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [mobileMenuOpen]);
+
+  // Close drawer on route change
+  const prevAdminPathname = React.useRef(location.pathname);
+  useEffect(() => {
+    if (prevAdminPathname.current !== location.pathname) {
+      prevAdminPathname.current = location.pathname;
+      setMobileMenuOpen(false);
+    }
+  }, [location.pathname]);
 
   const navLinks = [
     { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -83,6 +128,7 @@ export const AdminNav: React.FC = () => {
         <div 
           className="admin-drawer-overlay" 
           onClick={() => setMobileMenuOpen(false)}
+          onTouchMove={(e) => e.preventDefault()}
           aria-hidden="true"
         />
       )}

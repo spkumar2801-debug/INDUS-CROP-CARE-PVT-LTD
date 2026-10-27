@@ -14,13 +14,14 @@ export const Header: React.FC<HeaderProps> = ({ onOpenQuoteModal: _onOpenQuoteMo
   const location = useLocation();
   const { customerCareNumber, displayFormattedNumber, handleCustomerCareWhatsApp } = useSiteSettings();
 
-  // Detect scroll to add slight elevation / compact state
+  // Detect scroll to add slight elevation / compact state without redundant re-renders
   useEffect(() => {
+    let lastScrolled = window.scrollY > 20;
     const handleScroll = () => {
-      if (window.scrollY > 20) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
+      const scrolled = window.scrollY > 20;
+      if (scrolled !== lastScrolled) {
+        lastScrolled = scrolled;
+        setIsScrolled(scrolled);
       }
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -28,8 +29,12 @@ export const Header: React.FC<HeaderProps> = ({ onOpenQuoteModal: _onOpenQuoteMo
   }, []);
 
   // Close mobile menu whenever route changes
+  const prevPathname = React.useRef(location.pathname);
   useEffect(() => {
-    setIsMobileMenuOpen(false);
+    if (prevPathname.current !== location.pathname) {
+      prevPathname.current = location.pathname;
+      setIsMobileMenuOpen(false);
+    }
   }, [location.pathname]);
 
   const isActive = (path: string) => {
@@ -46,13 +51,13 @@ export const Header: React.FC<HeaderProps> = ({ onOpenQuoteModal: _onOpenQuoteMo
     <>
       <header className={`site-header-wrapper ${isScrolled ? 'is-scrolled' : ''}`}>
         <div className="site-header-pill">
-          
+
           {/* Brand Logo */}
           <Link to="/" className="brand-logo-link" aria-label="Indus Crop Care Home">
             <div className="brand-logo-frame">
-              <img 
-                src="/images/branding/indus/indus-logo.png" 
-                alt="Indus Crop Care Pvt. Ltd." 
+              <img
+                src="/images/branding/indus/indus-logo.png"
+                alt="Indus Crop Care Pvt. Ltd."
                 className="brand-logo-img"
                 width={92}
                 height={40}
@@ -88,8 +93,8 @@ export const Header: React.FC<HeaderProps> = ({ onOpenQuoteModal: _onOpenQuoteMo
 
           {/* Desktop Action Desks */}
           <div className="header-actions-desktop">
-            <a 
-              href={`tel:+${customerCareNumber || '918886069143'}`} 
+            <a
+              href={`tel:+${customerCareNumber || '918886069143'}`}
               className="btn-header-call"
               aria-label={`Call Indus Crop Care at ${displayFormattedNumber || '+91 88860 69143'}`}
             >
@@ -97,8 +102,8 @@ export const Header: React.FC<HeaderProps> = ({ onOpenQuoteModal: _onOpenQuoteMo
               <span>{displayFormattedNumber || '+91 88860 69143'}</span>
             </a>
 
-            <button 
-              type="button" 
+            <button
+              type="button"
               className="btn btn-whatsapp btn-sm header-quote-btn"
               onClick={handleContactAction}
               title="Official Customer Care & WhatsApp Desk"
@@ -110,7 +115,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenQuoteModal: _onOpenQuoteMo
 
           {/* Mobile Right Controls: Phone Call + 3-Line Animated Hamburger */}
           <div className="header-actions-mobile">
-            <a 
+            <a
               href={`tel:+${customerCareNumber || '918886069143'}`}
               className="mobile-phone-btn"
               aria-label="Call Indus Crop Care Support"
@@ -120,8 +125,8 @@ export const Header: React.FC<HeaderProps> = ({ onOpenQuoteModal: _onOpenQuoteMo
             </a>
 
             {/* Custom 3-Line Morphing Hamburger Button */}
-            <button 
-              type="button" 
+            <button
+              type="button"
               className={`hamburger-button ${isMobileMenuOpen ? 'is-active' : ''}`}
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               aria-expanded={isMobileMenuOpen}
@@ -142,7 +147,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenQuoteModal: _onOpenQuoteMo
       )}
 
       {/* Mobile Drawer / Overlay Navigation */}
-      <MobileMenu 
+      <MobileMenu
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
         onOpenQuoteModal={() => {

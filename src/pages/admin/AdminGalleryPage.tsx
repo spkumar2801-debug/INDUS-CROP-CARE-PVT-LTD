@@ -30,7 +30,9 @@ export const AdminGalleryPage: React.FC = () => {
   };
 
   useEffect(() => {
-    loadGallery();
+    getAllGalleryItemsAdmin()
+      .then(res => setItems(res))
+      .finally(() => setLoading(false));
   }, []);
 
   const handleTogglePublish = async (item: GalleryItem) => {

@@ -42,13 +42,7 @@ export function useScrollReveal() {
     const observeTargets = () => {
       const targets = document.querySelectorAll('.reveal-on-scroll:not(.is-revealed)');
       targets.forEach(el => {
-        // If element is already above or inside viewport upon initial mount, reveal it immediately
-        const rect = el.getBoundingClientRect();
-        if (rect.top <= window.innerHeight * 0.95 && rect.bottom >= 0) {
-          el.classList.add('is-revealed');
-        } else {
-          observer.observe(el);
-        }
+        observer.observe(el);
       });
     };
 
@@ -57,14 +51,18 @@ export function useScrollReveal() {
 
     // Check again at staggered intervals to catch async rendered items (e.g. products)
     const t1 = setTimeout(observeTargets, 150);
-    const t2 = setTimeout(observeTargets, 500);
-    const t3 = setTimeout(observeTargets, 1200);
+    const t2 = setTimeout(observeTargets, 600);
 
-    // Watch for newly mounted DOM elements (e.g. products rendered after async Firebase fetch)
+    // Watch for newly mounted DOM elements with rAF debouncing to prevent thrashing
     let mutationObserver: MutationObserver | null = null;
+    let rafId: number | null = null;
     if ('MutationObserver' in window) {
       mutationObserver = new MutationObserver(() => {
-        observeTargets();
+        if (rafId !== null) return;
+        rafId = window.requestAnimationFrame(() => {
+          observeTargets();
+          rafId = null;
+        });
       });
       mutationObserver.observe(document.body, {
         childList: true,
@@ -72,25 +70,10 @@ export function useScrollReveal() {
       });
     }
 
-    // Passive scroll check as a bulletproof fallback for short mobile viewports
-    const handleScrollFallback = () => {
-      const targets = document.querySelectorAll('.reveal-on-scroll:not(.is-revealed)');
-      targets.forEach(el => {
-        const rect = el.getBoundingClientRect();
-        if (rect.top <= window.innerHeight + 40) {
-          el.classList.add('is-revealed');
-          observer.unobserve(el);
-        }
-      });
-    };
-
-    window.addEventListener('scroll', handleScrollFallback, { passive: true });
-
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
-      clearTimeout(t3);
-      window.removeEventListener('scroll', handleScrollFallback);
+      if (rafId !== null) window.cancelAnimationFrame(rafId);
       if (mutationObserver) mutationObserver.disconnect();
       observer.disconnect();
     };

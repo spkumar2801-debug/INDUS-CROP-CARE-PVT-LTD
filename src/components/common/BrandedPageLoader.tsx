@@ -5,7 +5,7 @@ interface BrandedPageLoaderProps {
   initialOnly?: boolean;
 }
 
-export const BrandedPageLoader: React.FC<BrandedPageLoaderProps> = () => {
+export const BrandedPageLoader: React.FC<BrandedPageLoaderProps> = ({ initialOnly = false }) => {
   const location = useLocation();
   const isInitialMount = useRef(true);
   const previousPath = useRef(location.pathname);
@@ -45,6 +45,7 @@ export const BrandedPageLoader: React.FC<BrandedPageLoaderProps> = () => {
       setTransitionFadingOut(true);
       setTimeout(() => {
         setShowTransition(false);
+        setTransitionFadingOut(false);
       }, 150);
     }
   };
@@ -69,7 +70,7 @@ export const BrandedPageLoader: React.FC<BrandedPageLoaderProps> = () => {
     };
   }, [showInitial]);
 
-  // 2. Page-Transition animation on public navigation options (~1.0s brief transition)
+  // 2. Smooth Page-Transition animation on public route changes (~480ms total)
   useEffect(() => {
     // Skip on initial mount
     if (isInitialMount.current) {
@@ -78,7 +79,9 @@ export const BrandedPageLoader: React.FC<BrandedPageLoaderProps> = () => {
       return;
     }
 
-    // Skip if pathname has not changed (e.g. query params, hash changes, component rerenders)
+    if (initialOnly) return;
+
+    // Skip if pathname has not changed (e.g. query param changes like search or category filters)
     if (location.pathname === previousPath.current) {
       return;
     }
@@ -104,24 +107,27 @@ export const BrandedPageLoader: React.FC<BrandedPageLoaderProps> = () => {
       }
     } catch {}
 
-    // Trigger brief 1.0s page transition
-    setShowTransition(true);
-    setTransitionFadingOut(false);
+    // Trigger smooth, snappy brand page-transition
+    const raf = window.requestAnimationFrame(() => {
+      setShowTransition(true);
+      setTransitionFadingOut(false);
+    });
 
     const fadeTimer = setTimeout(() => {
       setTransitionFadingOut(true);
-    }, 750);
+    }, 340);
 
     const doneTimer = setTimeout(() => {
       setShowTransition(false);
       setTransitionFadingOut(false);
-    }, 1000);
+    }, 520);
 
     return () => {
+      window.cancelAnimationFrame(raf);
       clearTimeout(fadeTimer);
       clearTimeout(doneTimer);
     };
-  }, [location.pathname, showInitial]);
+  }, [location.pathname, showInitial, initialOnly]);
 
   // If initial intro is active
   if (showInitial) {
@@ -169,7 +175,7 @@ export const BrandedPageLoader: React.FC<BrandedPageLoaderProps> = () => {
     );
   }
 
-  // If page transition is active
+  // If page navigation transition is active
   if (showTransition) {
     return (
       <div 

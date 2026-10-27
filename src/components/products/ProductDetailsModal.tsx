@@ -17,6 +17,24 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'english' | 'telugu' | 'sheet'>('english');
 
+  React.useEffect(() => {
+    if (!isOpen) return;
+
+    document.documentElement.classList.add('modal-open');
+    document.body.classList.add('modal-open');
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.documentElement.classList.remove('modal-open');
+      document.body.classList.remove('modal-open');
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, onClose]);
+
   if (!isOpen || !product) return null;
 
   return (
