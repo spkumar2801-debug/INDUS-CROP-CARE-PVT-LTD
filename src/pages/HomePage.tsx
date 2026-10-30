@@ -106,6 +106,44 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
     }
   }, [heroMediaType, heroVideoUrl, heroVideoMuted]);
 
+  // Subtle cinematic hero background parallax during scroll
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) return;
+
+    // If browser natively supports CSS scroll-driven animations, CSS handles it off-thread
+    if (window.CSS && CSS.supports && CSS.supports('animation-timeline', 'scroll()')) {
+      return;
+    }
+
+    const bgEl = document.querySelector<HTMLElement>('.hero-cinematic-bg');
+    if (!bgEl) return;
+
+    let rafId: number | null = null;
+    let lastScrollY = -1;
+
+    const onScroll = () => {
+      const scrollY = window.scrollY;
+      if (scrollY <= 900 && scrollY !== lastScrollY) {
+        lastScrollY = scrollY;
+        if (rafId === null) {
+          rafId = window.requestAnimationFrame(() => {
+            const offset = (scrollY * 0.15).toFixed(1);
+            bgEl.style.setProperty('--hero-scroll-parallax', `${offset}px`);
+            rafId = null;
+          });
+        }
+      }
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (rafId !== null) window.cancelAnimationFrame(rafId);
+    };
+  }, []);
+
   const overlayDarkness = typeof hero?.overlayDarkness === 'number' ? hero.overlayDarkness : 0.65;
   const gradientStrength = typeof hero?.gradientStrength === 'number' ? hero.gradientStrength : 0.8;
   const heightPreset = hero?.heroHeightPreset || 'standard';

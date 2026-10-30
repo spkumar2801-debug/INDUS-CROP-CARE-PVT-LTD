@@ -45,6 +45,48 @@ export const GalleryPage: React.FC = () => {
     return items.filter(i => i.category === selectedCategory);
   }, [items, selectedCategory]);
 
+  // Premium Scroll Reveal Observer for gallery cards
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion || !('IntersectionObserver' in window)) {
+      document.querySelectorAll('.gallery-card-reveal').forEach(el => {
+        el.classList.add('is-revealed');
+      });
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries, obs) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-revealed');
+            obs.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        root: null,
+        rootMargin: '0px 0px 50px 0px',
+        threshold: 0.08
+      }
+    );
+
+    const observeUnrevealed = () => {
+      const cards = document.querySelectorAll('.gallery-card-reveal:not(.is-revealed)');
+      cards.forEach(card => observer.observe(card));
+    };
+
+    observeUnrevealed();
+    const timer = setTimeout(observeUnrevealed, 80);
+
+    return () => {
+      clearTimeout(timer);
+      observer.disconnect();
+    };
+  }, [filteredItems]);
+
   return (
     <div style={{ backgroundColor: 'var(--color-sage-50)', minHeight: '85vh', color: 'var(--color-charcoal-800)' }}>
 
@@ -95,16 +137,18 @@ export const GalleryPage: React.FC = () => {
             </div>
           ) : (
             <div className="gallery-grid">
-              {filteredItems.map(item => (
-                <article
-                  key={item.id}
-                  className="gallery-card"
-                  onClick={() => setActiveItem(item)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveItem(item); } }}
-                  aria-label={`View photography for ${item.title}`}
-                >
+              {filteredItems.map((item, index) => {
+                const staggerClass = `stagger-${(index % 3) + 1}`;
+                return (
+                  <article
+                    key={item.id}
+                    className={`gallery-card gallery-card-reveal ${staggerClass}`}
+                    onClick={() => setActiveItem(item)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveItem(item); } }}
+                    aria-label={`View photography for ${item.title}`}
+                  >
                   <div className="gallery-img-wrap">
                     <img
                       src={item.imageUrl}
@@ -137,8 +181,9 @@ export const GalleryPage: React.FC = () => {
                     )}
                   </div>
                 </article>
-              ))}
-            </div>
+              );
+            })}
+          </div>
           )}
 
         </div>

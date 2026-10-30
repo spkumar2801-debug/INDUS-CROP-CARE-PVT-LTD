@@ -169,6 +169,48 @@ export const ProductsPage: React.FC<ProductsPageProps> = ({ onOpenQuote, onOpenD
     setSearchParams({});
   };
 
+  // Premium Scroll Reveal Observer for product cards
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion || !('IntersectionObserver' in window)) {
+      document.querySelectorAll('.product-card-reveal').forEach(el => {
+        el.classList.add('is-revealed');
+      });
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries, obs) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-revealed');
+            obs.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        root: null,
+        rootMargin: '0px 0px 50px 0px',
+        threshold: 0.08
+      }
+    );
+
+    const observeUnrevealed = () => {
+      const cards = document.querySelectorAll('.product-card-reveal:not(.is-revealed)');
+      cards.forEach(card => observer.observe(card));
+    };
+
+    observeUnrevealed();
+    const timer = setTimeout(observeUnrevealed, 80);
+
+    return () => {
+      clearTimeout(timer);
+      observer.disconnect();
+    };
+  }, [paginatedProducts, safeCurrentPage, activeCategory]);
+
   const isFiltered = activeCategory !== 'All Products' || Boolean(searchInput.trim()) || safeCurrentPage > 1;
 
   // Calculate slice range for summary text
@@ -336,14 +378,18 @@ export const ProductsPage: React.FC<ProductsPageProps> = ({ onOpenQuote, onOpenD
           ) : (
             <>
               <div className="products-grid">
-                {paginatedProducts.map(product => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    onOpenQuote={onOpenQuote}
-                    onOpenDetails={onOpenDetails}
-                  />
-                ))}
+                {paginatedProducts.map((product, index) => {
+                  const staggerClass = `stagger-${(index % 4) + 1}`;
+                  return (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      className={`product-card-reveal ${staggerClass}`}
+                      onOpenQuote={onOpenQuote}
+                      onOpenDetails={onOpenDetails}
+                    />
+                  );
+                })}
               </div>
 
               {/* Pagination Controls */}

@@ -82,7 +82,11 @@ const PublicLayout: React.FC<{
   return (
     <>
       <Header onOpenQuoteModal={() => onOpenEnquiry()} />
-      <main style={{ flex: 1 }}>{children}</main>
+      <main className="site-page-main" style={{ flex: 1 }}>
+        <div key={location.pathname} className="page-transition-wrapper">
+          {children}
+        </div>
+      </main>
       {!isContactPage && (
         <ProductEnquirySection products={products} selectedProductId={selectedEnquiryProduct} />
       )}

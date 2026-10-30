@@ -6,11 +6,12 @@ interface ProductCardProps {
   product: Product;
   onOpenQuote: (product: Product) => void;
   onOpenDetails: (product: Product) => void;
+  className?: string;
 }
 
-const ProductCardComponent: React.FC<ProductCardProps> = ({ product, onOpenQuote, onOpenDetails }) => {
+const ProductCardComponent: React.FC<ProductCardProps> = ({ product, onOpenQuote, onOpenDetails, className }) => {
   return (
-    <article className="product-card" id={`product-${product.code.toLowerCase().replace(/\s+/g, '-')}`}>
+    <article className={`product-card ${className || ''}`.trim()} id={`product-${product.code.toLowerCase().replace(/\s+/g, '-')}`}>
       {/* Studio Crop Photography & Badges */}
       <div 
         className="product-card-img-wrap"
