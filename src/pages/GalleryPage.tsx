@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { Image as ImageIcon, Eye, Tag } from 'lucide-react';
 import { GalleryItem } from '../types/gallery';
-import { getPublishedGalleryItems } from '../services/galleryService';
+import { getPublishedGalleryItems, subscribeToGallery } from '../services/galleryService';
 import { GalleryLightbox } from '../components/gallery/GalleryLightbox';
 
 export const GalleryPage: React.FC = () => {
@@ -11,9 +11,25 @@ export const GalleryPage: React.FC = () => {
   const [activeItem, setActiveItem] = useState<GalleryItem | null>(null);
 
   useEffect(() => {
+    let isMounted = true;
     getPublishedGalleryItems()
-      .then(data => setItems(data))
-      .finally(() => setLoading(false));
+      .then(data => {
+        if (isMounted) setItems(data);
+      })
+      .finally(() => {
+        if (isMounted) setLoading(false);
+      });
+
+    const unsubscribe = subscribeToGallery(() => {
+      getPublishedGalleryItems().then(data => {
+        if (isMounted) setItems(data);
+      });
+    });
+
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
   }, []);
 
   const categories = useMemo(() => {

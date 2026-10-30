@@ -740,17 +740,6 @@ const SEED_PRODUCTS: Product[] = [
 
 export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
   {
-    id: "indus-conf-2026-team-stage",
-    title: "Annual Conference 2026\u201327 Team Assembly",
-    description: "Indus Crop Care executive leadership, agronomy leads, and field managers gathered for the Annual Conference 2026\u201327.",
-    category: "Corporate Events",
-    imageUrl: "/images/gallery/indus-conf-2026-team-stage.jpg",
-    altText: "Indus Crop Care leadership and agronomy team on stage at Annual Conference 2026-27",
-    caption: "Indus Crop Care executive leadership, agronomy leads, and field managers gathered for the Annual Conference 2026\u201327.",
-    isPublished: true,
-    sortOrder: 1
-  },
-  {
     id: "indus-conf-lamp-lighting",
     title: "Inaugural Lamp Lighting Ceremony",
     description: "Auspicious lamp lighting (Jyothi Prajvalana) inaugurating the Annual Conference 2026\u201327 proceedings.",
@@ -759,7 +748,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Indus Crop Care directors lighting the traditional brass ceremonial lamp at conference opening",
     caption: "Auspicious lamp lighting (Jyothi Prajvalana) inaugurating the Annual Conference 2026\u201327 proceedings.",
     isPublished: true,
-    sortOrder: 2
+    sortOrder: 1
   },
   {
     id: "indus-conf-lamp-directors",
@@ -770,73 +759,62 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Managing Director and executive directors gathered around ceremonial brass lamp",
     caption: "Managing Director and executive board members participating in the ceremonial conference inauguration.",
     isPublished: true,
-    sortOrder: 3
+    sortOrder: 2
   },
   {
     id: "indus-conf-executive-table",
     title: "Executive Directorate Conference Address",
-    description: "Managing directors and technical advisors chairing the Annual Strategic Conference.",
+    description: "Managing Director, executive directors, and technical advisors chairing the Annual Strategic Conference.",
     category: "Corporate Events",
     imageUrl: "/images/gallery/indus-conf-executive-table.jpg",
     altText: "Indus Crop Care executive directors seated at the conference head table",
-    caption: "Managing directors and technical advisors chairing the Annual Strategic Conference.",
+    caption: "Managing Director, executive directors, and technical advisors chairing the Annual Strategic Conference.",
+    isPublished: true,
+    sortOrder: 3
+  },
+  {
+    id: "indus-conf-team-grand-assembly",
+    title: "Annual Conference 2026\u201327 Grand Team Assembly",
+    description: "Complete Indus Crop Care corporate executive leadership, agronomy specialists, regional managers, and field officers united at the Annual Conference 2026\u201327.",
+    category: "Corporate Events",
+    imageUrl: "/images/gallery/indus-conf-team-grand-assembly.jpg",
+    altText: "Complete Indus Crop Care leadership, agronomy team, and regional officers on stage at Annual Conference 2026-27",
+    caption: "Complete Indus Crop Care corporate, technical, and field operations team assembled at Annual Conference 2026\u201327.",
     isPublished: true,
     sortOrder: 4
   },
   {
-    id: "indus-conf-keynote-address",
-    title: "Managing Director Leadership Keynote",
-    description: "Keynote address setting forth the vision for sustainable crop protection and farmer empowerment.",
+    id: "indus-conf-md-ceremonial-welcome",
+    title: "Managing Director Ceremonial Welcome",
+    description: "Managing Director Sri Narendranath Dut receiving ceremonial floral welcome and honors on the conference stage.",
     category: "Corporate Events",
-    imageUrl: "/images/gallery/indus-conf-keynote-address.jpg",
-    altText: "Managing Director addressing attendees from podium at Indus Crop Care Annual Conference",
-    caption: "Keynote address setting forth the vision for sustainable crop protection and farmer empowerment.",
+    imageUrl: "/images/gallery/indus-conf-md-ceremonial-welcome.jpg",
+    altText: "Indus Crop Care Managing Director welcomed with floral bouquet on conference stage",
+    caption: "Ceremonial floral welcome honoring the Managing Director at Annual Conference 2026\u201327.",
     isPublished: true,
     sortOrder: 5
   },
   {
-    id: "indus-conf-podium-vision",
-    title: "Directorate Strategic Vision & Roadmap",
-    description: "Deliberations on bio-nutrition innovation, product expansion, and sustainable agricultural yields.",
+    id: "indus-conf-keynote-address",
+    title: "Director Leadership Keynote",
+    description: "Director delivering leadership keynote address setting forth the strategic vision for sustainable crop protection, field trial excellence, and farmer empowerment.",
     category: "Corporate Events",
-    imageUrl: "/images/gallery/indus-conf-podium-vision.jpg",
-    altText: "Managing Director addressing conference with Annual Conference backdrop and product display",
-    caption: "Deliberations on bio-nutrition innovation, product expansion, and sustainable agricultural yields.",
+    imageUrl: "/images/gallery/indus-conf-keynote-address.jpg",
+    altText: "Indus Crop Care Director addressing attendees from podium at Annual Conference 2026-27",
+    caption: "Director delivering leadership keynote address setting forth the vision for sustainable crop protection and farmer empowerment.",
     isPublished: true,
     sortOrder: 6
   },
   {
-    id: "indus-conf-strategy-session",
-    title: "Annual Strategic Deliberations",
-    description: "Indus leadership team presenting regional sales strategies and input portfolio goals.",
-    category: "Corporate Events",
-    imageUrl: "/images/gallery/indus-conf-strategy-session.jpg",
-    altText: "Executive leaders and agronomy managers during conference strategy presentation",
-    caption: "Indus leadership team presenting regional sales strategies and input portfolio goals.",
-    isPublished: true,
-    sortOrder: 7
-  },
-  {
-    id: "indus-conf-hall-delegates",
-    title: "Annual Conference Delegate Session",
-    description: "Technical advisors, sales leads, and regional distribution partners attending strategy deliberations.",
-    category: "Corporate Events",
-    imageUrl: "/images/gallery/indus-conf-hall-delegates.jpg",
-    altText: "Conference banquet hall with Indus Crop Care team seated at deliberation tables",
-    caption: "Technical advisors, sales leads, and regional distribution partners attending strategy deliberations.",
-    isPublished: true,
-    sortOrder: 8
-  },
-  {
     id: "indus-conf-merit-award-stage",
-    title: "Excellence in Agri-Input Service Award",
-    description: "Stage felicitation and trophy presentation honoring exceptional regional field service.",
+    title: "Director Sales & Marketing Welcome & Recognition",
+    description: "Stage felicitation and ceremonial bouquet presentation welcoming the Director of Sales & Marketing at Annual Conference 2026\u201327.",
     category: "Corporate Events",
     imageUrl: "/images/gallery/indus-conf-merit-award-stage.jpg",
-    altText: "Indus Crop Care directors presenting excellence award memento on stage",
-    caption: "Stage felicitation and trophy presentation honoring exceptional regional field service.",
+    altText: "Director Sales & Marketing receiving stage felicitation and floral bouquet at Annual Conference",
+    caption: "Welcoming Director Sales & Marketing on stage at Annual Conference 2026\u201327.",
     isPublished: true,
-    sortOrder: 9
+    sortOrder: 7
   },
   {
     id: "indus-conf-merit-trophy-md",
@@ -847,18 +825,73 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Managing Director presenting merit trophy to regional executive on conference stage",
     caption: "Managing Director and senior directors conferring annual performance awards to regional team leads.",
     isPublished: true,
+    sortOrder: 8
+  },
+  {
+    id: "indus-conf-md-lamp-invocation",
+    title: "Managing Director Lamp Lighting & Invocation",
+    description: "Managing Director Sri Narendranath Dut lighting the traditional ceremonial lamp during invocation proceedings.",
+    category: "Corporate Events",
+    imageUrl: "/images/gallery/indus-conf-md-lamp-invocation.jpg",
+    altText: "Managing Director Sri Narendranath Dut lighting the traditional ceremonial lamp",
+    caption: "Managing Director performing traditional ceremonial lamp lighting at conference opening.",
+    isPublished: true,
+    sortOrder: 9
+  },
+  {
+    id: "indus-conf-stage-leadership",
+    title: "Executive Directorate & Advisory Panel",
+    description: "Executive directors, technical consultants, and zonal heads gathered on stage at Annual Conference 2026\u201327.",
+    category: "Corporate Events",
+    imageUrl: "/images/gallery/indus-conf-stage-leadership.jpg",
+    altText: "Indus Crop Care executive directors and technical advisors on conference stage",
+    caption: "Indus Crop Care executive directors and technical advisory board on stage.",
+    isPublished: true,
     sortOrder: 10
   },
   {
-    id: "indus-conf-sustainable-standee",
-    title: "Sustainable Crop Nutrition Standee Showcase",
-    description: "Showcasing the dedicated bio-nutrition and plant vigor product portfolio.",
+    id: "indus-conf-2026-team-stage",
+    title: "Annual Conference Directorate & Technical Assembly",
+    description: "Indus Crop Care executive leadership, agronomy leads, and field managers gathered for the Annual Conference 2026\u201327.",
     category: "Corporate Events",
-    imageUrl: "/images/gallery/indus-conf-sustainable-standee.jpg",
-    altText: "Indus Crop Care representative beside sustainable nutrition product banner",
-    caption: "Showcasing the dedicated bio-nutrition and plant vigor product portfolio.",
+    imageUrl: "/images/gallery/indus-conf-2026-team-stage.jpg",
+    altText: "Indus Crop Care leadership and agronomy team on stage at Annual Conference 2026-27",
+    caption: "Indus Crop Care executive leadership, agronomy leads, and field managers gathered for the Annual Conference 2026\u201327.",
     isPublished: true,
     sortOrder: 11
+  },
+  {
+    id: "indus-conf-podium-vision",
+    title: "Directorate Strategic Vision & Roadmap",
+    description: "Deliberations on bio-nutrition innovation, product expansion, and sustainable agricultural yields.",
+    category: "Corporate Events",
+    imageUrl: "/images/gallery/indus-conf-podium-vision.jpg",
+    altText: "Managing Director addressing conference with Annual Conference backdrop and product display",
+    caption: "Deliberations on bio-nutrition innovation, product expansion, and sustainable agricultural yields.",
+    isPublished: true,
+    sortOrder: 12
+  },
+  {
+    id: "indus-conf-strategy-session",
+    title: "Annual Strategic Deliberations",
+    description: "Indus leadership team presenting regional sales strategies and input portfolio goals.",
+    category: "Corporate Events",
+    imageUrl: "/images/gallery/indus-conf-strategy-session.jpg",
+    altText: "Executive leaders and agronomy managers during conference strategy presentation",
+    caption: "Indus leadership team presenting regional sales strategies and input portfolio goals.",
+    isPublished: true,
+    sortOrder: 13
+  },
+  {
+    id: "indus-conf-hall-delegates",
+    title: "Annual Conference Delegate Session",
+    description: "Technical advisors, sales leads, and regional distribution partners attending strategy deliberations.",
+    category: "Corporate Events",
+    imageUrl: "/images/gallery/indus-conf-hall-delegates.jpg",
+    altText: "Conference banquet hall with Indus Crop Care team seated at deliberation tables",
+    caption: "Technical advisors, sales leads, and regional distribution partners attending strategy deliberations.",
+    isPublished: true,
+    sortOrder: 14
   },
   {
     id: "indus-conf-lawn-leadership",
@@ -869,7 +902,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Indus Crop Care senior leadership standing on lawn during annual conference meet",
     caption: "Executive directors and technical heads during annual strategic planning sessions.",
     isPublished: true,
-    sortOrder: 12
+    sortOrder: 15
   },
   {
     id: "indus-conf-garden-executives",
@@ -880,7 +913,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Indus Crop Care board directors and regional managers in outdoor conference setting",
     caption: "Executive directors and regional technical officers gathered in the conference resort grounds.",
     isPublished: true,
-    sortOrder: 13
+    sortOrder: 16
   },
   {
     id: "indus-conf-garden-team",
@@ -891,7 +924,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Indus Crop Care regional agronomy managers standing together on garden lawn",
     caption: "Field executives and regional managers representing Telangana and Andhra Pradesh operations.",
     isPublished: true,
-    sortOrder: 14
+    sortOrder: 17
   },
   {
     id: "indus-conf-lawn-honour",
@@ -902,7 +935,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Ceremonial shawl and bouquet felicitation of Indus leadership team member",
     caption: "Honoring key management contributors with traditional ceremonial shawl and bouquet.",
     isPublished: true,
-    sortOrder: 15
+    sortOrder: 18
   },
   {
     id: "indus-conf-lawn-felicitation",
@@ -913,7 +946,18 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Indus directors honoring colleague with ceremonial shawl and memento on garden lawn",
     caption: "Formal ceremonial honor presentation recognizing leadership and dedicated agri-input service.",
     isPublished: true,
-    sortOrder: 16
+    sortOrder: 19
+  },
+  {
+    id: "indus-conf-sustainable-standee",
+    title: "Sustainable Crop Nutrition Standee Showcase",
+    description: "Showcasing the dedicated bio-nutrition and plant vigor product portfolio.",
+    category: "Corporate Events",
+    imageUrl: "/images/gallery/indus-conf-sustainable-standee.jpg",
+    altText: "Indus Crop Care representative beside sustainable nutrition product banner",
+    caption: "Showcasing the dedicated bio-nutrition and plant vigor product portfolio.",
+    isPublished: true,
+    sortOrder: 20
   },
   {
     id: "indus-conf-gala-dinner",
@@ -924,7 +968,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Evening courtyard banquet dinner with illuminated seating during Indus annual meet",
     caption: "Evening banquet and social gathering celebrating corporate milestones and annual achievements.",
     isPublished: true,
-    sortOrder: 17
+    sortOrder: 21
   },
   {
     id: "indus-field-paddy-paidipalle",
@@ -935,7 +979,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Vibrant green paddy crop field trial in Paidipalle, Telangana",
     caption: "Extensive lush paddy demonstration plot exhibiting balanced tiller emergence and dense green canopy.",
     isPublished: true,
-    sortOrder: 18
+    sortOrder: 22
   },
   {
     id: "indus-field-paddy-paidipalle-dense",
@@ -946,7 +990,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Dense green paddy field crop demonstration in Paidipalle",
     caption: "Close crop stand demonstration verifying increased active tillers and vigorous chlorophyll pigmentation.",
     isPublished: true,
-    sortOrder: 19
+    sortOrder: 23
   },
   {
     id: "indus-field-paddy-vaadi",
@@ -957,7 +1001,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Farmer in lush green paddy demonstration plot in Vaadi, Telangana",
     caption: "Farmer observing robust vegetative growth and root vigor following Indus nutrient management.",
     isPublished: true,
-    sortOrder: 20
+    sortOrder: 24
   },
   {
     id: "indus-field-paddy-vaadi-plot",
@@ -968,7 +1012,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Farmer with Indus input bottle beside irrigated paddy crop plot in Vaadi",
     caption: "Demonstrating plant height uniformity, stem thickness, and disease resistance in irrigated paddy.",
     isPublished: true,
-    sortOrder: 21
+    sortOrder: 25
   },
   {
     id: "indus-field-spraying-demo",
@@ -979,7 +1023,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Agricultural worker performing foliar spray application demonstration in field",
     caption: "Precision foliar spray application demonstrating uniform droplet coverage on crop foliage.",
     isPublished: true,
-    sortOrder: 22
+    sortOrder: 26
   },
   {
     id: "indus-field-fertik-rice",
@@ -990,7 +1034,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Rice field plot demonstration featuring Indus Fertik nutrition formulation",
     caption: "Demonstration field comparing root vigor and crop stand with Fertik organic input application.",
     isPublished: true,
-    sortOrder: 23
+    sortOrder: 27
   },
   {
     id: "indus-field-veg-plot",
@@ -1001,7 +1045,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Field trial of vegetable crops showing healthy foliage and growth",
     caption: "Demonstration of vegetable crop canopy health and pest tolerance with balanced nutrition.",
     isPublished: true,
-    sortOrder: 24
+    sortOrder: 28
   },
   {
     id: "indus-field-maize-stalk-plot",
@@ -1012,7 +1056,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Indus Crop Care formulation pack placed in healthy maize trial plot",
     caption: "In-field evaluation verifying thick stalk development, early cob formation, and deep green leaf color.",
     isPublished: true,
-    sortOrder: 25
+    sortOrder: 29
   },
   {
     id: "indus-field-jagtial-foliage",
@@ -1023,7 +1067,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Healthy green crop foliage with strong vegetative vigor in Jagtial",
     caption: "Dense, disease-free foliage and balanced internode spacing in field inspection plot.",
     isPublished: true,
-    sortOrder: 26
+    sortOrder: 30
   },
   {
     id: "indus-field-plot-jagtial-pack",
@@ -1034,7 +1078,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Indus Crop Care formulation pack placed in demonstration plot for farmer review",
     caption: "Direct comparison of crop emergence in field plots treated with Indus specialized formulations.",
     isPublished: true,
-    sortOrder: 27
+    sortOrder: 31
   },
   {
     id: "indus-field-cotton-chilli-foliage",
@@ -1045,7 +1089,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Healthy broad green leaves in Adilabad trial field plot",
     caption: "Leaf surface inspection showing vibrant chlorophyll density and absence of sucking pest damage.",
     isPublished: true,
-    sortOrder: 28
+    sortOrder: 32
   },
   {
     id: "indus-field-chilli-foliage-trial",
@@ -1056,7 +1100,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Healthy vibrant green chilli crop stand in Adilabad demonstration plot",
     caption: "Field verification showing strong branch proliferation and uniform fruit set in commercial chilli.",
     isPublished: true,
-    sortOrder: 29
+    sortOrder: 33
   },
   {
     id: "indus-field-agronomist-leaf-exam",
@@ -1067,7 +1111,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Agronomist and farmers examining leaf underside during field diagnostics",
     caption: "Field technical officer diagnosing leaf tissue health and guiding farmers on optimal spray schedules.",
     isPublished: true,
-    sortOrder: 30
+    sortOrder: 34
   },
   {
     id: "indus-field-south-valluru",
@@ -1078,7 +1122,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Field demonstration plot in South Valluru, Andhra Pradesh",
     caption: "Healthy crop stands cultivated under scientific nutrient management in Krishna district.",
     isPublished: true,
-    sortOrder: 31
+    sortOrder: 35
   },
   {
     id: "indus-farmer-nizamabad-bottle",
@@ -1089,7 +1133,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Farmers holding Indus crop health product bottles in Nizamabad, Telangana",
     caption: "Progressive farmers sharing positive yield response and crop recovery after Indus formulation application.",
     isPublished: true,
-    sortOrder: 32
+    sortOrder: 36
   },
   {
     id: "indus-farmer-jamidi-telangana",
@@ -1100,7 +1144,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Farmer with Indus representative in Jamidi field consultation",
     caption: "Field technical executive reviewing crop stand improvement with local farmer.",
     isPublished: true,
-    sortOrder: 33
+    sortOrder: 37
   },
   {
     id: "indus-farmer-jamidi-advisory",
@@ -1111,7 +1155,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Farmers in Jamidi reviewing agricultural advisory on smartphone with Indus officer",
     caption: "Agronomist guiding cultivators on digital advisory, weather alerts, and tank-mix compatibility.",
     isPublished: true,
-    sortOrder: 34
+    sortOrder: 38
   },
   {
     id: "indus-farmer-saterla-telangana",
@@ -1122,7 +1166,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Farmer in field holding Indus crop care formulation in Saterla",
     caption: "Demonstrating increased boll setting and vegetative vigor in cotton fields.",
     isPublished: true,
-    sortOrder: 35
+    sortOrder: 39
   },
   {
     id: "indus-farmer-krishna-ap",
@@ -1133,7 +1177,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Progressive farmer in Krishna district with Indus field agronomist",
     caption: "Field officer explaining dosage precision and compatibility for balanced fertilization.",
     isPublished: true,
-    sortOrder: 36
+    sortOrder: 40
   },
   {
     id: "indus-farmer-adilabad-review",
@@ -1144,7 +1188,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Farmers holding Indus formulation bottles in Adilabad crop field",
     caption: "Field harvest review showcasing improved fruit weight and uniform crop maturity.",
     isPublished: true,
-    sortOrder: 37
+    sortOrder: 41
   },
   {
     id: "indus-farmer-adilabad-testimonial",
@@ -1155,7 +1199,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Cultivator in Adilabad field holding Indus crop nutrition bottle",
     caption: "Adilabad farmer demonstrating significant vegetative recovery after seasonal dry spells.",
     isPublished: true,
-    sortOrder: 38
+    sortOrder: 42
   },
   {
     id: "indus-farmer-crop-chilli-smile",
@@ -1166,7 +1210,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Farmer smiling in vibrant green chilli crop field holding Indus product",
     caption: "Farmer standing in flourishing chilli field verifying vigorous flowering and healthy foliage.",
     isPublished: true,
-    sortOrder: 39
+    sortOrder: 43
   },
   {
     id: "indus-farmer-kuchlapoor-cotton",
@@ -1177,7 +1221,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Farmer holding Indus bottle in lush cotton field in Kuchlapoor",
     caption: "Farmer in blooming cotton field verifying boll retention and plant vigor.",
     isPublished: true,
-    sortOrder: 40
+    sortOrder: 44
   },
   {
     id: "indus-farmer-kuchlapoor-cotton-field",
@@ -1188,7 +1232,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Farmer presenting healthy cotton plants with Indus crop formulation container",
     caption: "Field inspection of healthy cotton canopy with abundant sympodial branches and square formation.",
     isPublished: true,
-    sortOrder: 41
+    sortOrder: 45
   },
   {
     id: "indus-farmer-field-officer-bike",
@@ -1199,7 +1243,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Field representative consulting with farmer during routine scouting tour",
     caption: "Agronomy field officer conducting routine farm scouting and advisory visits.",
     isPublished: true,
-    sortOrder: 42
+    sortOrder: 46
   },
   {
     id: "indus-farmer-field-standing",
@@ -1210,7 +1254,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Farmer standing in field holding Indus Crop Care product container",
     caption: "Checking crop foliage and flowering response alongside local agricultural cultivators.",
     isPublished: true,
-    sortOrder: 43
+    sortOrder: 47
   },
   {
     id: "indus-seminar-mega-canopy",
@@ -1221,7 +1265,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Over 100 farmers gathered under ceremonial canopy for Indus agricultural seminar",
     caption: "Large-scale farmer congregation learning about scientific input schedules and balanced soil nutrition.",
     isPublished: true,
-    sortOrder: 44
+    sortOrder: 48
   },
   {
     id: "indus-seminar-village-canopy",
@@ -1232,7 +1276,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Farmers and technical officers assembled under marquee for product demonstration",
     caption: "Agronomy officers and local farming community gathered around technical input demonstration counters.",
     isPublished: true,
-    sortOrder: 45
+    sortOrder: 49
   },
   {
     id: "indus-seminar-interactive-workshop",
@@ -1243,7 +1287,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Village farmers seated during technical input presentation in outdoor shamiana",
     caption: "Village-level interactive workshop educating progressive cultivators on micro-nutrition and pest resistance.",
     isPublished: true,
-    sortOrder: 46
+    sortOrder: 50
   },
   {
     id: "indus-seminar-progressive-assembly",
@@ -1254,7 +1298,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Village cultivators listening to technical agricultural presentation",
     caption: "Agronomists delivering live guidance to village men and women progressive cultivators.",
     isPublished: true,
-    sortOrder: 47
+    sortOrder: 51
   },
   {
     id: "indus-seminar-hall-training",
@@ -1265,7 +1309,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Village farmers seated during technical input training session in community hall",
     caption: "Community hall technical workshop educating farmers on integrated nutrient and pest management.",
     isPublished: true,
-    sortOrder: 48
+    sortOrder: 52
   },
   {
     id: "indus-seminar-village-meeting",
@@ -1276,7 +1320,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Farmers and agronomy staff in outdoor village consultation",
     caption: "Village-level interactive discussion addressing seasonal crop health challenges.",
     isPublished: true,
-    sortOrder: 49
+    sortOrder: 53
   },
   {
     id: "indus-seminar-stage-felicitation",
@@ -1287,7 +1331,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Stage ceremony honoring local farmers and distributors with ceremonial shawls",
     caption: "Honoring outstanding local cultivators and channel partners for sustainable crop practices.",
     isPublished: true,
-    sortOrder: 50
+    sortOrder: 54
   },
   {
     id: "indus-seminar-felicitation-assembly",
@@ -1298,7 +1342,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Farmers standing with agronomy leads wearing traditional ceremonial honors",
     caption: "Honoring progressive mandal farmers and lead growers with ceremonial honors for pioneering sustainable practices.",
     isPublished: true,
-    sortOrder: 51
+    sortOrder: 55
   },
   {
     id: "indus-dealer-vijayawada-handover",
@@ -1309,7 +1353,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Indus field executive presenting product inventory to authorized agro retailer in Vijayawada",
     caption: "Presenting Indus Crop Care product inventory to premier regional retail partner.",
     isPublished: true,
-    sortOrder: 52
+    sortOrder: 56
   },
   {
     id: "indus-dealer-thimmapuram-store",
@@ -1320,7 +1364,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Agro dealer inside retail shop in Thimma Puram, Telangana, with Indus products",
     caption: "Certified agro dealer showroom fully stocked with Indus biofertilizers and plant nutrients.",
     isPublished: true,
-    sortOrder: 53
+    sortOrder: 57
   },
   {
     id: "indus-dealer-store-interior",
@@ -1331,7 +1375,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Interior of agricultural supply store showing shelves of Indus Crop Care products",
     caption: "Fully stocked shelves of Indus bio-stimulants, micronutrients, and crop protectors.",
     isPublished: true,
-    sortOrder: 54
+    sortOrder: 58
   },
   {
     id: "indus-dealer-counter-consultation",
@@ -1342,7 +1386,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Retail distributor at sales counter with Indus Crop Care formulations",
     caption: "Retail partner providing agronomic input recommendations to farmers at the counter.",
     isPublished: true,
-    sortOrder: 55
+    sortOrder: 59
   },
   {
     id: "indus-dealer-agro-counter-stock",
@@ -1353,7 +1397,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Agricultural retailer shop counter packed with Indus formulation buckets and bottles",
     caption: "Prominent retail counter display featuring specialized Indus liquid formulations and soil inputs.",
     isPublished: true,
-    sortOrder: 56
+    sortOrder: 60
   },
   {
     id: "indus-dealer-counter-advisory",
@@ -1364,7 +1408,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Dealer sales counter consultation with Indus Crop Care products",
     caption: "Retail dealer consulting on application dosage and product compatibility with progressive cultivators.",
     isPublished: true,
-    sortOrder: 57
+    sortOrder: 61
   },
   {
     id: "indus-dealer-transport-logistics",
@@ -1375,7 +1419,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Distribution vehicle loaded with cartons and sacks of Indus agri-inputs",
     caption: "Dispatch of packaged bio-inputs for timely delivery to mandal-level retail outlets.",
     isPublished: true,
-    sortOrder: 58
+    sortOrder: 62
   },
   {
     id: "indus-dealer-warehouse-stock",
@@ -1386,7 +1430,7 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Stacks of Indus organic fertilizer and soil conditioner bags in warehouse",
     caption: "Bulk inventory of soil conditioners and organic fertilizers ready for dispatch.",
     isPublished: true,
-    sortOrder: 59
+    sortOrder: 63
   },
   {
     id: "indus-dealer-shelf-showcase",
@@ -1397,9 +1441,10 @@ export const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
     altText: "Clean store shelf display of bottled Indus crop nutrition and protection inputs",
     caption: "Prominent shelf displays featuring liquid biofertilizers and plant growth regulators.",
     isPublished: true,
-    sortOrder: 60
+    sortOrder: 64
   }
 ];
+
 
 export const MICRONUTRIENTS_COMBO_PRODUCTS: Product[] = [
   {
