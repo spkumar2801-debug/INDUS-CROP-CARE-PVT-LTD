@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Tag, ChevronLeft, ChevronRight } from 'lucide-react';
 import { GalleryItem } from '../../types/gallery';
 
@@ -21,160 +22,129 @@ export const GalleryLightbox: React.FC<GalleryLightboxProps> = ({
   currentIndex,
   totalCount
 }) => {
+  // Prevent background scrolling and attach keyboard shortcuts
   useEffect(() => {
+    if (!isOpen) return;
+
+    document.documentElement.classList.add('modal-open');
+    document.body.classList.add('modal-open');
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-      if (e.key === 'ArrowLeft' && onPrev) onPrev();
-      if (e.key === 'ArrowRight' && onNext) onNext();
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      }
+      if (e.key === 'ArrowLeft' && onPrev) {
+        e.preventDefault();
+        onPrev();
+      }
+      if (e.key === 'ArrowRight' && onNext) {
+        e.preventDefault();
+        onNext();
+      }
     };
-    if (isOpen) {
-      document.documentElement.classList.add('modal-open');
-      document.body.classList.add('modal-open');
-      window.addEventListener('keydown', handleKeyDown);
-    }
+
+    window.addEventListener('keydown', handleKeyDown);
+
     return () => {
       document.documentElement.classList.remove('modal-open');
       document.body.classList.remove('modal-open');
+      document.body.style.overflow = prevOverflow;
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [isOpen, onClose, onPrev, onNext]);
 
   if (!isOpen || !item) return null;
+  if (typeof document === 'undefined') return null;
 
-  return (
+  const modalContent = (
     <div 
-      className="modal-overlay" 
+      className="gallery-lightbox-overlay" 
       onClick={onClose}
       role="dialog" 
       aria-modal="true" 
-      aria-label="Image Lightbox"
-      style={{ backgroundColor: 'rgba(5, 20, 10, 0.9)' }}
+      aria-label={`Preview: ${item.title}`}
     >
       <div 
-        style={{ 
-          maxWidth: '880px', 
-          width: '100%', 
-          backgroundColor: '#FFFFFF', 
-          borderRadius: 'var(--radius-xl)', 
-          overflow: 'hidden',
-          boxShadow: '0 30px 70px rgba(0,0,0,0.5)',
-          position: 'relative'
-        }}
+        className="gallery-lightbox-dialog"
         onClick={e => e.stopPropagation()}
       >
-        <div style={{ position: 'relative', backgroundColor: '#071F11', maxHeight: '70vh', minHeight: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {/* Clearly Visible Top-Right Close Button */}
+        <button 
+          type="button" 
+          onClick={onClose} 
+          className="gallery-lightbox-close-btn"
+          aria-label="Close image preview"
+          title="Close (Esc)"
+        >
+          <X size={20} strokeWidth={2.5} />
+        </button>
+
+        {/* Centered High-Resolution Image Presentation Stage */}
+        <div className="gallery-lightbox-stage">
           <img 
             src={item.imageUrl} 
             alt={item.altText || item.title} 
-            style={{ maxWidth: '100%', maxHeight: '70vh', objectFit: 'contain' }}
+            className="gallery-lightbox-image"
+            loading="eager"
+            decoding="sync"
           />
 
+          {/* Navigation Chevron: Previous */}
           {onPrev && (
             <button 
               type="button" 
               onClick={(e) => { e.stopPropagation(); onPrev(); }} 
+              className="gallery-lightbox-nav-btn prev"
               aria-label="Previous photograph"
-              style={{
-                position: 'absolute',
-                left: '14px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                background: 'rgba(5, 20, 10, 0.75)',
-                color: '#FFFFFF',
-                border: '1px solid rgba(255, 255, 255, 0.25)',
-                borderRadius: '50%',
-                width: '42px',
-                height: '42px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                backdropFilter: 'blur(8px)',
-                transition: 'all 0.2s ease',
-                zIndex: 10
-              }}
+              title="Previous photograph (Left Arrow)"
             >
-              <ChevronLeft size={24} />
+              <ChevronLeft size={24} strokeWidth={2.5} />
             </button>
           )}
 
+          {/* Navigation Chevron: Next */}
           {onNext && (
             <button 
               type="button" 
               onClick={(e) => { e.stopPropagation(); onNext(); }} 
+              className="gallery-lightbox-nav-btn next"
               aria-label="Next photograph"
-              style={{
-                position: 'absolute',
-                right: '14px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                background: 'rgba(5, 20, 10, 0.75)',
-                color: '#FFFFFF',
-                border: '1px solid rgba(255, 255, 255, 0.25)',
-                borderRadius: '50%',
-                width: '42px',
-                height: '42px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                backdropFilter: 'blur(8px)',
-                transition: 'all 0.2s ease',
-                zIndex: 10
-              }}
+              title="Next photograph (Right Arrow)"
             >
-              <ChevronRight size={24} />
+              <ChevronRight size={24} strokeWidth={2.5} />
             </button>
           )}
-
-          <button 
-            type="button" 
-            onClick={onClose} 
-            className="modal-close-btn"
-            style={{ 
-              position: 'absolute', 
-              top: '16px', 
-              right: '16px', 
-              background: 'rgba(5, 20, 10, 0.75)', 
-              color: '#FFF', 
-              border: '1px solid rgba(255,255,255,0.2)', 
-              width: '38px',
-              height: '38px',
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              zIndex: 11
-            }}
-            aria-label="Close lightbox"
-          >
-            <X size={20} />
-          </button>
         </div>
 
-        <div style={{ padding: '24px 28px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <span className="badge badge-green">
-              <Tag size={12} style={{ marginRight: '4px' }} />
+        {/* Informative Photographic Header & Caption Bar */}
+        <div className="gallery-lightbox-info">
+          <div className="gallery-lightbox-meta-row">
+            <span className="gallery-lightbox-category-badge">
+              <Tag size={12} style={{ marginRight: '5px' }} />
               {item.category}
             </span>
             {currentIndex !== undefined && totalCount !== undefined && (
-              <span style={{ fontSize: '0.82rem', color: 'var(--color-charcoal-500)', fontWeight: 600 }}>
+              <span className="gallery-lightbox-counter">
                 {currentIndex + 1} of {totalCount}
               </span>
             )}
           </div>
-          <h3 style={{ fontSize: '1.3rem', color: 'var(--color-primary-green-dark)', marginBottom: '8px' }}>
+          
+          <h3 className="gallery-lightbox-title">
             {item.title}
           </h3>
+          
           {item.description && (
-            <p style={{ fontSize: '0.92rem', color: 'var(--color-text-body)', lineHeight: '1.5', margin: 0 }}>
+            <p className="gallery-lightbox-description">
               {item.description}
             </p>
           )}
+          
           {item.caption && (
-            <div style={{ marginTop: '12px', fontSize: '0.85rem', color: 'var(--color-harvest-gold)', fontWeight: 600 }}>
+            <div className="gallery-lightbox-caption">
               {item.caption}
             </div>
           )}
@@ -182,4 +152,6 @@ export const GalleryLightbox: React.FC<GalleryLightboxProps> = ({
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 };

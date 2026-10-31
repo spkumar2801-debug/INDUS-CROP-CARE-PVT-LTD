@@ -82,22 +82,50 @@
   transform: translate3d(0, var(--hero-scroll-parallax, 0px), 0);
 }
 
-@supports (animation-timeline: scroll()) {
-  @keyframes heroScrollParallax {
-    from {
-      transform: translate3d(0, 0, 0);
-    }
-    to {
-      transform: translate3d(0, 110px, 0);
-    }
+/* Bottom-to-Top Cinematic Hero Background Reveal following Intro */
+@keyframes heroBgRevealUp {
+  0% {
+    opacity: 0.72;
+    transform: translate3d(0, calc(var(--hero-scroll-parallax, 0px) + 26px), 0);
+    filter: blur(5px);
   }
-
-  .hero-cinematic-bg {
-    animation: heroScrollParallax linear both;
-    animation-timeline: scroll();
-    animation-range: 0px 900px;
+  40% {
+    opacity: 0.92;
+    filter: blur(1.2px);
+  }
+  75% {
+    opacity: 1;
+    filter: blur(0px);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, var(--hero-scroll-parallax, 0px), 0);
+    filter: blur(0px);
   }
 }
+
+html.intro-active .hero-cinematic-bg {
+  opacity: 0.72;
+  transform: translate3d(0, calc(var(--hero-scroll-parallax, 0px) + 26px), 0);
+  filter: blur(5px);
+}
+
+.hero-cinematic-bg.hero-bg-revealing {
+  animation: heroBgRevealUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform, opacity, filter;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.intro-active .hero-cinematic-bg,
+  .hero-cinematic-bg.hero-bg-revealing {
+    animation: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+  }
+}
+
+
 
 .hero-image-element {
   position: absolute;
@@ -173,6 +201,26 @@
   position: relative;
   z-index: 10;
   box-sizing: border-box;
+}
+
+/* Intro-to-Home Animation Synchronization
+   Guarantees hero content never appears prematurely during or behind intro */
+html.intro-active .hero-content-wrap,
+.hero-content-wrap.hero-waiting {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+html.intro-active .hero-content-wrap *,
+.hero-content-wrap.hero-waiting * {
+  animation: none !important;
+}
+
+.hero-content-wrap.hero-revealed {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.35s ease-out;
 }
 
 /* 1. Introductory Eyebrow Badge (Step 1: subtle fade-in) */
@@ -836,6 +884,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html.intro-active .hero-content-wrap,
+  .hero-content-wrap.hero-waiting,
+  .hero-content-wrap.hero-revealed,
   .hero-badge,
   .hero-title,
   .hero-title-line,

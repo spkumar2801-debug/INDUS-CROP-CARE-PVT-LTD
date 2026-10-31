@@ -2221,6 +2221,78 @@ export const NEW_FUNGICIDE_AND_BIOSTIMULANT_PRODUCTS: Product[] = [
     isPublished: true,
     isFeatured: true,
     sortOrder: 131
+  },
+  {
+    id: 'indus-rudra',
+    name: 'Indus Rudra',
+    code: 'ICC-132',
+    slug: 'indus-rudra-biostimulant',
+    category: 'Biostimulants',
+    categoryTelugu: 'బయోస్టిమ్యులెంట్స్ (Biostimulants)',
+    broadGroup: 'Biostimulants',
+    formulation: 'Biostimulant',
+    composition: 'Agricultural Biostimulant Formulation',
+    shortDescription: 'Indus Rudra is a premium agricultural biostimulant from Indus Crop Care Pvt. Ltd., supplied in a genuine 500 ml ICCPL bottle.',
+    description: 'Indus Rudra is a verified agricultural biostimulant manufactured and packed by Indus Crop Care Pvt. Ltd. under the corporate ethos "In the Service of Farmers". Presented in a 500 ml container featuring authentic ICCPL shoulder embossing and verified Indus Crop Care seal.',
+    teluguDescription: 'ఇండస్ క్రాప్ కేర్ రుద్ర (Rudra) - రైతన్నకు భరోసా అందించే విశిష్ట బయోస్టిమ్యులెంట్. 500 మి.లీ. పరిమాణంలో లభ్యం.',
+    features: [
+      'Product Name: Rudra',
+      'Product Classification: Biostimulants',
+      'Packaging / Net Content: 500 ml',
+      'Bottle Authenticity: Genuine Embossed ICCPL Shoulder Mark',
+      'Manufacturer: Indus Crop Care Pvt. Ltd.',
+      'Corporate Slogan: In the Service of Farmers'
+    ],
+    specifications: [
+      { label: 'Product Name', value: 'Rudra' },
+      { label: 'Category', value: 'Biostimulants' },
+      { label: 'Formulation', value: 'Biostimulant' },
+      { label: 'Net Content', value: '500 ml' },
+      { label: 'Packaging Type', value: 'Bottle with Embossed ICCPL Brand Seal' },
+      { label: 'Manufacturer', value: 'Indus Crop Care Pvt. Ltd.' }
+    ],
+    imageUrl: '/images/indus-products/indus-rudra.jpg',
+    sheetImageUrl: '/images/indus-products/indus-rudra.jpg',
+    isPublished: true,
+    isFeatured: true,
+    sortOrder: 132
+  },
+  {
+    id: 'indus-raana',
+    name: 'Indus Raana',
+    code: 'ICC-133',
+    slug: 'indus-raana-biostimulant',
+    category: 'Biostimulants',
+    categoryTelugu: 'బయోస్టిమ్యులెంట్స్ (Biostimulants)',
+    broadGroup: 'Biostimulants',
+    formulation: 'Biostimulant',
+    composition: 'Agricultural Biostimulant Formulation',
+    shortDescription: 'Indus Raana (...Reap Rich) is an authentic biostimulant from Indus Crop Care Pvt. Ltd., an ISO 9001:2015 certified company, supplied in a 500 ml bottle.',
+    description: 'Indus Raana (...Reap Rich) is an authentic agricultural biostimulant formulated by Indus Crop Care Pvt. Ltd. Produced under ISO 9001:2015 certified manufacturing standards and supplied in a 500 ml bottle with genuine ICCPL embossing and company seal.',
+    teluguDescription: 'ఇండస్ క్రాప్ కేర్ రాణా (Raana - ...Reap Rich) - అధిక దిగుబడుల సాధనకై రూపొందించిన నాణ్యమైన బయోస్టిమ్యులెంట్. ISO 9001:2015 ప్రమాణాలతో 500 మి.లీ. ప్యాకింగ్‌లో లభ్యం.',
+    features: [
+      'Product Name: Raana',
+      'Product Tagline: ...Reap Rich',
+      'Product Classification: Biostimulants',
+      'Quality Standard: An ISO 9001:2015 Certified Company',
+      'Packaging / Net Content: 500 ml',
+      'Bottle Authenticity: Genuine Embossed ICCPL Shoulder Mark',
+      'Manufacturer: Indus Crop Care Pvt. Ltd.'
+    ],
+    specifications: [
+      { label: 'Product Name', value: 'Raana (...Reap Rich)' },
+      { label: 'Category', value: 'Biostimulants' },
+      { label: 'Formulation', value: 'Biostimulant' },
+      { label: 'Quality Certification', value: 'ISO 9001:2015 Certified' },
+      { label: 'Net Content', value: '500 ml' },
+      { label: 'Packaging Type', value: 'Bottle with Embossed ICCPL Brand Seal' },
+      { label: 'Manufacturer', value: 'Indus Crop Care Pvt. Ltd.' }
+    ],
+    imageUrl: '/images/indus-products/indus-raana.jpg',
+    sheetImageUrl: '/images/indus-products/indus-raana.jpg',
+    isPublished: true,
+    isFeatured: true,
+    sortOrder: 133
   }
 ];
 
@@ -2232,7 +2304,7 @@ export const INITIAL_PRODUCTS: Product[] = [
   ...SEED_PRODUCTS.map((p, i) => ({
     ...p,
     broadGroup: 'Seeds',
-    sortOrder: 132 + i + 1
+    sortOrder: 134 + i + 1
   }))
 ];
 

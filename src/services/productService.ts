@@ -1,12 +1,12 @@
-import { 
-  collection, 
-  getDocs, 
-  doc, 
-  getDoc, 
-  setDoc, 
-  deleteDoc, 
-  query, 
-  where, 
+import {
+  collection,
+  getDocs,
+  doc,
+  getDoc,
+  setDoc,
+  deleteDoc,
+  query,
+  where,
   serverTimestamp,
   arrayUnion,
   onSnapshot
@@ -16,7 +16,7 @@ import { Product } from '../types/product';
 import { INITIAL_PRODUCTS } from '../data/initialProducts';
 
 const PRODUCTS_COLLECTION = 'products';
-const LOCAL_STORAGE_KEY = 'indus_products_cache_v11';
+const LOCAL_STORAGE_KEY = 'indus_products_cache_v13';
 const DELETED_PRODUCTS_KEY = 'indus_deleted_products_v2';
 
 // In-memory event bus for live website reactivity without full page reload
@@ -136,7 +136,7 @@ export function recordDeletedProductId(id: string): void {
   set.add(id);
   try {
     localStorage.setItem(DELETED_PRODUCTS_KEY, JSON.stringify(Array.from(set)));
-  } catch {}
+  } catch { }
 }
 
 export function removeDeletedProductId(id: string): void {
@@ -144,7 +144,7 @@ export function removeDeletedProductId(id: string): void {
   if (set.delete(id)) {
     try {
       localStorage.setItem(DELETED_PRODUCTS_KEY, JSON.stringify(Array.from(set)));
-    } catch {}
+    } catch { }
   }
 }
 
@@ -166,7 +166,7 @@ function getLocalProducts(): Product[] {
   const initial = deduplicateProducts(INITIAL_PRODUCTS.filter(p => !deletedIds.has(p.id)));
   try {
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(initial));
-  } catch {}
+  } catch { }
   return initial;
 }
 
@@ -279,7 +279,7 @@ export async function getAllProductsAdmin(): Promise<Product[]> {
             });
           }
         }
-      } catch {}
+      } catch { }
 
       const local = getLocalProducts();
       const productMap = new Map<string, Product>();

@@ -2,17 +2,17 @@ import React, { useEffect, useState, useRef } from 'react';
 
 /**
  * Premium Cinematic Logo Intro — Indus Crop Care Pvt. Ltd.
- * Displays an exact 3.5s luxury opening sequence on the first website visit per session:
- * - 0.0s – 0.7s: Elegant dark forest-green background appears with subtle ambient light aura
- * - 0.7s – 1.8s: Existing Indus Crop Care logo smoothly reveals with refined scale and opacity entrance
- * - 1.8s – 2.7s: Soft golden light sweep across logo + elegant company title and Telugu motto reveal
- * - 2.7s – 3.5s: Smooth cinematic transition (800ms dissolve) into the existing Home page
+ * Full cinematic lifecycle:
+ * - 0.0s – 0.5s: Sophisticated forest-green background & subtle ambient botanical aura
+ * - 0.5s – 1.4s: Authentic Indus logo reveals with smooth scale (0.88 -> 1.0) and opacity
+ * - 1.4s – 2.3s: Soft golden light sweep across logo + elegant company title and Telugu motto reveal
+ * - 2.3s – 3.6s: Full majestic brand mark and motto display in steady clarity
+ * - 3.6s – 4.45s: Complete luxury exit transition (smooth dissolve, gentle stage scale & blur)
  * - Plays once per user session (sessionStorage)
- * - Click anywhere or press any key to skip immediately
- * - Respects prefers-reduced-motion
+ * - Click anywhere or press any key to gracefully trigger exit transition immediately
+ * - Automatically bypassed when prefers-reduced-motion is detected
  */
 export const BrandedPageLoader: React.FC = () => {
-  // Check if session has already displayed initial cinematic logo reveal or prefers reduced motion
   const [showIntro, setShowIntro] = useState(() => {
     try {
       if (typeof window !== 'undefined') {
@@ -31,43 +31,61 @@ export const BrandedPageLoader: React.FC = () => {
   const [isFadingOut, setIsFadingOut] = useState(false);
   const skipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Skip handler on click or keypress
+  // Safely notify the application and hero section that intro has finished
+  const notifyComplete = () => {
+    try {
+      sessionStorage.setItem('indus_intro_played', 'true');
+    } catch {}
+    if (typeof document !== 'undefined') {
+      document.documentElement.classList.remove('intro-active');
+      document.documentElement.classList.add('intro-completed');
+    }
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('indus:intro-complete'));
+    }
+  };
+
+  // Skip handler gracefully triggers the exit transition
   const handleSkip = () => {
-    if (!showIntro) return;
+    if (!showIntro || isFadingOut) return;
     setIsFadingOut(true);
     if (skipTimerRef.current) clearTimeout(skipTimerRef.current);
     skipTimerRef.current = setTimeout(() => {
       setShowIntro(false);
-      try {
-        sessionStorage.setItem('indus_intro_played', 'true');
-      } catch {}
-    }, 280);
+      setIsFadingOut(false);
+      notifyComplete();
+    }, 450);
   };
 
-  // Cinematic intro timeline: exact 3.5s sequence
-  // 0.0s - 2.7s: Background, Logo Entrance, Light Sweep & Typography
-  // 2.7s - 3.5s: Dissolve fade-out into Home page (800ms transition)
+  // Complete Animation Lifecycle Synchronization
   useEffect(() => {
-    if (!showIntro) return;
+    if (!showIntro) {
+      notifyComplete();
+      return;
+    }
 
-    const fadeTimer = setTimeout(() => {
+    if (typeof document !== 'undefined') {
+      document.documentElement.classList.add('intro-active');
+    }
+
+    // Begin the exit transition after the logo, text, and brand display have completed (3.6s)
+    const exitTriggerTimer = setTimeout(() => {
       setIsFadingOut(true);
-    }, 2700);
+    }, 3600);
 
-    const doneTimer = setTimeout(() => {
+    // Unmount ONLY after the full 850ms exit transition has finished playing (4.45s)
+    const unmountTimer = setTimeout(() => {
       setShowIntro(false);
       setIsFadingOut(false);
-      try {
-        sessionStorage.setItem('indus_intro_played', 'true');
-      } catch {}
-    }, 3500);
+      notifyComplete();
+    }, 4350);
 
     const handleKeyDown = () => handleSkip();
     window.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      clearTimeout(fadeTimer);
-      clearTimeout(doneTimer);
+      clearTimeout(exitTriggerTimer);
+      clearTimeout(unmountTimer);
       if (skipTimerRef.current) clearTimeout(skipTimerRef.current);
       window.removeEventListener('keydown', handleKeyDown);
     };
@@ -79,7 +97,7 @@ export const BrandedPageLoader: React.FC = () => {
     <div 
       className={`cinematic-intro-overlay ${isFadingOut ? 'is-fading-out' : ''}`}
       onClick={handleSkip}
-      title="Click anywhere to skip"
+      title="Click anywhere to continue"
       role="dialog"
       aria-label="Welcome to Indus Crop Care"
       aria-modal="true"

@@ -34,6 +34,54 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
   const videoRef = useRef<HTMLVideoElement>(null);
   const { settings } = useSiteSettings();
 
+  // Coordinate Home hero reveal with intro lifecycle so hero content never shows prematurely
+  const [heroReady, setHeroReady] = useState(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        if (sessionStorage.getItem('indus_intro_played') || 
+            window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          return true;
+        }
+      }
+    } catch {}
+    return false;
+  });
+
+  // Track when hero is actively revealing immediately following intro completion
+  const [isIntroRevealing, setIsIntroRevealing] = useState(false);
+
+  useEffect(() => {
+    if (heroReady) return;
+
+    const onIntroComplete = () => {
+      setIsIntroRevealing(true);
+      setHeroReady(true);
+    };
+
+    window.addEventListener('indus:intro-complete', onIntroComplete);
+
+    // Safety fallback: ensure hero section is never stuck
+    const safetyTimer = setTimeout(() => {
+      setIsIntroRevealing(true);
+      setHeroReady(true);
+    }, 4600);
+
+    return () => {
+      window.removeEventListener('indus:intro-complete', onIntroComplete);
+      clearTimeout(safetyTimer);
+    };
+  }, [heroReady]);
+
+  // Cleanly remove revealing class after animation settles
+  useEffect(() => {
+    if (isIntroRevealing) {
+      const timer = setTimeout(() => {
+        setIsIntroRevealing(false);
+      }, 700);
+      return () => clearTimeout(timer);
+    }
+  }, [isIntroRevealing]);
+
   useEffect(() => {
     document.documentElement.classList.add('page-home');
     let isMounted = true;
@@ -112,10 +160,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReducedMotion) return;
 
-    // If browser natively supports CSS scroll-driven animations, CSS handles it off-thread
-    if (window.CSS && CSS.supports && CSS.supports('animation-timeline', 'scroll()')) {
-      return;
-    }
+
 
     const bgEl = document.querySelector<HTMLElement>('.hero-cinematic-bg');
     if (!bgEl) return;
@@ -172,7 +217,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
         aria-label="Indus Crop Care Hero"
       >
         <div 
-          className="hero-cinematic-bg" 
+          className={`hero-cinematic-bg ${isIntroRevealing ? "hero-bg-revealing" : ""}`} 
           aria-hidden="true"
           style={{
             backgroundImage: heroMediaType === 'image' 
@@ -260,7 +305,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
         />
 
         <div className="container">
-          <div className="hero-content-wrap">
+          <div className={`hero-content-wrap ${heroReady ? 'hero-revealed' : 'hero-waiting'}`}>
             
             {/* Introductory Eyebrow Badge */}
             <div className="hero-badge">

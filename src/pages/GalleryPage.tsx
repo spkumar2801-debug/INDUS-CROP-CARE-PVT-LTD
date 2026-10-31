@@ -45,6 +45,11 @@ export const GalleryPage: React.FC = () => {
     return items.filter(i => i.category === selectedCategory);
   }, [items, selectedCategory]);
 
+  const activeIndex = useMemo(() => {
+    if (!activeItem) return -1;
+    return filteredItems.findIndex(i => i.id === activeItem.id);
+  }, [activeItem, filteredItems]);
+
   // Premium Scroll Reveal Observer for gallery cards
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -194,6 +199,10 @@ export const GalleryPage: React.FC = () => {
         item={activeItem}
         isOpen={Boolean(activeItem)}
         onClose={() => setActiveItem(null)}
+        onPrev={activeIndex > 0 ? () => setActiveItem(filteredItems[activeIndex - 1]) : undefined}
+        onNext={activeIndex >= 0 && activeIndex < filteredItems.length - 1 ? () => setActiveItem(filteredItems[activeIndex + 1]) : undefined}
+        currentIndex={activeIndex >= 0 ? activeIndex : undefined}
+        totalCount={filteredItems.length}
       />
 
     </div>
