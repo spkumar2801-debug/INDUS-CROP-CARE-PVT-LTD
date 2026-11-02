@@ -233,7 +233,7 @@ export const ProductsPage: React.FC<ProductsPageProps> = ({ onOpenQuote, onOpenD
             <CheckCircle2 size={13} />
             <span>Official Catalogue &bull; {products.length > 0 ? `${products.length} Certified Formulations & Seeds` : '127 Certified Formulations & Seeds'}</span>
           </span>
-          <h1 style={{ fontSize: 'clamp(2.2rem, 4.5vw, 3.4rem)', color: '#FFFFFF', marginBottom: '14px', fontWeight: 800, letterSpacing: '-0.025em' }}>
+          <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(2.2rem, 4.5vw, 3.4rem)', color: '#FFFFFF', marginBottom: '14px', fontWeight: 700, letterSpacing: '-0.025em' }}>
             Indus Crop Care Product Portfolio
           </h1>
           <p style={{ fontSize: '1.08rem', color: 'var(--color-sage-200)', margin: '0 auto', lineHeight: '1.65' }}>

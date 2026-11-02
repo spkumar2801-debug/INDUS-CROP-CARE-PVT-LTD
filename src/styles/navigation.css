@@ -134,7 +134,8 @@
   position: relative;
   font-family: var(--font-heading);
   font-size: 0.92rem;
-  font-weight: 600;
+  font-weight: 500;
+  letter-spacing: 0.01em;
   color: var(--color-sage-200);
   padding: 8px 0;
   display: inline-flex;
@@ -149,7 +150,7 @@
 
 .nav-link.active {
   color: #FFFFFF;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .nav-link-indicator {
@@ -181,7 +182,8 @@
   border: 1px solid rgba(255, 255, 255, 0.16);
   color: #FFFFFF;
   font-size: 0.86rem;
-  font-weight: 700;
+  font-weight: 600;
+  letter-spacing: 0.015em;
   transition: all var(--transition-fast);
   white-space: nowrap;
 }
@@ -194,10 +196,23 @@
 }
 
 .header-quote-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  max-height: 40px;
+  border-radius: var(--radius-pill) !important;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  letter-spacing: 0.015em;
+  transition: all var(--transition-fast);
+  box-sizing: border-box;
+  line-height: 1;
   height: 40px;
   white-space: nowrap;
-  font-size: 0.88rem;
-  padding: 0 18px;
+  font-size: 0.86rem;
+  padding: 0 16px;
 }
 
 /* Mobile Actions */
@@ -239,7 +254,17 @@
   gap: 5px;
   cursor: pointer;
   padding: 0;
-  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.12s ease;
+  will-change: transform;
+}
+
+.hamburger-button:active {
+  transform: scale(0.92);
+  transition-duration: 0.05s;
 }
 
 .hamburger-line {
@@ -248,8 +273,9 @@
   height: 2px;
   background-color: #FFFFFF;
   border-radius: 2px;
-  transition: transform 0.32s var(--ease-out-expo), opacity 0.25s ease, background-color 0.25s ease;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.16s ease, background-color 0.16s ease;
   transform-origin: center;
+  will-change: transform, opacity;
 }
 
 /* Morphing into 'X' Close icon */
@@ -304,9 +330,11 @@ html.mobile-menu-open {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.28s ease;
+  transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.22s ease;
   overflow: hidden;
   will-change: opacity, visibility;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .mobile-menu-overlay.is-open {
@@ -348,7 +376,10 @@ html.mobile-menu-open {
   box-sizing: border-box;
   transform: translate3d(100%, 0, 0);
   will-change: transform;
-  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  touch-action: pan-y;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
@@ -385,9 +416,16 @@ html.mobile-menu-open {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all var(--transition-fast);
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.12s ease;
   cursor: pointer;
   flex-shrink: 0;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-close-btn:active {
+  transform: scale(0.92);
+  transition-duration: 0.05s;
 }
 
 .mobile-close-btn:hover {
@@ -403,8 +441,10 @@ html.mobile-menu-open {
   padding: 8px 12px;
   border-radius: 6px;
   font-family: var(--font-telugu);
-  font-size: 0.88rem;
-  font-weight: 700;
+  font-size: 0.86rem;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
   color: #FFF3D6;
   margin-bottom: 14px;
   flex-shrink: 0;
@@ -432,10 +472,15 @@ html.mobile-menu-open {
   font-family: var(--font-heading);
   font-size: 1.02rem;
   font-weight: 600;
-  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.22s ease, background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.18s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
   opacity: 0;
-  transform: translate3d(0, 8px, 0);
+  transform: translate3d(0, 6px, 0);
   flex-shrink: 0;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .mobile-menu-overlay.is-open .mobile-nav-item {
@@ -444,23 +489,23 @@ html.mobile-menu-open {
 }
 
 .mobile-menu-overlay.is-open .stagger-1 {
-  transition-delay: 0.03s;
+  transition-delay: 0.02s;
 }
 
 .mobile-menu-overlay.is-open .stagger-2 {
-  transition-delay: 0.06s;
+  transition-delay: 0.04s;
 }
 
 .mobile-menu-overlay.is-open .stagger-3 {
-  transition-delay: 0.09s;
+  transition-delay: 0.06s;
 }
 
 .mobile-menu-overlay.is-open .stagger-4 {
-  transition-delay: 0.12s;
+  transition-delay: 0.08s;
 }
 
 .mobile-menu-overlay.is-open .stagger-5 {
-  transition-delay: 0.15s;
+  transition-delay: 0.10s;
 }
 
 .mobile-nav-item:hover,
@@ -468,6 +513,13 @@ html.mobile-menu-open {
   background: rgba(37, 211, 102, 0.16);
   border-color: rgba(37, 211, 102, 0.4);
   color: #FFFFFF;
+}
+
+.mobile-nav-item:active {
+  background: rgba(37, 211, 102, 0.25);
+  border-color: rgba(37, 211, 102, 0.55);
+  transform: scale(0.985);
+  transition-duration: 0.05s;
 }
 
 .mobile-nav-item.active .mobile-nav-item-icon {
@@ -516,6 +568,15 @@ html.mobile-menu-open {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   text-decoration: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+.mobile-call-action:active {
+  transform: scale(0.985);
+  background: rgba(255, 255, 255, 0.08);
+  transition-duration: 0.05s;
 }
 
 .mobile-call-icon {
@@ -539,8 +600,11 @@ html.mobile-menu-open {
 }
 
 .mobile-call-num {
+  font-family: var(--font-heading);
   font-size: 0.95rem;
-  font-weight: 700;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
   color: #FFFFFF;
 }
 

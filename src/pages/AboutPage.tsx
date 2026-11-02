@@ -37,11 +37,11 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onOpenQuote }) => {
             </span>
           </div>
 
-          <h1 style={{ fontSize: 'clamp(2.2rem, 5vw, 3.6rem)', color: '#FFFFFF', marginBottom: '18px', lineHeight: '1.15', fontWeight: 800, letterSpacing: '-0.025em' }}>
+          <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(2.2rem, 5vw, 3.6rem)', color: '#FFFFFF', marginBottom: '18px', lineHeight: '1.15', fontWeight: 700, letterSpacing: '-0.025em' }}>
             About Indus Crop Care Pvt. Ltd.
           </h1>
 
-          <div className="telugu-quote" style={{ fontSize: '1.25rem', color: 'var(--color-gold-400)', marginBottom: '20px', fontWeight: 700 }}>
+          <div className="telugu-quote" style={{ fontFamily: 'var(--font-telugu)', fontSize: '1.25rem', color: 'var(--color-gold-400)', marginBottom: '20px', fontWeight: 600, lineHeight: 1.5 }}>
             రైతన్నకు భరోసా.. ఇండస్ ఉత్పాదనలు
           </div>
 
@@ -69,7 +69,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onOpenQuote }) => {
                 <span style={{ fontSize: '0.78rem', color: 'var(--color-primary-green)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                   Company Profile
                 </span>
-                <h2 style={{ fontSize: 'clamp(1.5rem, 3.2vw, 2.1rem)', color: 'var(--color-charcoal-950)', margin: 0, fontWeight: 800 }}>
+                <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.5rem, 3.2vw, 2.1rem)', color: 'var(--color-charcoal-950)', margin: 0, fontWeight: 700, letterSpacing: '-0.02em' }}>
                   A Proven Track Record of Over 15 Years
                 </h2>
               </div>
@@ -130,7 +130,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onOpenQuote }) => {
                   />
                 </div>
                 <div>
-                  <h3 style={{ fontSize: '1.22rem', color: 'var(--color-charcoal-950)', margin: '0 0 4px 0', fontWeight: 800 }}>
+                  <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.22rem', color: 'var(--color-charcoal-950)', margin: '0 0 4px 0', fontWeight: 700, letterSpacing: '-0.015em' }}>
                     K. Narendranath Dut
                   </h3>
                   <div style={{ fontSize: '0.88rem', color: 'var(--color-primary-green)', fontWeight: 700, marginBottom: '4px' }}>
@@ -171,7 +171,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onOpenQuote }) => {
                   />
                 </div>
                 <div>
-                  <h3 style={{ fontSize: '1.22rem', color: 'var(--color-charcoal-950)', margin: '0 0 4px 0', fontWeight: 800 }}>
+                  <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.22rem', color: 'var(--color-charcoal-950)', margin: '0 0 4px 0', fontWeight: 700, letterSpacing: '-0.015em' }}>
                     K. Anoopkumar
                   </h3>
                   <div style={{ fontSize: '0.88rem', color: 'var(--color-primary-green)', fontWeight: 700, marginBottom: '4px' }}>
@@ -199,7 +199,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onOpenQuote }) => {
               display: 'flex',
               flexDirection: 'column'
             }}>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 14px', borderRadius: 'var(--radius-pill)', backgroundColor: 'rgba(2, 132, 199, 0.12)', color: '#0284C7', fontWeight: 800, fontSize: '0.82rem', letterSpacing: '0.08em', width: 'fit-content', marginBottom: '18px' }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 14px', borderRadius: 'var(--radius-pill)', backgroundColor: 'rgba(2, 132, 199, 0.12)', color: '#0284C7', fontFamily: 'var(--font-heading)', fontWeight: 700, fontSize: '0.80rem', letterSpacing: '0.08em', width: 'fit-content', marginBottom: '18px' }}>
                 <Target size={16} />
                 <span>OUR VISION</span>
               </div>
@@ -215,7 +215,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onOpenQuote }) => {
               display: 'flex',
               flexDirection: 'column'
             }}>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 14px', borderRadius: 'var(--radius-pill)', backgroundColor: 'var(--color-primary-green-surface)', color: 'var(--color-primary-green-dark)', fontWeight: 800, fontSize: '0.82rem', letterSpacing: '0.08em', width: 'fit-content', marginBottom: '18px' }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 14px', borderRadius: 'var(--radius-pill)', backgroundColor: 'var(--color-primary-green-surface)', color: 'var(--color-primary-green-dark)', fontFamily: 'var(--font-heading)', fontWeight: 700, fontSize: '0.80rem', letterSpacing: '0.08em', width: 'fit-content', marginBottom: '18px' }}>
                 <Sprout size={16} />
                 <span>OUR MISSION</span>
               </div>
@@ -264,7 +264,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onOpenQuote }) => {
                 <div style={{ width: '56px', height: '56px', borderRadius: '50%', backgroundColor: 'rgba(251, 191, 36, 0.15)', color: '#F59E0B', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
                   <Sparkles size={26} />
                 </div>
-                <h3 style={{ fontSize: '1.2rem', color: 'var(--color-charcoal-950)', marginBottom: '8px', fontWeight: 800 }}>
+                <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.2rem', color: 'var(--color-charcoal-950)', marginBottom: '8px', fontWeight: 700, letterSpacing: '-0.015em' }}>
                   Innovation
                 </h3>
                 <p style={{ fontSize: '0.9rem', color: 'var(--color-charcoal-600)', lineHeight: '1.5', margin: 0 }}>
@@ -277,7 +277,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onOpenQuote }) => {
                 <div style={{ width: '56px', height: '56px', borderRadius: '50%', backgroundColor: 'rgba(34, 197, 94, 0.15)', color: '#22C55E', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
                   <Leaf size={26} />
                 </div>
-                <h3 style={{ fontSize: '1.2rem', color: 'var(--color-charcoal-950)', marginBottom: '8px', fontWeight: 800 }}>
+                <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.2rem', color: 'var(--color-charcoal-950)', marginBottom: '8px', fontWeight: 700, letterSpacing: '-0.015em' }}>
                   Sustainability
                 </h3>
                 <p style={{ fontSize: '0.9rem', color: 'var(--color-charcoal-600)', lineHeight: '1.5', margin: 0 }}>
@@ -290,7 +290,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onOpenQuote }) => {
                 <div style={{ width: '56px', height: '56px', borderRadius: '50%', backgroundColor: 'rgba(59, 130, 246, 0.15)', color: '#3B82F6', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
                   <ShieldCheck size={26} />
                 </div>
-                <h3 style={{ fontSize: '1.2rem', color: 'var(--color-charcoal-950)', marginBottom: '8px', fontWeight: 800 }}>
+                <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.2rem', color: 'var(--color-charcoal-950)', marginBottom: '8px', fontWeight: 700, letterSpacing: '-0.015em' }}>
                   Quality
                 </h3>
                 <p style={{ fontSize: '0.9rem', color: 'var(--color-charcoal-600)', lineHeight: '1.5', margin: 0 }}>
@@ -303,7 +303,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onOpenQuote }) => {
                 <div style={{ width: '56px', height: '56px', borderRadius: '50%', backgroundColor: 'rgba(236, 72, 153, 0.15)', color: '#EC4899', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
                   <Scale size={26} />
                 </div>
-                <h3 style={{ fontSize: '1.2rem', color: 'var(--color-charcoal-950)', marginBottom: '8px', fontWeight: 800 }}>
+                <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.2rem', color: 'var(--color-charcoal-950)', marginBottom: '8px', fontWeight: 700, letterSpacing: '-0.015em' }}>
                   Integrity
                 </h3>
                 <p style={{ fontSize: '0.9rem', color: 'var(--color-charcoal-600)', lineHeight: '1.5', margin: 0 }}>
@@ -321,11 +321,11 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onOpenQuote }) => {
             border: '1px solid rgba(14, 107, 56, 0.25)',
             marginBottom: '40px'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-primary-green-dark)', fontWeight: 800, fontSize: '0.84rem', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-primary-green-dark)', fontFamily: 'var(--font-heading)', fontWeight: 700, fontSize: '0.80rem', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>
               <Sprout size={18} />
               <span>Seeds Division Announcement</span>
             </div>
-            <h3 style={{ fontSize: '1.3rem', color: 'var(--color-charcoal-950)', marginBottom: '10px', fontWeight: 800 }}>
+            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.3rem', color: 'var(--color-charcoal-950)', marginBottom: '10px', fontWeight: 700, letterSpacing: '-0.018em' }}>
               INDAS AGRI SEEDS INDIA PVT LTD — Group Seeds Division
             </h3>
             <p style={{ fontSize: '1.02rem', lineHeight: '1.7', color: 'var(--color-charcoal-700)', marginBottom: '14px' }}>

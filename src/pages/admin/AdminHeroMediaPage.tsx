@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Sparkles, 
   Image as ImageIcon, 
@@ -17,7 +17,8 @@ import {
   Sliders, 
   Eye, 
   HelpCircle,
-  Undo2
+  Undo2,
+  Trash2
 } from 'lucide-react';
 import { AdminNav } from '../../components/admin/AdminNav';
 import { HeroSettings, SiteSettings } from '../../types/settings';
@@ -38,8 +39,16 @@ export const AdminHeroMediaPage: React.FC = () => {
   
   // Live Preview Device mode
   const [previewDevice, setPreviewDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
+  
+  // Desktop upload state
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Mobile upload state
+  const [isMobileUploading, setIsMobileUploading] = useState(false);
+  const [mobileUploadProgress, setMobileUploadProgress] = useState(0);
+  const mobileFileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     getSiteSettings().then((s) => {
@@ -68,6 +77,7 @@ export const AdminHeroMediaPage: React.FC = () => {
         secondaryCtaText: 'Contact Us',
         secondaryCtaLink: '/contact'
       };
+
       // Ensure activeHero contains only persistent URLs, discarding stale session blobs
       if (activeHero.videoUrl?.startsWith('blob:')) {
         activeHero.videoUrl = '/videos/hero-cinematic.mp4';
@@ -78,6 +88,14 @@ export const AdminHeroMediaPage: React.FC = () => {
       if (activeHero.videoPosterUrl?.startsWith('blob:')) {
         activeHero.videoPosterUrl = '/assets/indus-crop-hero.webp';
       }
+      if (activeHero.mobileMediaUrl?.startsWith('blob:')) {
+        activeHero.mobileMediaUrl = '';
+        activeHero.mobileMediaActive = false;
+      }
+      if (activeHero.mobileVideoPosterUrl?.startsWith('blob:')) {
+        activeHero.mobileVideoPosterUrl = '';
+      }
+
       setPublishedHero(activeHero);
 
       // Check if there is an unsaved draft
@@ -94,6 +112,13 @@ export const AdminHeroMediaPage: React.FC = () => {
           }
           if (parsed.videoPosterUrl?.startsWith('blob:')) {
             parsed.videoPosterUrl = activeHero.videoPosterUrl;
+          }
+          if (parsed.mobileMediaUrl?.startsWith('blob:')) {
+            parsed.mobileMediaUrl = activeHero.mobileMediaUrl || '';
+            parsed.mobileMediaActive = activeHero.mobileMediaActive;
+          }
+          if (parsed.mobileVideoPosterUrl?.startsWith('blob:')) {
+            parsed.mobileVideoPosterUrl = activeHero.mobileVideoPosterUrl || '';
           }
           setHeroForm(parsed);
           setStatusMessage({ type: 'info', text: 'Loaded your previous saved draft. You can preview or publish it.' });
@@ -121,9 +146,7 @@ export const AdminHeroMediaPage: React.FC = () => {
     });
   };
 
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
-
-  // Unified Media Upload handler: auto-detects image vs video, optimizes, and stores persistently
+  // Unified Desktop Media Upload handler: auto-detects image vs video, optimizes, and stores persistently
   const handleUnifiedMediaUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -159,7 +182,6 @@ export const AdminHeroMediaPage: React.FC = () => {
         }
 
         const res = await uploadVideoToCloudinary(file, 'hero', (percent) => setUploadProgress(percent));
-        // Automatically derive high-definition frame poster from the video URL on CDN
         const autoPoster = res.secureUrl.replace(/\.(mp4|webm)$/i, '.jpg');
 
         setHeroForm((prev) => {
@@ -175,7 +197,7 @@ export const AdminHeroMediaPage: React.FC = () => {
           };
         });
 
-        showNotification('success', `Video "${file.name}" uploaded successfully! The hero is now set to Video. Click "Publish to Live Homepage" to update the live website.`);
+        showNotification('success', `Desktop Video "${file.name}" uploaded successfully! Click "Publish to Live Homepage" to update the live website.`);
       } else {
         if (!isCloudinaryConfigured()) {
           throw new Error('Persistent cloud storage is not configured.');
@@ -189,15 +211,14 @@ export const AdminHeroMediaPage: React.FC = () => {
             ...prev,
             mediaType: 'image',
             imageUrl: res.secureUrl,
-            imageMobileUrl: res.secureUrl,
             videoPosterUrl: res.secureUrl
           };
         });
 
-        showNotification('success', `Image "${file.name}" uploaded successfully! The hero is now set to Image. Click "Publish to Live Homepage" to update the live website.`);
+        showNotification('success', `Desktop Image "${file.name}" uploaded successfully! Click "Publish to Live Homepage" to update the live website.`);
       }
     } catch (err: any) {
-      console.error('Media upload error:', err);
+      console.error('Desktop media upload error:', err);
       showNotification('error', 'Upload failed: ' + (err?.message || 'Please check your connection and try again.'));
     } finally {
       setIsUploading(false);
@@ -205,11 +226,108 @@ export const AdminHeroMediaPage: React.FC = () => {
     }
   };
 
+  // Dedicated Mobile Media Upload handler: auto-detects image vs video, optimizes, and stores persistently
+  const handleMobileMediaUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    e.target.value = '';
+
+    const isVideo = file.type.startsWith('video/') || /\.(mp4|webm)$/i.test(file.name);
+    const isImage = file.type.startsWith('image/') || /\.(jpe?g|png|webp|avif)$/i.test(file.name);
+
+    if (!isVideo && !isImage) {
+      showNotification('error', 'Unsupported format for mobile media. Please select an image (JPG, PNG, WebP) or video (MP4, WebM).');
+      return;
+    }
+
+    if (isVideo && file.size > 25 * 1024 * 1024) {
+      showNotification('error', 'Mobile video file exceeds 25MB. Please upload a video under 25MB for smooth mobile loading.');
+      return;
+    }
+
+    if (isImage && file.size > 15 * 1024 * 1024) {
+      showNotification('error', 'Mobile image file exceeds 15MB. Please upload an image under 15MB.');
+      return;
+    }
+
+    setIsMobileUploading(true);
+    setMobileUploadProgress(5);
+
+    try {
+      if (isVideo) {
+        if (!isCloudinaryConfigured()) {
+          throw new Error('Persistent cloud storage is not configured.');
+        }
+
+        const res = await uploadVideoToCloudinary(file, 'hero', (percent) => setMobileUploadProgress(percent));
+        const autoPoster = res.secureUrl.replace(/\.(mp4|webm)$/i, '.jpg');
+
+        setHeroForm((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            mobileMediaType: 'video',
+            mobileMediaUrl: res.secureUrl,
+            mobileVideoPosterUrl: autoPoster,
+            videoMobileUrl: res.secureUrl,
+            mobileMediaActive: true
+          };
+        });
+
+        showNotification('success', `Mobile Video "${file.name}" uploaded successfully! Mobile devices will now display this dedicated video. Click "Publish to Live Homepage" to save.`);
+      } else {
+        if (!isCloudinaryConfigured()) {
+          throw new Error('Persistent cloud storage is not configured.');
+        }
+
+        const res = await uploadToCloudinary(file, 'branding', (percent) => setMobileUploadProgress(percent));
+
+        setHeroForm((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            mobileMediaType: 'image',
+            mobileMediaUrl: res.secureUrl,
+            imageMobileUrl: res.secureUrl,
+            mobileVideoPosterUrl: '',
+            mobileMediaActive: true
+          };
+        });
+
+        showNotification('success', `Mobile Image "${file.name}" uploaded successfully! Mobile devices will now display this dedicated photo. Click "Publish to Live Homepage" to save.`);
+      }
+    } catch (err: any) {
+      console.error('Mobile media upload error:', err);
+      showNotification('error', 'Mobile upload failed: ' + (err?.message || 'Please check your connection and try again.'));
+    } finally {
+      setIsMobileUploading(false);
+      setMobileUploadProgress(0);
+    }
+  };
+
+  // Remove dedicated mobile media (revert to desktop fallback)
+  const handleRemoveMobileMedia = () => {
+    setHeroForm((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        mobileMediaType: undefined,
+        mobileMediaUrl: '',
+        imageMobileUrl: '',
+        videoMobileUrl: '',
+        mobileVideoPosterUrl: '',
+        mobileMediaActive: false
+      };
+    });
+    showNotification('info', 'Mobile media override removed. Mobile devices will now automatically use desktop hero media as fallback.');
+  };
+
   // Save Draft (Local only)
   const handleSaveDraft = () => {
     if (!heroForm) return;
     localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(heroForm));
-    showNotification('info', 'Draft saved locally! You can test it in the device preview window below before publishing.');
+    showNotification('info', 'Draft saved locally! You can test it in the device preview window before publishing.');
   };
 
   // Publish to Live Website
@@ -218,15 +336,19 @@ export const AdminHeroMediaPage: React.FC = () => {
 
     // Strict guard: Never allow temporary browser-session blob: URLs to be published
     if (heroForm.videoUrl?.startsWith('blob:')) {
-      showNotification('error', 'Video is still uploading or has a temporary session blob URL. Please wait for upload to complete before publishing.');
+      showNotification('error', 'Desktop video is still uploading or has a temporary session blob URL. Please wait for upload to complete before publishing.');
       return;
     }
     if (heroForm.imageUrl?.startsWith('blob:')) {
-      showNotification('error', 'Image is still uploading or has a temporary session blob URL. Please wait for upload to complete before publishing.');
+      showNotification('error', 'Desktop image is still uploading or has a temporary session blob URL. Please wait for upload to complete before publishing.');
       return;
     }
     if (heroForm.videoPosterUrl?.startsWith('blob:')) {
-      showNotification('error', 'Poster image has a temporary session blob URL. Please wait for upload to complete before publishing.');
+      showNotification('error', 'Desktop poster image has a temporary session blob URL. Please wait for upload to complete before publishing.');
+      return;
+    }
+    if (heroForm.mobileMediaUrl?.startsWith('blob:')) {
+      showNotification('error', 'Mobile media is still uploading or has a temporary session blob URL. Please wait for upload to complete before publishing.');
       return;
     }
 
@@ -294,10 +416,14 @@ export const AdminHeroMediaPage: React.FC = () => {
       primaryCtaText: 'Explore Products',
       primaryCtaLink: '/products',
       secondaryCtaText: 'Contact Us',
-      secondaryCtaLink: '/contact'
+      secondaryCtaLink: '/contact',
+      mobileMediaType: undefined,
+      mobileMediaUrl: '',
+      mobileVideoPosterUrl: '',
+      mobileMediaActive: false
     };
     setHeroForm(defaults);
-    showNotification('info', 'Reset form to premium Indus agricultural hero defaults. Click Publish to apply.');
+    showNotification('info', 'Reset form to brand default agricultural hero settings. Click Publish to apply.');
   };
 
   if (loading || !heroForm) {
@@ -311,12 +437,25 @@ export const AdminHeroMediaPage: React.FC = () => {
     );
   }
 
-  // Calculate live preview container styles
-  const previewWidths = {
-    desktop: '100%',
-    tablet: '768px',
-    mobile: '375px'
-  };
+  // Determine whether mobile media is configured
+  const hasMobileMedia = Boolean(
+    heroForm.mobileMediaUrl && 
+    !heroForm.mobileMediaUrl.startsWith('blob:') && 
+    heroForm.mobileMediaActive !== false
+  );
+
+  // Active media displayed in Live Preview based on selected device
+  const previewMediaType = previewDevice === 'mobile'
+    ? (hasMobileMedia ? (heroForm.mobileMediaType || 'image') : heroForm.mediaType)
+    : heroForm.mediaType;
+
+  const previewMediaUrl = previewDevice === 'mobile'
+    ? (hasMobileMedia ? heroForm.mobileMediaUrl : (heroForm.mediaType === 'video' ? heroForm.videoUrl : heroForm.imageUrl))
+    : (heroForm.mediaType === 'video' ? heroForm.videoUrl : heroForm.imageUrl);
+
+  const previewPosterUrl = previewDevice === 'mobile'
+    ? (hasMobileMedia ? (heroForm.mobileVideoPosterUrl || heroForm.mobileMediaUrl) : (heroForm.videoPosterUrl || heroForm.imageUrl))
+    : (heroForm.videoPosterUrl || heroForm.imageUrl);
 
   return (
     <div className="admin-layout">
@@ -364,9 +503,9 @@ export const AdminHeroMediaPage: React.FC = () => {
           </div>
         </header>
 
-        <div className="admin-content" style={{ maxWidth: '1280px' }}>
+        <div className="admin-content" style={{ maxWidth: '1360px' }}>
           
-          {/* Live Upload Progress Banner */}
+          {/* Live Upload Progress Banners */}
           {isUploading && (
             <div style={{ 
               backgroundColor: '#E8F5E9', 
@@ -382,7 +521,26 @@ export const AdminHeroMediaPage: React.FC = () => {
               fontSize: '0.9rem'
             }}>
               <Upload size={18} />
-              <span>Uploading media to secure storage... {uploadProgress > 0 ? `(${uploadProgress}%)` : ''}</span>
+              <span>Uploading Desktop Media to secure CDN... {uploadProgress > 0 ? `(${uploadProgress}%)` : ''}</span>
+            </div>
+          )}
+
+          {isMobileUploading && (
+            <div style={{ 
+              backgroundColor: '#E8F5E9', 
+              border: '1px solid #A5D6A7', 
+              padding: '12px 20px', 
+              borderRadius: 'var(--radius-md)', 
+              color: '#2E7D32', 
+              marginBottom: '20px', 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '12px',
+              fontWeight: 600,
+              fontSize: '0.9rem'
+            }}>
+              <Smartphone size={18} />
+              <span>Uploading Mobile Media to secure CDN... {mobileUploadProgress > 0 ? `(${mobileUploadProgress}%)` : ''}</span>
             </div>
           )}
 
@@ -436,7 +594,11 @@ export const AdminHeroMediaPage: React.FC = () => {
                 boxShadow: '0 0 0 3px rgba(37, 211, 102, 0.25)'
               }} />
               <div style={{ fontSize: '0.88rem', color: 'var(--color-charcoal-700)' }}>
-                <strong>Currently Published:</strong> {publishedHero?.mediaType === 'video' ? 'Video Hero' : 'Agricultural Image Hero'}
+                <strong>Desktop Hero:</strong> {publishedHero?.mediaType === 'video' ? 'Video Hero' : 'Image Hero'}
+                <span style={{ margin: '0 8px', color: 'var(--color-charcoal-400)' }}>&bull;</span>
+                <strong>Mobile Hero:</strong> {publishedHero?.mobileMediaUrl && publishedHero.mobileMediaActive !== false 
+                  ? `Dedicated ${publishedHero.mobileMediaType === 'video' ? 'Video' : 'Image'}` 
+                  : 'Desktop Fallback'}
                 {publishedHero?.publishedAt && (
                   <span style={{ color: 'var(--color-charcoal-500)', marginLeft: '8px' }}>
                     (Published {new Date(publishedHero.publishedAt).toLocaleDateString()} at {new Date(publishedHero.publishedAt).toLocaleTimeString()})
@@ -475,12 +637,12 @@ export const AdminHeroMediaPage: React.FC = () => {
             {/* LEFT COLUMN: Controls & Settings */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', minWidth: 0, width: '100%' }}>
               
-              {/* Card 1: Unified Hero Media Manager (Image or Video) */}
+              {/* Card 1: Desktop Hero Media (Primary) */}
               <div className="card hero-media-card" style={{ backgroundColor: '#FFFFFF' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                   <h3 style={{ fontSize: '1.05rem', color: 'var(--color-charcoal-900)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Sparkles size={18} style={{ color: 'var(--color-primary-green)' }} />
-                    <span>1. Hero Media (Image or Video)</span>
+                    <Monitor size={18} style={{ color: 'var(--color-primary-green)' }} />
+                    <span>1. Desktop Hero Media (Primary)</span>
                   </h3>
                   <span style={{
                     display: 'inline-flex',
@@ -499,7 +661,7 @@ export const AdminHeroMediaPage: React.FC = () => {
                 </div>
 
                 <p style={{ fontSize: '0.82rem', color: 'var(--color-charcoal-600)', margin: '0 0 16px 0', lineHeight: '1.5' }}>
-                  Upload a photo or video to display as the homepage hero. The system automatically detects your file format, optimizes it, and renders it across desktop, tablet, and mobile screens.
+                  Main desktop hero media. Used across desktop and tablet viewports, and serves as the automatic fallback for mobile if no mobile media is configured.
                 </p>
 
                 {/* Media Preview Box */}
@@ -530,7 +692,7 @@ export const AdminHeroMediaPage: React.FC = () => {
                   ) : (
                     <img
                       src={heroForm.imageUrl || '/assets/indus-crop-hero.webp'}
-                      alt="Current hero preview"
+                      alt="Current desktop hero preview"
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     />
                   )}
@@ -552,7 +714,7 @@ export const AdminHeroMediaPage: React.FC = () => {
                     gap: '6px'
                   }}>
                     {heroForm.mediaType === 'video' ? <VideoIcon size={12} /> : <ImageIcon size={12} />}
-                    <span>{heroForm.mediaType === 'video' ? 'Video Hero' : 'Image Hero'}</span>
+                    <span>{heroForm.mediaType === 'video' ? 'Desktop Video' : 'Desktop Image'}</span>
                   </div>
 
                   {/* Publish Status Indicator */}
@@ -561,7 +723,7 @@ export const AdminHeroMediaPage: React.FC = () => {
                       {publishedHero?.mediaType === heroForm.mediaType &&
                        publishedHero?.videoUrl === heroForm.videoUrl &&
                        publishedHero?.imageUrl === heroForm.imageUrl ? (
-                        <span style={{ color: '#69F0AE', fontWeight: 600 }}>✓ Published & Live on Website</span>
+                        <span style={{ color: '#69F0AE', fontWeight: 600 }}>✓ Published & Live on Desktop</span>
                       ) : (
                         <span style={{ color: '#FFD54F', fontWeight: 600 }}>⚠️ Unsaved Changes (Click Publish above)</span>
                       )}
@@ -572,7 +734,7 @@ export const AdminHeroMediaPage: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Single Unified Upload / Replace Button */}
+                {/* File input */}
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -601,8 +763,8 @@ export const AdminHeroMediaPage: React.FC = () => {
                       {isUploading
                         ? `Uploading to Cloud Storage... (${uploadProgress}%)`
                         : (heroForm.imageUrl || heroForm.videoUrl)
-                        ? 'Replace Media (Upload New Image or Video)'
-                        : 'Upload Hero Image or Video'}
+                        ? 'Replace Desktop Media (Upload New Image or Video)'
+                        : 'Upload Desktop Hero Image or Video'}
                     </span>
                   </button>
 
@@ -611,10 +773,10 @@ export const AdminHeroMediaPage: React.FC = () => {
                   </p>
                 </div>
 
-                {/* Quick Display Switcher (if both formats are available) */}
+                {/* Quick Display Switcher */}
                 <div style={{ borderTop: '1px solid var(--color-border-light)', paddingTop: '14px', marginTop: '4px' }}>
                   <label className="form-label" style={{ fontSize: '0.78rem', marginBottom: '8px', display: 'block', color: 'var(--color-charcoal-600)' }}>
-                    Active Hero Display Mode:
+                    Active Desktop Display Mode:
                   </label>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '10px' }}>
                     <button
@@ -678,11 +840,199 @@ export const AdminHeroMediaPage: React.FC = () => {
                 )}
               </div>
 
-              {/* Card 2: Presentation & Legibility Overlays */}
+              {/* Card 2: Dedicated Mobile Hero Media (Responsive Override) */}
+              <div className="card hero-media-card" style={{ backgroundColor: '#FFFFFF' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  <h3 style={{ fontSize: '1.05rem', color: 'var(--color-charcoal-900)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Smartphone size={18} style={{ color: 'var(--color-action-green)' }} />
+                    <span>2. Mobile Hero Media</span>
+                  </h3>
+                  <span style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    padding: '3px 10px',
+                    borderRadius: '12px',
+                    fontSize: '0.75rem',
+                    fontWeight: 700,
+                    backgroundColor: hasMobileMedia 
+                      ? (heroForm.mobileMediaType === 'video' ? '#E8F5E9' : '#E3F2FD')
+                      : '#FFF8E1',
+                    color: hasMobileMedia
+                      ? (heroForm.mobileMediaType === 'video' ? '#1B5E20' : '#0D47A1')
+                      : '#B78103'
+                  }}>
+                    {hasMobileMedia ? (
+                      heroForm.mobileMediaType === 'video' ? <VideoIcon size={13} /> : <ImageIcon size={13} />
+                    ) : (
+                      <HelpCircle size={13} />
+                    )}
+                    <span>
+                      {hasMobileMedia 
+                        ? (heroForm.mobileMediaType === 'video' ? 'Mobile Video Active' : 'Mobile Image Active')
+                        : 'Using Desktop Fallback'}
+                    </span>
+                  </span>
+                </div>
+
+                <p style={{ fontSize: '0.82rem', color: 'var(--color-charcoal-600)', margin: '0 0 16px 0', lineHeight: '1.5' }}>
+                  Upload a separate portrait-oriented photo or video tailored specifically for smartphone screens. If not configured, mobile viewports automatically fall back to your desktop hero media.
+                </p>
+
+                {/* Mobile Preview Box */}
+                {hasMobileMedia ? (
+                  <div style={{
+                    position: 'relative',
+                    width: '100%',
+                    height: '190px',
+                    borderRadius: 'var(--radius-md)',
+                    overflow: 'hidden',
+                    backgroundColor: '#0A180E',
+                    marginBottom: '16px',
+                    border: '1px solid var(--color-border-light)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    {heroForm.mobileMediaType === 'video' && heroForm.mobileMediaUrl ? (
+                      <video
+                        key={heroForm.mobileMediaUrl}
+                        src={heroForm.mobileMediaUrl}
+                        poster={heroForm.mobileVideoPosterUrl || undefined}
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                    ) : (
+                      <img
+                        src={heroForm.mobileMediaUrl}
+                        alt="Current mobile hero preview"
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                    )}
+
+                    {/* Overlay Type Badge */}
+                    <div style={{
+                      position: 'absolute',
+                      top: '10px',
+                      left: '10px',
+                      background: 'rgba(0, 0, 0, 0.75)',
+                      backdropFilter: 'blur(4px)',
+                      color: '#FFFFFF',
+                      padding: '4px 10px',
+                      borderRadius: '6px',
+                      fontSize: '0.74rem',
+                      fontWeight: 600,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px'
+                    }}>
+                      {heroForm.mobileMediaType === 'video' ? <VideoIcon size={12} /> : <ImageIcon size={12} />}
+                      <span>{heroForm.mobileMediaType === 'video' ? 'Mobile Video' : 'Mobile Image'}</span>
+                    </div>
+
+                    {/* Publish Status Indicator */}
+                    <div className="hero-media-status-banner">
+                      <span>
+                        {publishedHero?.mobileMediaUrl === heroForm.mobileMediaUrl &&
+                         publishedHero?.mobileMediaType === heroForm.mobileMediaType &&
+                         publishedHero?.mobileMediaActive === heroForm.mobileMediaActive ? (
+                          <span style={{ color: '#69F0AE', fontWeight: 600 }}>✓ Published & Live on Mobile</span>
+                        ) : (
+                          <span style={{ color: '#FFD54F', fontWeight: 600 }}>⚠️ Unsaved Changes (Click Publish above)</span>
+                        )}
+                      </span>
+                      <span style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.7rem' }}>
+                        {heroForm.mobileMediaType === 'video' ? 'MP4 / WebM' : 'WebP / JPG'}
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{
+                    padding: '24px 16px',
+                    borderRadius: 'var(--radius-md)',
+                    backgroundColor: '#F8FAF8',
+                    border: '1.5px dashed var(--color-border-light)',
+                    textAlign: 'center',
+                    marginBottom: '16px'
+                  }}>
+                    <Smartphone size={32} style={{ color: 'var(--color-sage-400)', marginBottom: '8px' }} />
+                    <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--color-charcoal-700)', marginBottom: '4px' }}>
+                      No Dedicated Mobile Media Configured
+                    </div>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--color-charcoal-500)', maxWidth: '380px', margin: '0 auto' }}>
+                      Mobile visitors currently see your desktop {heroForm.mediaType === 'video' ? 'Video' : 'Image'} automatically. Upload an image or video below to set a mobile-specific presentation.
+                    </div>
+                  </div>
+                )}
+
+                {/* Mobile Hidden File Input */}
+                <input
+                  ref={mobileFileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/jpg,video/mp4,video/webm"
+                  onChange={handleMobileMediaUpload}
+                  style={{ display: 'none' }}
+                />
+
+                {/* Upload & Remove Controls */}
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={() => mobileFileInputRef.current?.click()}
+                    disabled={isMobileUploading}
+                    style={{
+                      flex: 1,
+                      minWidth: '200px',
+                      justifyContent: 'center',
+                      padding: '11px 16px',
+                      fontSize: '0.88rem',
+                      fontWeight: 700,
+                      gap: '8px'
+                    }}
+                  >
+                    <Upload size={15} />
+                    <span>
+                      {isMobileUploading
+                        ? `Uploading Mobile Media... (${mobileUploadProgress}%)`
+                        : hasMobileMedia
+                        ? 'Replace Mobile Media (Image or Video)'
+                        : 'Upload Mobile Hero Image or Video'}
+                    </span>
+                  </button>
+
+                  {hasMobileMedia && (
+                    <button
+                      type="button"
+                      className="btn btn-outline"
+                      onClick={handleRemoveMobileMedia}
+                      style={{
+                        padding: '11px 16px',
+                        fontSize: '0.88rem',
+                        color: '#C62828',
+                        borderColor: '#FFCDD2',
+                        backgroundColor: '#FFEBEE',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                      }}
+                      title="Remove mobile-specific media and restore automatic desktop fallback"
+                    >
+                      <Trash2 size={14} />
+                      <span>Remove (Use Fallback)</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Card 3: Presentation & Legibility Overlays */}
               <div className="card hero-media-card" style={{ backgroundColor: '#FFFFFF' }}>
                 <h3 style={{ fontSize: '1.05rem', color: 'var(--color-charcoal-900)', margin: '0 0 12px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Sliders size={18} style={{ color: 'var(--color-primary-green)' }} />
-                  <span>2. Presentation & Legibility Overlays</span>
+                  <span>3. Presentation & Legibility Overlays</span>
                 </h3>
 
                 {/* Darkness Slider */}
@@ -727,11 +1077,11 @@ export const AdminHeroMediaPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Card 3: Editable Hero Copy & CTAs */}
+              {/* Card 4: Editable Hero Copy & CTAs */}
               <div className="card hero-media-card" style={{ backgroundColor: '#FFFFFF' }}>
                 <h3 style={{ fontSize: '1.05rem', color: 'var(--color-charcoal-900)', margin: '0 0 12px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Sparkles size={18} style={{ color: 'var(--color-harvest-gold)' }} />
-                  <span>3. Editable Headline & Call-to-Actions</span>
+                  <span>4. Editable Headline & Call-to-Actions</span>
                 </h3>
 
                 <div className="form-group" style={{ marginBottom: '14px' }}>
@@ -834,10 +1184,10 @@ export const AdminHeroMediaPage: React.FC = () => {
 
             {/* RIGHT COLUMN: Live Interactive Device Preview Window */}
             <div className="hero-media-preview-col">
-              <div className="card hero-media-card" style={{ backgroundColor: '#FFFFFF', boxShadow: '0 8px 30px rgba(0,0,0,0.08)' }}>
+              <div className="hero-media-preview-card">
                 
-                {/* Device Switcher Header */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', borderBottom: '1px solid var(--color-border-light)', paddingBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
+                {/* Device Switcher Header (Pinned at top of preview card) */}
+                <div className="hero-media-preview-header">
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <Eye size={18} style={{ color: 'var(--color-primary-green)' }} />
                     <span style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--color-charcoal-900)' }}>
@@ -850,20 +1200,7 @@ export const AdminHeroMediaPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setPreviewDevice('desktop')}
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        padding: '6px 14px',
-                        borderRadius: 'var(--radius-pill)',
-                        border: 'none',
-                        background: previewDevice === 'desktop' ? '#FFFFFF' : 'transparent',
-                        color: previewDevice === 'desktop' ? 'var(--color-primary-green-dark)' : 'var(--color-charcoal-600)',
-                        fontWeight: 700,
-                        fontSize: '0.78rem',
-                        cursor: 'pointer',
-                        boxShadow: previewDevice === 'desktop' ? '0 2px 6px rgba(0,0,0,0.08)' : 'none'
-                      }}
+                      className={`preview-device-btn ${previewDevice === 'desktop' ? 'active' : ''}`}
                     >
                       <Monitor size={14} />
                       <span>Desktop (16:9)</span>
@@ -872,20 +1209,7 @@ export const AdminHeroMediaPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setPreviewDevice('tablet')}
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        padding: '6px 14px',
-                        borderRadius: 'var(--radius-pill)',
-                        border: 'none',
-                        background: previewDevice === 'tablet' ? '#FFFFFF' : 'transparent',
-                        color: previewDevice === 'tablet' ? 'var(--color-primary-green-dark)' : 'var(--color-charcoal-600)',
-                        fontWeight: 700,
-                        fontSize: '0.78rem',
-                        cursor: 'pointer',
-                        boxShadow: previewDevice === 'tablet' ? '0 2px 6px rgba(0,0,0,0.08)' : 'none'
-                      }}
+                      className={`preview-device-btn ${previewDevice === 'tablet' ? 'active' : ''}`}
                     >
                       <Tablet size={14} />
                       <span>Tablet</span>
@@ -894,20 +1218,7 @@ export const AdminHeroMediaPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setPreviewDevice('mobile')}
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        padding: '6px 14px',
-                        borderRadius: 'var(--radius-pill)',
-                        border: 'none',
-                        background: previewDevice === 'mobile' ? '#FFFFFF' : 'transparent',
-                        color: previewDevice === 'mobile' ? 'var(--color-primary-green-dark)' : 'var(--color-charcoal-600)',
-                        fontWeight: 700,
-                        fontSize: '0.78rem',
-                        cursor: 'pointer',
-                        boxShadow: previewDevice === 'mobile' ? '0 2px 6px rgba(0,0,0,0.08)' : 'none'
-                      }}
+                      className={`preview-device-btn ${previewDevice === 'mobile' ? 'active' : ''}`}
                     >
                       <Smartphone size={14} />
                       <span>Mobile (375px)</span>
@@ -915,220 +1226,267 @@ export const AdminHeroMediaPage: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Simulated Device Frame */}
-                <div className="hero-device-frame-container" style={{ 
-                  padding: previewDevice === 'mobile' ? '20px 10px' : previewDevice === 'tablet' ? '16px' : '0' 
+                {/* Device Status Bar */}
+                <div style={{
+                  padding: '7px 20px',
+                  backgroundColor: '#F8FAF8',
+                  borderBottom: '1px solid var(--color-border-light)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  fontSize: '0.74rem',
+                  color: 'var(--color-charcoal-600)',
+                  flexWrap: 'wrap',
+                  gap: '6px'
                 }}>
-                  <div className="hero-device-frame" style={{
-                    width: previewWidths[previewDevice],
-                    borderRadius: previewDevice === 'mobile' ? '28px' : previewDevice === 'tablet' ? '16px' : '0',
-                    border: previewDevice !== 'desktop' ? '6px solid #2A3B30' : 'none',
-                    boxShadow: previewDevice !== 'desktop' ? '0 12px 40px rgba(0,0,0,0.6)' : 'none'
-                  }}>
-                    
-                    {/* Simulated Mini Navbar */}
-                    <div style={{ 
-                      position: 'absolute', 
-                      top: 0, 
-                      left: 0, 
-                      right: 0, 
-                      height: '52px', 
-                      background: 'rgba(3, 14, 7, 0.85)', 
-                      backdropFilter: 'blur(8px)',
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      justifyContent: 'space-between', 
-                      padding: '0 20px', 
-                      zIndex: 30,
-                      borderBottom: '1px solid rgba(255,255,255,0.08)'
-                    }}>
-                      <img 
-                        src="/images/branding/indus/indus-logo.png" 
-                        alt="Indus Logo" 
-                        style={{ height: '26px', width: 'auto' }} 
-                      />
-                      <div style={{ display: previewDevice === 'mobile' ? 'none' : 'flex', gap: '16px', fontSize: '0.78rem', color: '#FFFFFF', fontWeight: 600 }}>
-                        <span>Home</span>
-                        <span>About</span>
-                        <span>Products</span>
-                        <span>Contact</span>
-                      </div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--color-action-green)', fontWeight: 700 }}>
-                        +91 88860 69143
-                      </div>
-                    </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{
+                      width: '6px',
+                      height: '6px',
+                      borderRadius: '50%',
+                      backgroundColor: 'var(--color-action-green)'
+                    }} />
+                    <span>
+                      Viewing: <strong>{previewDevice === 'desktop' ? 'Desktop (16:9)' : previewDevice === 'tablet' ? 'Tablet' : 'Mobile Phone (375px)'}</strong>
+                    </span>
+                  </div>
+                  <div>
+                    {previewDevice === 'mobile' ? (
+                      hasMobileMedia ? (
+                        <span style={{ color: '#1B5E20', fontWeight: 700 }}>
+                          Dedicated Mobile {heroForm.mobileMediaType === 'video' ? 'Video' : 'Image'} Active
+                        </span>
+                      ) : (
+                        <span style={{ color: '#B78103', fontWeight: 600 }}>
+                          Using Desktop {heroForm.mediaType === 'video' ? 'Video' : 'Image'} (Fallback)
+                        </span>
+                      )
+                    ) : (
+                      <span style={{ color: '#1B5E20', fontWeight: 600 }}>
+                        Desktop {heroForm.mediaType === 'video' ? 'Video' : 'Image'}
+                      </span>
+                    )}
+                  </div>
+                </div>
 
-                    {/* Simulated Hero Stage */}
-                    <div style={{
-                      position: 'relative',
-                      minHeight: previewDevice === 'mobile' ? '460px' : '380px',
-                      paddingTop: '68px',
-                      paddingBottom: '36px',
-                      paddingLeft: '24px',
-                      paddingRight: '24px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'center',
-                      overflow: 'hidden'
+                {/* Scrollable Preview Body (Smooth, non-conflicting, full reachability) */}
+                <div className="hero-media-preview-body">
+                  <div className="hero-device-frame-container" style={{ 
+                    padding: previewDevice === 'mobile' ? '20px 10px' : previewDevice === 'tablet' ? '16px 12px' : '0' 
+                  }}>
+                    <div className="hero-device-frame" style={{
+                      width: previewDevice === 'mobile' ? '375px' : previewDevice === 'tablet' ? 'min(100%, 640px)' : '100%',
+                      borderRadius: previewDevice === 'mobile' ? '28px' : previewDevice === 'tablet' ? '16px' : '0',
+                      border: previewDevice !== 'desktop' ? '6px solid #2A3B30' : 'none',
+                      boxShadow: previewDevice !== 'desktop' ? '0 12px 40px rgba(0,0,0,0.6)' : 'none'
                     }}>
                       
-                      {/* Live Background Media */}
-                      <div style={{
-                        position: 'absolute',
-                        inset: 0,
-                        zIndex: 1,
-                        backgroundImage: heroForm.mediaType === 'image' 
-                          ? `url('${previewDevice === 'mobile' && heroForm.imageMobileUrl ? heroForm.imageMobileUrl : heroForm.imageUrl}')` 
-                          : `url('${heroForm.videoPosterUrl || heroForm.imageUrl}')`,
-                        backgroundSize: heroForm.imageFit || 'cover',
-                        backgroundPosition: previewDevice === 'mobile' ? (heroForm.imagePositionMobile || 'center center') : (heroForm.imagePositionDesktop || 'center 36%'),
-                        backgroundRepeat: 'no-repeat'
+                      {/* Simulated Mini Navbar */}
+                      <div style={{ 
+                        position: 'absolute', 
+                        top: 0, 
+                        left: 0, 
+                        right: 0, 
+                        height: '52px', 
+                        background: 'rgba(3, 14, 7, 0.85)', 
+                        backdropFilter: 'blur(8px)',
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'space-between', 
+                        padding: '0 20px', 
+                        zIndex: 30,
+                        borderBottom: '1px solid rgba(255,255,255,0.08)'
                       }}>
-                        {heroForm.mediaType === 'video' && heroForm.videoUrl && (
-                          <video
-                            key={heroForm.videoUrl}
-                            autoPlay
-                            muted
-                            loop
-                            playsInline
-                            poster={heroForm.videoPosterUrl || heroForm.imageUrl}
-                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                          >
-                            <source 
-                              src={heroForm.videoUrl} 
-                              type={heroForm.videoUrl.toLowerCase().includes('.webm') ? 'video/webm' : 'video/mp4'} 
-                            />
-                          </video>
-                        )}
+                        <img 
+                          src="/images/branding/indus/indus-logo.png" 
+                          alt="Indus Logo" 
+                          style={{ height: '26px', width: 'auto' }} 
+                        />
+                        <div style={{ display: previewDevice === 'mobile' ? 'none' : 'flex', gap: '16px', fontSize: '0.78rem', color: '#FFFFFF', fontWeight: 600 }}>
+                          <span>Home</span>
+                          <span>About</span>
+                          <span>Products</span>
+                          <span>Contact</span>
+                        </div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--color-action-green)', fontWeight: 700 }}>
+                          +91 88860 69143
+                        </div>
                       </div>
 
-                      {/* Live Dynamic Gradient Overlays */}
+                      {/* Simulated Hero Stage */}
                       <div style={{
-                        position: 'absolute',
-                        inset: 0,
-                        zIndex: 2,
-                        pointerEvents: 'none',
-                        background: `linear-gradient(90deg, 
-                          rgba(3, 14, 7, ${Math.min(0.96, (heroForm.overlayDarkness ?? 0.65) + 0.25)}) 0%, 
-                          rgba(3, 14, 7, ${heroForm.overlayDarkness ?? 0.65}) 55%, 
-                          rgba(3, 14, 7, ${(heroForm.overlayDarkness ?? 0.65) * 0.45}) 100%)`
-                      }} />
-
-                      {/* Live Hero Content Elements */}
-                      <div style={{ position: 'relative', zIndex: 10, maxWidth: '640px' }}>
+                        position: 'relative',
+                        minHeight: previewDevice === 'mobile' ? '460px' : '380px',
+                        paddingTop: '68px',
+                        paddingBottom: '36px',
+                        paddingLeft: '24px',
+                        paddingRight: '24px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        overflow: 'hidden'
+                      }}>
                         
-                        {/* Eyebrow Badge */}
+                        {/* Live Background Media */}
                         <div style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          background: 'rgba(4, 20, 11, 0.75)',
-                          border: '1px solid rgba(37, 211, 102, 0.35)',
-                          padding: '3px 10px',
-                          borderRadius: '20px',
-                          fontSize: '0.68rem',
-                          fontWeight: 700,
-                          color: 'var(--color-action-green)',
-                          marginBottom: '10px'
+                          position: 'absolute',
+                          inset: 0,
+                          zIndex: 1,
+                          backgroundImage: previewMediaType === 'image' 
+                            ? `url('${previewMediaUrl}')` 
+                            : (previewPosterUrl ? `url('${previewPosterUrl}')` : undefined),
+                          backgroundSize: heroForm.imageFit || 'cover',
+                          backgroundPosition: previewDevice === 'mobile' 
+                            ? (heroForm.imagePositionMobile || 'center center') 
+                            : (heroForm.imagePositionDesktop || 'center 36%'),
+                          backgroundRepeat: 'no-repeat'
                         }}>
-                          <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: 'var(--color-action-green)' }} />
-                          <span>{heroForm.badgeText}</span>
+                          {previewMediaType === 'video' && previewMediaUrl && (
+                            <video
+                              key={previewMediaUrl}
+                              autoPlay
+                              muted
+                              loop
+                              playsInline
+                              poster={previewPosterUrl || undefined}
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            >
+                              <source 
+                                src={previewMediaUrl} 
+                                type={previewMediaUrl.toLowerCase().includes('.webm') ? 'video/webm' : 'video/mp4'} 
+                              />
+                            </video>
+                          )}
                         </div>
 
-                        {/* Title */}
-                        <h2 style={{
-                          fontSize: previewDevice === 'mobile' ? '1.5rem' : '2.1rem',
-                          fontWeight: 900,
-                          color: '#FFFFFF',
-                          lineHeight: '1.2',
-                          margin: '0 0 8px 0',
-                          fontFamily: 'var(--font-heading)'
-                        }}>
-                          {heroForm.titleLine1}<br />
-                          <span style={{
-                            background: 'linear-gradient(135deg, #FFE082 0%, #25D366 100%)',
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent'
-                          }}>
-                            {heroForm.titleLine2}
-                          </span>
-                        </h2>
+                        {/* Live Dynamic Gradient Overlays */}
+                        <div style={{
+                          position: 'absolute',
+                          inset: 0,
+                          zIndex: 2,
+                          pointerEvents: 'none',
+                          background: `linear-gradient(90deg, 
+                            rgba(3, 14, 7, ${Math.min(0.96, (heroForm.overlayDarkness ?? 0.65) + 0.25)}) 0%, 
+                            rgba(3, 14, 7, ${heroForm.overlayDarkness ?? 0.65}) 55%, 
+                            rgba(3, 14, 7, ${(heroForm.overlayDarkness ?? 0.65) * 0.45}) 100%)`
+                        }} />
 
-                        {/* Telugu Motto */}
-                        {heroForm.teluguMotto && (
+                        {/* Live Hero Content Elements */}
+                        <div style={{ position: 'relative', zIndex: 10, maxWidth: '640px' }}>
+                          
+                          {/* Eyebrow Badge */}
                           <div style={{
-                            display: 'inline-block',
-                            background: 'rgba(245, 199, 78, 0.15)',
-                            borderLeft: '3px solid #F5C74E',
-                            padding: '3px 10px',
-                            borderRadius: '0 4px 4px 0',
-                            color: '#FFE082',
-                            fontSize: '0.78rem',
-                            fontWeight: 700,
-                            marginBottom: '10px'
-                          }}>
-                            {heroForm.teluguMotto}
-                          </div>
-                        )}
-
-                        {/* Supporting Narrative */}
-                        <p style={{
-                          fontSize: previewDevice === 'mobile' ? '0.78rem' : '0.86rem',
-                          lineHeight: '1.5',
-                          color: 'var(--color-sage-200)',
-                          margin: '0 0 16px 0',
-                          display: '-webkit-box',
-                          WebkitLineClamp: previewDevice === 'mobile' ? 3 : 4,
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden'
-                        }}>
-                          {heroForm.description}
-                        </p>
-
-                        {/* CTA Buttons */}
-                        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                          <span style={{
-                            background: 'linear-gradient(135deg, #168547 0%, #0E6B38 100%)',
-                            color: '#FFFFFF',
-                            padding: '8px 18px',
-                            borderRadius: '30px',
-                            fontSize: '0.8rem',
-                            fontWeight: 700,
                             display: 'inline-flex',
                             alignItems: 'center',
                             gap: '6px',
-                            boxShadow: '0 4px 14px rgba(14, 107, 56, 0.4)'
-                          }}>
-                            <span>{heroForm.primaryCtaText}</span>
-                            <ArrowRight size={13} />
-                          </span>
-
-                          <span style={{
-                            background: 'rgba(255, 255, 255, 0.12)',
-                            color: '#FFFFFF',
-                            border: '1px solid rgba(255, 255, 255, 0.25)',
-                            padding: '8px 16px',
-                            borderRadius: '30px',
-                            fontSize: '0.8rem',
+                            background: 'rgba(4, 20, 11, 0.75)',
+                            border: '1px solid rgba(37, 211, 102, 0.35)',
+                            padding: '3px 10px',
+                            borderRadius: '20px',
+                            fontSize: '0.68rem',
                             fontWeight: 700,
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '6px'
+                            color: 'var(--color-action-green)',
+                            marginBottom: '10px'
                           }}>
-                            <PhoneCall size={12} />
-                            <span>{heroForm.secondaryCtaText}</span>
-                          </span>
+                            <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: 'var(--color-action-green)' }} />
+                            <span>{heroForm.badgeText}</span>
+                          </div>
+
+                          {/* Title */}
+                          <h2 style={{
+                            fontSize: previewDevice === 'mobile' ? '1.5rem' : '2.1rem',
+                            fontWeight: 900,
+                            color: '#FFFFFF',
+                            lineHeight: '1.2',
+                            margin: '0 0 8px 0',
+                            fontFamily: 'var(--font-heading)'
+                          }}>
+                            {heroForm.titleLine1}<br />
+                            <span style={{
+                              background: 'linear-gradient(135deg, #FFE082 0%, #25D366 100%)',
+                              WebkitBackgroundClip: 'text',
+                              WebkitTextFillColor: 'transparent'
+                            }}>
+                              {heroForm.titleLine2}
+                            </span>
+                          </h2>
+
+                          {/* Telugu Motto */}
+                          {heroForm.teluguMotto && (
+                            <div style={{
+                              display: 'inline-block',
+                              background: 'rgba(245, 199, 78, 0.15)',
+                              borderLeft: '3px solid #F5C74E',
+                              padding: '3px 10px',
+                              borderRadius: '0 4px 4px 0',
+                              color: '#FFE082',
+                              fontSize: '0.78rem',
+                              fontWeight: 700,
+                              marginBottom: '10px'
+                            }}>
+                              {heroForm.teluguMotto}
+                            </div>
+                          )}
+
+                          {/* Supporting Narrative */}
+                          <p style={{
+                            fontSize: previewDevice === 'mobile' ? '0.78rem' : '0.86rem',
+                            lineHeight: '1.5',
+                            color: 'var(--color-sage-200)',
+                            margin: '0 0 16px 0',
+                            display: '-webkit-box',
+                            WebkitLineClamp: previewDevice === 'mobile' ? 3 : 4,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden'
+                          }}>
+                            {heroForm.description}
+                          </p>
+
+                          {/* CTA Buttons */}
+                          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                            <span style={{
+                              background: 'linear-gradient(135deg, #168547 0%, #0E6B38 100%)',
+                              color: '#FFFFFF',
+                              padding: '8px 18px',
+                              borderRadius: '30px',
+                              fontSize: '0.8rem',
+                              fontWeight: 700,
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                              boxShadow: '0 4px 14px rgba(14, 107, 56, 0.4)'
+                            }}>
+                              <span>{heroForm.primaryCtaText}</span>
+                              <ArrowRight size={13} />
+                            </span>
+
+                            <span style={{
+                              background: 'rgba(255, 255, 255, 0.12)',
+                              color: '#FFFFFF',
+                              border: '1px solid rgba(255, 255, 255, 0.25)',
+                              padding: '8px 16px',
+                              borderRadius: '30px',
+                              fontSize: '0.8rem',
+                              fontWeight: 700,
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '6px'
+                            }}>
+                              <PhoneCall size={12} />
+                              <span>{heroForm.secondaryCtaText}</span>
+                            </span>
+                          </div>
+
                         </div>
 
                       </div>
-
                     </div>
                   </div>
                 </div>
 
-                {/* Helpful Hint */}
-                <div style={{ marginTop: '14px', fontSize: '0.78rem', color: 'var(--color-charcoal-500)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <HelpCircle size={14} style={{ color: 'var(--color-primary-green)' }} />
+                {/* Pinned Preview Footer */}
+                <div className="hero-media-preview-footer">
+                  <HelpCircle size={14} style={{ color: 'var(--color-primary-green)', flexShrink: 0 }} />
                   <span>Changes made in the left controls update this device preview in real-time before publishing.</span>
                 </div>
 

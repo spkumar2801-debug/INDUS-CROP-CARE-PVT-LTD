@@ -44,6 +44,18 @@ export function sanitizeHeroSettings(hero?: Partial<HeroSettings>): HeroSettings
     merged.videoPosterUrl = merged.imageUrl || base.videoPosterUrl;
   }
 
+  // Sanitize mobile media URLs
+  if (merged.mobileMediaUrl && merged.mobileMediaUrl.startsWith('blob:')) {
+    merged.mobileMediaUrl = '';
+    merged.mobileMediaActive = false;
+  }
+  if (merged.mobileVideoPosterUrl && merged.mobileVideoPosterUrl.startsWith('blob:')) {
+    merged.mobileVideoPosterUrl = '';
+  }
+  if (merged.mobileMediaType && merged.mobileMediaType !== 'video' && merged.mobileMediaType !== 'image') {
+    merged.mobileMediaType = undefined;
+  }
+
   // Ensure mediaType is strictly 'image' or 'video'
   if (merged.mediaType !== 'video') {
     merged.mediaType = 'image';
@@ -179,6 +191,12 @@ export async function updateSiteSettings(settings: Partial<SiteSettings>): Promi
     }
     if (settings.hero.videoPosterUrl?.startsWith('blob:')) {
       throw new Error('Cannot save temporary blob: URL. Please wait for the poster upload to complete.');
+    }
+    if (settings.hero.mobileMediaUrl?.startsWith('blob:')) {
+      throw new Error('Cannot save temporary blob: URL for mobile media. Please wait for upload to complete.');
+    }
+    if (settings.hero.mobileVideoPosterUrl?.startsWith('blob:')) {
+      throw new Error('Cannot save temporary blob: URL for mobile video poster. Please wait for upload to complete.');
     }
   }
 

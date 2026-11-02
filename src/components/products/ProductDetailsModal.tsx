@@ -52,11 +52,11 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
                 ISO 9001:2015 Certified
               </span>
             </div>
-            <h2 id="product-details-title" style={{ fontSize: '1.5rem', color: 'var(--color-charcoal-950, #0D1611)', fontWeight: 800 }}>
+            <h2 id="product-details-title" style={{ fontFamily: 'var(--font-heading)', fontSize: '1.45rem', color: 'var(--color-charcoal-950, #0D1611)', fontWeight: 700, letterSpacing: '-0.015em' }}>
               {product.name} {product.formulation && <span style={{ fontSize: '1.05rem', fontWeight: 600, color: 'var(--color-primary-green-dark, #0A522A)' }}>({product.formulation})</span>}
             </h2>
             {product.categoryTelugu && (
-              <p className="telugu-quote" style={{ margin: '4px 0 0 0', fontSize: '1.02rem', color: 'var(--color-charcoal-700, #2C3E35)', fontWeight: 600 }}>
+              <p className="telugu-quote" style={{ fontFamily: 'var(--font-telugu)', margin: '4px 0 0 0', fontSize: '1.02rem', color: 'var(--color-charcoal-700, #2C3E35)', fontWeight: 600, lineHeight: 1.5 }}>
                 {product.categoryTelugu} {product.code ? `(${product.code})` : ''}
               </p>
             )}
@@ -86,12 +86,12 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
               <span className="modal-crop-seal">Certified Specimen</span>
             </div>
             <div>
-              <p style={{ fontSize: '0.98rem', lineHeight: '1.68', color: 'var(--color-charcoal-800, #1B2921)', marginBottom: '18px' }}>
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: '0.96rem', lineHeight: '1.7', color: 'var(--color-charcoal-800, #1B2921)', marginBottom: '18px', letterSpacing: '-0.005em' }}>
                 {product.description}
               </p>
               {product.features && product.features.length > 0 && (
                 <div>
-                  <h4 style={{ fontSize: '0.85rem', textTransform: 'uppercase', color: 'var(--color-primary-green-dark, #0A522A)', marginBottom: '10px', letterSpacing: '0.05em', fontWeight: 800 }}>
+                  <h4 style={{ fontFamily: 'var(--font-heading)', fontSize: '0.84rem', textTransform: 'uppercase', color: 'var(--color-primary-green-dark, #0A522A)', marginBottom: '10px', letterSpacing: '0.06em', fontWeight: 700 }}>
                     Key Agronomic Highlights
                   </h4>
                   <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '8px', padding: 0 }}>

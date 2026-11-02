@@ -94,7 +94,7 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
         paddingBottom: 'clamp(48px, 7vw, 72px)',
         borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
       }}>
-        <div className="container" style={{ textAlign: 'center', maxWidth: '850px' }}>
+        <div className="container reveal-on-scroll" style={{ textAlign: 'center', maxWidth: '850px' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 16px', borderRadius: 'var(--radius-pill)', backgroundColor: 'rgba(37, 211, 102, 0.12)', border: '1px solid rgba(37, 211, 102, 0.3)', marginBottom: '16px' }}>
             <Sparkles size={14} style={{ color: 'var(--color-action-green)' }} />
             <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#A7F3D0', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
@@ -102,11 +102,11 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
             </span>
           </div>
 
-          <h1 style={{ fontSize: 'clamp(2.2rem, 4.5vw, 3.4rem)', color: '#FFFFFF', marginBottom: '14px', fontWeight: 800, letterSpacing: '-0.025em' }}>
+          <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(2.2rem, 4.5vw, 3.4rem)', color: '#FFFFFF', marginBottom: '14px', fontWeight: 700, letterSpacing: '-0.025em' }}>
             Contact Indus Crop Care Pvt. Ltd.
           </h1>
 
-          <div className="telugu-quote" style={{ fontSize: '1.25rem', color: 'var(--color-gold-400)', marginBottom: '18px', fontWeight: 700 }}>
+          <div className="telugu-quote" style={{ fontFamily: 'var(--font-telugu)', fontSize: '1.25rem', color: 'var(--color-gold-400)', marginBottom: '18px', fontWeight: 600, lineHeight: 1.5 }}>
             రైతన్నకు భరోసా.. ఇండస్ ఉత్పాదనలు
           </div>
 
@@ -121,7 +121,7 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
         <div className="container">
 
           {/* Official Banner Card */}
-          <div style={{
+          <div className="reveal-on-scroll" style={{
             borderRadius: 'var(--radius-lg)',
             overflow: 'hidden',
             border: '1px solid var(--color-border-light)',
@@ -141,19 +141,21 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
 
             {/* Left Column: Official Contact Details */}
             <div>
-              <span className="section-tag">Official Lines</span>
-              <h2 style={{ fontSize: 'clamp(1.6rem, 3vw, 2.1rem)', color: 'var(--color-charcoal-950)', marginBottom: '14px', fontWeight: 800 }}>
-                Corporate Offices & Direct Desks
-              </h2>
-              <p style={{ color: 'var(--color-charcoal-600)', lineHeight: '1.65', marginBottom: '32px' }}>
-                With over 15 years of agricultural service across India, our offices are staffed with qualified agronomists and commercial advisors ready to support dealers and farmers.
-              </p>
+              <div className="reveal-on-scroll">
+                <span className="section-tag">Official Lines</span>
+                <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.6rem, 3vw, 2.1rem)', color: 'var(--color-charcoal-950)', marginBottom: '14px', fontWeight: 700, letterSpacing: '-0.02em' }}>
+                  Corporate Offices & Direct Desks
+                </h2>
+                <p style={{ color: 'var(--color-charcoal-600)', lineHeight: '1.65', marginBottom: '32px' }}>
+                  With over 15 years of agricultural service across India, our offices are staffed with qualified agronomists and commercial advisors ready to support dealers and farmers.
+                </p>
+              </div>
 
               {/* Verified Contact Cards */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '36px' }}>
 
                 {/* Corporate Office */}
-                <div className="card card-light" style={{ padding: '24px', display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
+                <div className="card card-light reveal-on-scroll stagger-1" style={{ padding: '24px', display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
                   <div style={{ width: '48px', height: '48px', borderRadius: '12px', backgroundColor: 'var(--color-primary-green-surface)', color: 'var(--color-primary-green-dark)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     <Building2 size={24} />
                   </div>
@@ -161,7 +163,7 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
                     <span style={{ fontSize: '0.76rem', color: 'var(--color-primary-green-dark)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                       Headquarters
                     </span>
-                    <h3 style={{ fontSize: '1.18rem', color: 'var(--color-charcoal-950)', margin: '4px 0 8px 0', fontWeight: 800 }}>
+                    <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.18rem', color: 'var(--color-charcoal-950)', margin: '4px 0 8px 0', fontWeight: 700, letterSpacing: '-0.015em' }}>
                       Corporate Office
                     </h3>
                     <p style={{ fontSize: '0.94rem', color: 'var(--color-charcoal-700)', lineHeight: '1.6', margin: 0 }}>
@@ -171,7 +173,7 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
                 </div>
 
                 {/* Registered Office */}
-                <div className="card card-light" style={{ padding: '24px', display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
+                <div className="card card-light reveal-on-scroll stagger-2" style={{ padding: '24px', display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
                   <div style={{ width: '48px', height: '48px', borderRadius: '12px', backgroundColor: 'rgba(251, 191, 36, 0.12)', color: '#D97706', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     <MapPin size={24} />
                   </div>
@@ -179,7 +181,7 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
                     <span style={{ fontSize: '0.76rem', color: '#D97706', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                       Statutory Office
                     </span>
-                    <h3 style={{ fontSize: '1.18rem', color: 'var(--color-charcoal-950)', margin: '4px 0 8px 0', fontWeight: 800 }}>
+                    <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.18rem', color: 'var(--color-charcoal-950)', margin: '4px 0 8px 0', fontWeight: 700, letterSpacing: '-0.015em' }}>
                       Registered Office
                     </h3>
                     <p style={{ fontSize: '0.94rem', color: 'var(--color-charcoal-700)', lineHeight: '1.6', margin: 0 }}>
@@ -192,24 +194,24 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px' }}>
 
                   {/* Landline Telephone */}
-                  <div className="card card-light" style={{ padding: '20px' }}>
+                  <div className="card card-light reveal-on-scroll stagger-1" style={{ padding: '20px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', color: 'var(--color-primary-green-dark)' }}>
                       <Phone size={18} />
                       <span style={{ fontSize: '0.78rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Telephone</span>
                     </div>
-                    <a href="tel:04024110478" style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--color-charcoal-950)', textDecoration: 'none' }}>
+                    <a href="tel:04024110478" style={{ fontFamily: 'var(--font-heading)', fontSize: '1.08rem', fontWeight: 700, color: 'var(--color-charcoal-950)', textDecoration: 'none', letterSpacing: '0.01em' }}>
                       040-24110478
                     </a>
                     <div style={{ fontSize: '0.78rem', color: 'var(--color-charcoal-500)', marginTop: '4px' }}>Desk: Mon–Sat, 9AM–6PM</div>
                   </div>
 
                   {/* Mobile / WhatsApp */}
-                  <div className="card card-light" style={{ padding: '20px', borderLeft: '4px solid var(--color-action-green)' }}>
+                  <div className="card card-light reveal-on-scroll stagger-2" style={{ padding: '20px', borderLeft: '4px solid var(--color-action-green)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', color: 'var(--color-action-green)' }}>
                       <MessageSquareShare size={18} />
                       <span style={{ fontSize: '0.78rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Mobile & WhatsApp</span>
                     </div>
-                    <a href={`tel:+${customerCareNumber || '918886069143'}`} style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--color-charcoal-950)', textDecoration: 'none' }}>
+                    <a href={`tel:+${customerCareNumber || '918886069143'}`} style={{ fontFamily: 'var(--font-heading)', fontSize: '1.08rem', fontWeight: 700, color: 'var(--color-charcoal-950)', textDecoration: 'none', letterSpacing: '0.01em' }}>
                       {displayFormattedNumber || '+91 88860 69143'}
                     </a>
                     <div style={{ fontSize: '0.78rem', color: 'var(--color-charcoal-500)', marginTop: '4px' }}>Immediate WhatsApp response</div>
@@ -221,7 +223,7 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px' }}>
 
                   {/* Email */}
-                  <div className="card card-light" style={{ padding: '20px' }}>
+                  <div className="card card-light reveal-on-scroll stagger-1" style={{ padding: '20px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', color: '#0284C7' }}>
                       <Mail size={18} />
                       <span style={{ fontSize: '0.78rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Corporate Email</span>
@@ -233,7 +235,7 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
                   </div>
 
                   {/* Website */}
-                  <div className="card card-light" style={{ padding: '20px' }}>
+                  <div className="card card-light reveal-on-scroll stagger-2" style={{ padding: '20px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', color: '#7C3AED' }}>
                       <Globe size={18} />
                       <span style={{ fontSize: '0.78rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Official Web</span>
@@ -247,7 +249,7 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
                 </div>
 
                 {/* Direct WhatsApp Action Button */}
-                <div style={{ marginTop: '8px' }}>
+                <div className="reveal-on-scroll stagger-3" style={{ marginTop: '8px' }}>
                   <button
                     type="button"
                     className="btn btn-whatsapp"
@@ -265,11 +267,11 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
 
             {/* Right Column: General Enquiry Form */}
             <div>
-              <div className="card card-light" style={{ padding: 'clamp(24px, 4vw, 38px)' }}>
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--color-primary-green-dark)', fontWeight: 800, fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '8px' }}>
+              <div className="card card-light contact-form-card reveal-on-scroll stagger-2" style={{ padding: 'clamp(24px, 4vw, 38px)' }}>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--color-primary-green-dark)', fontFamily: 'var(--font-heading)', fontWeight: 700, fontSize: '0.80rem', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '8px' }}>
                   <span>Official Communication Desk</span>
                 </div>
-                <h3 style={{ fontSize: '1.5rem', color: 'var(--color-charcoal-950)', marginBottom: '8px', fontWeight: 800 }}>
+                <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.45rem', color: 'var(--color-charcoal-950)', marginBottom: '8px', fontWeight: 700, letterSpacing: '-0.02em' }}>
                   Send an Official Enquiry
                 </h3>
                 <p style={{ fontSize: '0.94rem', color: 'var(--color-charcoal-600)', marginBottom: '22px', lineHeight: '1.55' }}>
@@ -334,7 +336,7 @@ export const ContactPage: React.FC<ContactPageProps> = () => {
                 {submitted ? (
                   <div style={{ backgroundColor: 'var(--color-primary-green-surface)', border: '1px solid rgba(14, 107, 56, 0.25)', padding: '32px 24px', borderRadius: 'var(--radius-lg)', textAlign: 'center' }}>
                     <CheckCircle size={48} style={{ color: 'var(--color-primary-green)', margin: '0 auto 14px auto' }} />
-                    <h4 style={{ color: 'var(--color-charcoal-950)', fontSize: '1.3rem', marginBottom: '8px', fontWeight: 800 }}>
+                    <h4 style={{ color: 'var(--color-charcoal-950)', fontFamily: 'var(--font-heading)', fontSize: '1.25rem', marginBottom: '8px', fontWeight: 700, letterSpacing: '-0.015em' }}>
                       Enquiry Submitted Successfully
                     </h4>
                     <p style={{ color: 'var(--color-charcoal-700)', fontSize: '0.94rem', margin: 0, lineHeight: '1.6' }}>

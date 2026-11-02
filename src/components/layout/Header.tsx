@@ -104,11 +104,11 @@ export const Header: React.FC<HeaderProps> = ({ onOpenQuoteModal: _onOpenQuoteMo
 
             <button
               type="button"
-              className="btn btn-whatsapp btn-sm header-quote-btn"
+              className="btn btn-whatsapp header-quote-btn"
               onClick={handleContactAction}
               title="Official Customer Care & WhatsApp Desk"
             >
-              <MessageSquareShare size={16} />
+              <MessageSquareShare size={15} />
               <span>WhatsApp Desk</span>
             </button>
           </div>

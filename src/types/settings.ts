@@ -53,6 +53,10 @@ export interface HeroSettings {
   secondaryCtaLink?: string;
   publishedAt?: string;
   publishedBy?: string;
+  mobileMediaType?: 'image' | 'video';
+  mobileMediaUrl?: string;
+  mobileVideoPosterUrl?: string;
+  mobileMediaActive?: boolean;
 }
 
 export interface AdminUser {

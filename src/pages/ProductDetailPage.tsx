@@ -146,7 +146,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ onOpenQuot
                 </span>
               </div>
 
-              <h1 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.6rem)', color: '#F4F8F3', marginBottom: '12px', fontWeight: 800, lineHeight: '1.2' }}>
+              <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(2rem, 3.5vw, 2.6rem)', color: '#F4F8F3', marginBottom: '12px', fontWeight: 700, letterSpacing: '-0.02em', lineHeight: '1.2' }}>
                 {product.name}
               </h1>
 
@@ -170,7 +170,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ onOpenQuot
               )}
 
               {product.categoryTelugu && (
-                <div className="telugu-quote" style={{ fontSize: '1.15rem', color: '#FFE082', marginBottom: '16px' }}>
+                <div className="telugu-quote" style={{ fontFamily: 'var(--font-telugu)', fontSize: '1.15rem', color: '#FFE082', marginBottom: '16px', fontWeight: 600, lineHeight: 1.5 }}>
                   {product.categoryTelugu} - {product.code}
                 </div>
               )}

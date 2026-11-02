@@ -52,18 +52,20 @@
 }
 
 .admin-login-title {
+  font-family: var(--font-heading);
   font-size: 1.45rem;
-  font-weight: 800;
+  font-weight: 700;
   color: #072312;
   margin-bottom: 6px;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
 }
 
 .admin-login-subtitle {
+  font-family: var(--font-body);
   font-size: 0.88rem;
   color: #4B5563;
   margin: 0;
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
 .admin-form-group {
@@ -172,8 +174,10 @@
 .btn-admin-login {
   width: 100%;
   padding: 14px;
-  font-size: 1rem;
-  font-weight: 700;
+  font-family: var(--font-heading);
+  font-size: 0.96rem;
+  font-weight: 600;
+  letter-spacing: 0.015em;
   color: #FFFFFF;
   background-color: #0E6B38;
   border-radius: var(--radius-md);
@@ -258,10 +262,11 @@
 }
 
 .admin-mobile-header-title {
+  font-family: var(--font-heading);
   font-size: 1.05rem;
-  font-weight: 800;
+  font-weight: 700;
   color: #FFFFFF;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
 }
 
 .admin-mobile-header-actions {
@@ -534,10 +539,12 @@ body.admin-drawer-open {
 }
 
 .admin-brand h2 {
+  font-family: var(--font-heading);
   font-size: 1rem;
   color: #FFFFFF;
   line-height: 1.2;
-  font-weight: 800;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   margin: 0;
 }
 
@@ -561,8 +568,10 @@ body.admin-drawer-open {
   padding: 11px 14px;
   border-radius: var(--radius-md);
   color: #A3C2AB;
+  font-family: var(--font-heading);
   font-size: 0.92rem;
   font-weight: 600;
+  letter-spacing: 0.01em;
   text-decoration: none;
   transition: all var(--transition-fast);
 }
@@ -666,10 +675,11 @@ body.admin-drawer-open {
 }
 
 .admin-topbar h1 {
+  font-family: var(--font-heading);
   font-size: 1.35rem;
-  font-weight: 800;
+  font-weight: 700;
   color: #072312;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
   margin-bottom: 2px;
 }
 
@@ -720,8 +730,10 @@ body.admin-drawer-open {
 }
 
 .stat-info h3 {
+  font-family: var(--font-heading);
   font-size: 1.6rem;
-  font-weight: 800;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   color: #111827;
   line-height: 1;
   margin-bottom: 4px;
@@ -1223,8 +1235,104 @@ body.admin-drawer-open {
 @media (min-width: 1025px) {
   .hero-media-preview-col {
     position: sticky;
-    top: 90px;
+    top: 24px;
+    max-height: calc(100vh - 48px);
+    max-height: calc(100dvh - 48px);
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
   }
+}
+
+.hero-media-preview-card {
+  background-color: #FFFFFF;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-light);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+@media (min-width: 1025px) {
+  .hero-media-preview-card {
+    max-height: calc(100vh - 48px);
+    max-height: calc(100dvh - 48px);
+  }
+}
+
+.hero-media-preview-header {
+  flex-shrink: 0;
+  padding: 16px 20px 14px;
+  border-bottom: 1px solid var(--color-border-light);
+  background-color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  z-index: 10;
+}
+
+.preview-device-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  border: none;
+  background: transparent;
+  color: var(--color-charcoal-600);
+  font-weight: 700;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.preview-device-btn.active {
+  background: #FFFFFF;
+  color: var(--color-primary-green-dark);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.hero-media-preview-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 16px 20px;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* Custom sleek scrollbar for preview body */
+.hero-media-preview-body::-webkit-scrollbar {
+  width: 6px;
+}
+.hero-media-preview-body::-webkit-scrollbar-track {
+  background: #F1F5F2;
+  border-radius: 4px;
+}
+.hero-media-preview-body::-webkit-scrollbar-thumb {
+  background: #B4C4B8;
+  border-radius: 4px;
+}
+.hero-media-preview-body::-webkit-scrollbar-thumb:hover {
+  background: #8FA495;
+}
+
+.hero-media-preview-footer {
+  flex-shrink: 0;
+  padding: 12px 20px;
+  border-top: 1px solid var(--color-border-light);
+  background-color: #FAFCFA;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  color: var(--color-charcoal-500);
 }
 
 .hero-media-card {
@@ -1232,7 +1340,6 @@ body.admin-drawer-open {
   max-width: 100%;
   min-width: 0;
   box-sizing: border-box;
-  overflow: hidden;
 }
 
 .hero-media-status-banner {

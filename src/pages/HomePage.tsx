@@ -106,45 +106,84 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
     };
   }, []);
 
+  // Track device viewport for independent media selection (Desktop, Tablet, Mobile)
+  const [activeDevice, setActiveDevice] = useState<'desktop' | 'tablet' | 'mobile'>(() => {
+    if (typeof window !== 'undefined') {
+      const w = window.innerWidth;
+      if (w <= 640) return 'mobile';
+      if (w <= 1024) return 'tablet';
+      return 'desktop';
+    }
+    return 'desktop';
+  });
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handleResize = () => {
+      const w = window.innerWidth;
+      const nextDevice = w <= 640 ? 'mobile' : w <= 1024 ? 'tablet' : 'desktop';
+      setActiveDevice(prev => prev !== nextDevice ? nextDevice : prev);
+    };
+
+    window.addEventListener('resize', handleResize, { passive: true });
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const hero = settings?.hero;
 
-  const heroMediaType = hero?.mediaType === 'video' ? 'video' : 'image';
-  
-  // Guard against any temporary or stale browser blob: URLs
-  const rawImageUrl = hero?.imageUrl || '';
-  const heroImageUrl = (rawImageUrl && !rawImageUrl.startsWith('blob:')) 
-    ? rawImageUrl 
+  // Desktop Media (always preserved and independent)
+  const desktopMediaType = hero?.mediaType === 'video' ? 'video' : 'image';
+  const desktopImageUrl = (hero?.imageUrl && !hero.imageUrl.startsWith('blob:')) 
+    ? hero.imageUrl 
     : '/assets/indus-crop-hero.webp';
+  const desktopVideoUrl = (hero?.videoUrl && !hero.videoUrl.startsWith('blob:')) 
+    ? hero.videoUrl 
+    : '/videos/hero-cinematic.mp4';
+  const autoDerivedDesktopPoster = (desktopVideoUrl && !desktopVideoUrl.startsWith('blob:'))
+    ? desktopVideoUrl.replace(/\.(mp4|webm)$/i, '.jpg')
+    : '';
+  const rawPosterUrl = hero?.videoPosterUrl || '';
+  const desktopVideoPoster = (rawPosterUrl && !rawPosterUrl.startsWith('blob:') && !rawPosterUrl.includes('indus-crop-hero.webp')) 
+    ? rawPosterUrl 
+    : (autoDerivedDesktopPoster || desktopImageUrl);
 
-  const rawMobileUrl = hero?.imageMobileUrl || '';
-  const heroImageMobileUrl = (rawMobileUrl && !rawMobileUrl.startsWith('blob:')) 
-    ? rawMobileUrl 
-    : '/assets/indus-crop-hero-mobile.webp';
+  // Dedicated Mobile Media (with automatic fallback to Desktop)
+  const hasConfiguredMobileMedia = Boolean(
+    hero?.mobileMediaUrl && 
+    !hero.mobileMediaUrl.startsWith('blob:') && 
+    hero.mobileMediaActive !== false
+  );
+
+  const mobileMediaType = hasConfiguredMobileMedia
+    ? (hero?.mobileMediaType || (/\.(mp4|webm)$/i.test(hero!.mobileMediaUrl!) ? 'video' : 'image'))
+    : desktopMediaType;
+
+  const mobileMediaUrl = hasConfiguredMobileMedia
+    ? hero!.mobileMediaUrl!
+    : (desktopMediaType === 'video' ? desktopVideoUrl : desktopImageUrl);
+
+  const mobileVideoPoster = hasConfiguredMobileMedia
+    ? (hero?.mobileVideoPosterUrl || (mobileMediaType === 'video' ? mobileMediaUrl.replace(/\.(mp4|webm)$/i, '.jpg') : mobileMediaUrl))
+    : desktopVideoPoster;
+
+  // Active media for current viewport:
+  // Desktop (>1024px): Desktop media
+  // Tablet (641px - 1024px): Desktop media (16:9 cinematic widescreen)
+  // Mobile (<=640px): Dedicated mobile media if configured, otherwise fallback to Desktop media
+  const currentMediaType = activeDevice === 'mobile' ? mobileMediaType : desktopMediaType;
+  const currentVideoUrl = activeDevice === 'mobile' ? (mobileMediaType === 'video' ? mobileMediaUrl : '') : desktopVideoUrl;
+  const currentImageUrl = activeDevice === 'mobile' ? (mobileMediaType === 'image' ? mobileMediaUrl : desktopImageUrl) : desktopImageUrl;
+  const currentPosterUrl = activeDevice === 'mobile' ? mobileVideoPoster : desktopVideoPoster;
 
   const heroPositionDesktop = hero?.imagePositionDesktop || 'center 36%';
   const heroPositionMobile = hero?.imagePositionMobile || 'center center';
   const heroFit = hero?.imageFit || 'cover';
-  
-  const rawVideoUrl = hero?.videoUrl || '';
-  const heroVideoUrl = (rawVideoUrl && !rawVideoUrl.startsWith('blob:')) 
-    ? rawVideoUrl 
-    : '/videos/hero-cinematic.mp4';
-
-  const autoDerivedPoster = (rawVideoUrl && !rawVideoUrl.startsWith('blob:'))
-    ? rawVideoUrl.replace(/\.(mp4|webm)$/i, '.jpg')
-    : '';
-
-  const rawPosterUrl = hero?.videoPosterUrl || '';
-  const heroVideoPoster = (rawPosterUrl && !rawPosterUrl.startsWith('blob:') && !rawPosterUrl.includes('indus-crop-hero.webp')) 
-    ? rawPosterUrl 
-    : (autoDerivedPoster || '');
-
   const heroVideoLoop = hero?.videoLoop !== false;
   const heroVideoMuted = hero?.videoMuted !== false;
 
   // Guarantee mobile browser autoplay (iOS Safari and Android Chrome) by setting DOM attributes directly
   useEffect(() => {
-    if (heroMediaType === 'video' && videoRef.current) {
+    if (currentMediaType === 'video' && videoRef.current) {
       setVideoPlaybackError(false);
       videoRef.current.defaultMuted = true;
       videoRef.current.muted = heroVideoMuted;
@@ -152,7 +191,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
         console.info('[Indus Hero Video] Autoplay handled by browser:', err);
       });
     }
-  }, [heroMediaType, heroVideoUrl, heroVideoMuted]);
+  }, [currentMediaType, currentVideoUrl, heroVideoMuted]);
 
   // Subtle cinematic hero background parallax during scroll
   useEffect(() => {
@@ -220,16 +259,16 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
           className={`hero-cinematic-bg ${isIntroRevealing ? "hero-bg-revealing" : ""}`} 
           aria-hidden="true"
           style={{
-            backgroundImage: heroMediaType === 'image' 
-              ? `url('${heroImageUrl}')` 
-              : (heroVideoPoster ? `url('${heroVideoPoster}')` : undefined),
-            backgroundPosition: heroPositionDesktop,
+            backgroundImage: currentMediaType === 'image' 
+              ? `url('${currentImageUrl}')` 
+              : (currentPosterUrl ? `url('${currentPosterUrl}')` : undefined),
+            backgroundPosition: activeDevice === 'mobile' ? heroPositionMobile : heroPositionDesktop,
             ['--hero-pos-desktop' as string]: heroPositionDesktop,
             ['--hero-pos-mobile' as string]: heroPositionMobile,
             ['--hero-fit' as string]: heroFit
           } as React.CSSProperties}
         >
-          {heroMediaType === 'video' && !videoPlaybackError ? (
+          {currentMediaType === 'video' && !videoPlaybackError ? (
             <video
               ref={(node) => {
                 videoRef.current = node;
@@ -238,14 +277,14 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
                   node.muted = heroVideoMuted;
                 }
               }}
-              key={heroVideoUrl}
+              key={currentVideoUrl}
               className="hero-video-element"
               autoPlay
               muted={heroVideoMuted}
               loop={heroVideoLoop}
               playsInline
               preload="auto"
-              poster={heroVideoPoster || undefined}
+              poster={currentPosterUrl || undefined}
               aria-hidden="true"
               onError={() => {
                 console.warn('[Indus Hero Video] Playback encountered an issue, showing fallback poster smoothly.');
@@ -253,37 +292,26 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
               }}
             >
               <source 
-                src={heroVideoUrl} 
-                type={heroVideoUrl.toLowerCase().includes('.webm') ? 'video/webm' : 'video/mp4'} 
+                src={currentVideoUrl} 
+                type={currentVideoUrl.toLowerCase().includes('.webm') ? 'video/webm' : 'video/mp4'} 
               />
-              {hero?.videoMobileUrl && !hero.videoMobileUrl.startsWith('blob:') && (
-                <source 
-                  src={hero.videoMobileUrl} 
-                  type={hero.videoMobileUrl.toLowerCase().includes('.webm') ? 'video/webm' : 'video/mp4'} 
-                />
-              )}
             </video>
-          ) : heroMediaType === 'video' && videoPlaybackError ? (
+          ) : currentMediaType === 'video' && videoPlaybackError ? (
             <img 
-              src={heroVideoPoster} 
+              src={currentPosterUrl} 
               alt="Indus Crop Care Agricultural Landscape" 
               className="hero-image-element"
               loading="eager"
               decoding="async"
             />
           ) : (
-            <picture>
-              {heroImageMobileUrl && (
-                <source media="(max-width: 640px)" srcSet={heroImageMobileUrl} />
-              )}
-              <img 
-                src={heroImageUrl} 
-                alt="Indus Crop Care Agricultural Landscape" 
-                className="hero-image-element"
-                loading="eager"
-                decoding="async"
-              />
-            </picture>
+            <img 
+              src={currentImageUrl} 
+              alt="Indus Crop Care Agricultural Landscape" 
+              className="hero-image-element"
+              loading="eager"
+              decoding="async"
+            />
           )}
         </div>
 
@@ -674,11 +702,11 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
                   <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(22, 133, 71, 0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     {val.icon}
                   </div>
-                  <h4 style={{ color: '#06381C', fontSize: '1.18rem', margin: 0, fontWeight: 700 }}>
+                  <h4 style={{ color: '#06381C', fontFamily: 'var(--font-heading)', fontSize: '1.18rem', margin: 0, fontWeight: 700, letterSpacing: '-0.015em' }}>
                     {val.label}
                   </h4>
                 </div>
-                <p style={{ color: '#2D3748', fontSize: '0.92rem', margin: 0, lineHeight: '1.6', flex: 1, fontWeight: 500 }}>
+                <p style={{ color: '#2D3748', fontFamily: 'var(--font-body)', fontSize: '0.92rem', margin: 0, lineHeight: '1.68', flex: 1, fontWeight: 400, letterSpacing: '-0.005em' }}>
                   {val.desc}
                 </p>
               </div>
@@ -728,7 +756,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
                 />
               </div>
               <div>
-                <h3 style={{ fontSize: '1.22rem', color: 'var(--color-charcoal-950)', marginBottom: '4px', fontWeight: 800 }}>
+                <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.22rem', color: 'var(--color-charcoal-950)', marginBottom: '4px', fontWeight: 700, letterSpacing: '-0.015em' }}>
                   K. Narendranath Dut
                 </h3>
                 <div style={{ fontSize: '0.88rem', color: 'var(--color-primary-green)', fontWeight: 700, marginBottom: '2px' }}>
@@ -763,7 +791,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
                 />
               </div>
               <div>
-                <h3 style={{ fontSize: '1.22rem', color: 'var(--color-charcoal-950)', marginBottom: '4px', fontWeight: 800 }}>
+                <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.22rem', color: 'var(--color-charcoal-950)', marginBottom: '4px', fontWeight: 700, letterSpacing: '-0.015em' }}>
                   K. Anoopkumar
                 </h3>
                 <div style={{ fontSize: '0.88rem', color: 'var(--color-primary-green)', fontWeight: 700, marginBottom: '2px' }}>

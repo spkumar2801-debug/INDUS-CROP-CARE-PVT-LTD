@@ -71,10 +71,19 @@
   --color-error: #D93025;
   --color-info: #1A73E8;
 
-  /* Typography */
-  --font-heading: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  /* Typography Hierarchy — Refined Manrope (Headings) & Inter (Body) */
+  --font-heading: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-telugu: 'Noto Sans Telugu', 'Plus Jakarta Sans', sans-serif;
+  --font-telugu: 'Noto Sans Telugu', 'Manrope', -apple-system, sans-serif;
+
+  /* Typographic Letter Spacing Tokens */
+  --tracking-tighter: -0.03em;
+  --tracking-tight: -0.02em;
+  --tracking-snug: -0.01em;
+  --tracking-normal: 0em;
+  --tracking-wide: 0.04em;
+  --tracking-wider: 0.08em;
+  --tracking-widest: 0.14em;
 
   /* Borders & Dividers */
   --color-border-light: #E2E9E3;

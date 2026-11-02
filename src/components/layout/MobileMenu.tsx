@@ -81,7 +81,6 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onOpenQ
       <div 
         className="mobile-menu-backdrop" 
         onClick={onClose} 
-        onTouchMove={(e) => e.preventDefault()}
         aria-hidden="true" 
       />
 

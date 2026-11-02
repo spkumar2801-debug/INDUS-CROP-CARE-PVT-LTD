@@ -101,7 +101,7 @@ export const GalleryPage: React.FC = () => {
           <span className="badge badge-gold" style={{ marginBottom: '16px' }}>
             Field Trials & Visual Documentation
           </span>
-          <h1 style={{ fontSize: 'clamp(2.2rem, 4.5vw, 3.4rem)', color: '#FFFFFF', marginBottom: '14px', fontWeight: 800, letterSpacing: '-0.025em' }}>
+          <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(2.2rem, 4.5vw, 3.4rem)', color: '#FFFFFF', marginBottom: '14px', fontWeight: 700, letterSpacing: '-0.025em' }}>
             Indus Crop Care Gallery
           </h1>
           <p style={{ fontSize: '1.08rem', color: 'var(--color-sage-200)', maxWidth: '680px', margin: '0 auto', lineHeight: '1.65' }}>

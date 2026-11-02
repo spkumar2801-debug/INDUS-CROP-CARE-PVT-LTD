@@ -28,7 +28,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenQuoteModal: _onOpenQuoteMo
               />
             </div>
             
-            <p style={{ fontSize: '0.9rem', lineHeight: '1.65', color: 'var(--color-sage-300)', marginBottom: '18px' }}>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: '0.90rem', lineHeight: '1.68', color: 'var(--color-sage-300)', marginBottom: '18px' }}>
               Indus Crop Care Pvt. Ltd. is a renowned agri-input enterprise with an established track record of over 15 years in agricultural science — empowering farmers with high-potency crop protection and plant nutrition.
             </p>
 
@@ -46,7 +46,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenQuoteModal: _onOpenQuoteMo
 
           {/* Column 2: Quick Links */}
           <div>
-            <h4 style={{ color: '#FFFFFF', fontSize: '1.05rem', fontWeight: 700, marginBottom: '20px', letterSpacing: '0.02em' }}>
+            <h4 style={{ color: '#FFFFFF', fontFamily: 'var(--font-heading)', fontSize: '1.02rem', fontWeight: 600, marginBottom: '20px', letterSpacing: '0.01em' }}>
               Quick Navigation
             </h4>
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '11px', fontSize: '0.9rem', padding: 0 }}>
@@ -80,7 +80,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenQuoteModal: _onOpenQuoteMo
 
           {/* Column 3: Product Categories */}
           <div>
-            <h4 style={{ color: '#FFFFFF', fontSize: '1.05rem', fontWeight: 700, marginBottom: '20px', letterSpacing: '0.02em' }}>
+            <h4 style={{ color: '#FFFFFF', fontFamily: 'var(--font-heading)', fontSize: '1.02rem', fontWeight: 600, marginBottom: '20px', letterSpacing: '0.01em' }}>
               Catalogue Spectrum
             </h4>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '7px' }}>
@@ -129,7 +129,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenQuoteModal: _onOpenQuoteMo
 
           {/* Column 4: Contact & Statutory Desks */}
           <div>
-            <h4 style={{ color: '#FFFFFF', fontSize: '1.05rem', fontWeight: 700, marginBottom: '20px', letterSpacing: '0.02em' }}>
+            <h4 style={{ color: '#FFFFFF', fontFamily: 'var(--font-heading)', fontSize: '1.02rem', fontWeight: 600, marginBottom: '20px', letterSpacing: '0.01em' }}>
               Official Communication
             </h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', fontSize: '0.88rem' }}>

@@ -91,10 +91,10 @@ export const AdminSettingsPage: React.FC = () => {
                 <Sparkles size={13} />
                 <span>HOMEPAGE HERO CONTROLS</span>
               </div>
-              <h3 style={{ color: '#FFFFFF', fontSize: '1.25rem', margin: '0 0 6px 0', fontWeight: 800 }}>
+              <h3 style={{ fontFamily: 'var(--font-heading)', color: '#FFFFFF', fontSize: '1.25rem', margin: '0 0 6px 0', fontWeight: 700, letterSpacing: '-0.015em' }}>
                 Hero Media & Visual Experience Manager
               </h3>
-              <p style={{ color: 'var(--color-sage-200)', fontSize: '0.88rem', margin: 0, maxWidth: '580px', lineHeight: '1.5' }}>
+              <p style={{ fontFamily: 'var(--font-body)', color: 'var(--color-sage-200)', fontSize: '0.88rem', margin: 0, maxWidth: '580px', lineHeight: '1.55' }}>
                 Switch between photorealistic agricultural image and video, adjust mobile/desktop positioning, preview on devices, and customize headline text without writing code.
               </p>
             </div>
@@ -105,7 +105,9 @@ export const AdminSettingsPage: React.FC = () => {
               style={{ 
                 backgroundColor: 'var(--color-action-green)', 
                 color: '#061E11', 
-                fontWeight: 800, 
+                fontFamily: 'var(--font-heading)',
+                fontWeight: 600, 
+                letterSpacing: '0.015em',
                 padding: '12px 22px', 
                 borderRadius: 'var(--radius-pill)',
                 display: 'inline-flex',

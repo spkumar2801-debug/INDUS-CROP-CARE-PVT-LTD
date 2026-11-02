@@ -787,7 +787,7 @@ export const AdminGalleryPage: React.FC = () => {
                           {/* Order & Client Lock Badge */}
                           <td>
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-                              <span style={{ fontWeight: 800, fontSize: '0.95rem', color: '#111827' }}>
+                              <span style={{ fontFamily: 'var(--font-heading)', fontWeight: 700, fontSize: '0.95rem', color: '#111827' }}>
                                 #{item.sortOrder || fullIndex + 1}
                               </span>
                               {isClientTop3 && (
@@ -1533,7 +1533,7 @@ export const AdminGalleryPage: React.FC = () => {
                       return (
                         <tr key={item.id} style={{ backgroundColor: isClientTop3 ? 'rgba(254, 243, 199, 0.3)' : undefined }}>
                           <td>
-                            <div style={{ fontWeight: 800, fontSize: '0.9rem', color: '#111827' }}>
+                            <div style={{ fontFamily: 'var(--font-heading)', fontWeight: 700, fontSize: '0.9rem', color: '#111827' }}>
                               #{idx + 1}
                             </div>
                             {isClientTop3 && (
