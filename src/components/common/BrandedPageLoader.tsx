@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 /**
  * Premium Cinematic Logo Intro — Indus Crop Care Pvt. Ltd.
@@ -7,12 +8,13 @@ import React, { useEffect, useState, useRef } from 'react';
  * - 0.5s – 1.4s: Authentic Indus logo reveals with smooth scale (0.88 -> 1.0) and opacity
  * - 1.4s – 2.3s: Soft golden light sweep across logo + elegant company title and Telugu motto reveal
  * - 2.3s – 3.6s: Full majestic brand mark and motto display in steady clarity
- * - 3.6s – 4.45s: Complete luxury exit transition (smooth dissolve, gentle stage scale & blur)
+ * - 3.6s – 4.25s: Complete luxury exit transition (smooth dissolve, gentle stage scale & blur)
  * - Plays once per user session (sessionStorage)
  * - Click anywhere or press any key to gracefully trigger exit transition immediately
  * - Automatically bypassed when prefers-reduced-motion is detected
  */
 export const BrandedPageLoader: React.FC = () => {
+  const navigate = useNavigate();
   const [showIntro, setShowIntro] = useState(() => {
     try {
       if (typeof window !== 'undefined') {
@@ -30,9 +32,14 @@ export const BrandedPageLoader: React.FC = () => {
 
   const [isFadingOut, setIsFadingOut] = useState(false);
   const skipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isTransitioningRef = useRef(false);
+  const hasNotifiedRef = useRef(false);
+  const pendingNavigationRef = useRef<string | null>(null);
 
   // Safely notify the application and hero section that intro has finished
   const notifyComplete = () => {
+    if (hasNotifiedRef.current) return;
+    hasNotifiedRef.current = true;
     try {
       sessionStorage.setItem('indus_intro_played', 'true');
     } catch {}
@@ -45,16 +52,28 @@ export const BrandedPageLoader: React.FC = () => {
     }
   };
 
-  // Skip handler gracefully triggers the exit transition
-  const handleSkip = () => {
-    if (!showIntro || isFadingOut) return;
+  // Predictable, smooth exit transition (handles auto-timer, click, keydown, and nav requests)
+  const startGracefulExit = (targetPath?: string) => {
+    if (!showIntro || isTransitioningRef.current) return;
+    isTransitioningRef.current = true;
+
+    if (targetPath) {
+      pendingNavigationRef.current = targetPath;
+    }
+
     setIsFadingOut(true);
+    notifyComplete();
+
     if (skipTimerRef.current) clearTimeout(skipTimerRef.current);
     skipTimerRef.current = setTimeout(() => {
       setShowIntro(false);
       setIsFadingOut(false);
-      notifyComplete();
-    }, 450);
+      if (pendingNavigationRef.current) {
+        const dest = pendingNavigationRef.current;
+        pendingNavigationRef.current = null;
+        navigate(dest);
+      }
+    }, 650);
   };
 
   // Complete Animation Lifecycle Synchronization
@@ -70,24 +89,30 @@ export const BrandedPageLoader: React.FC = () => {
 
     // Begin the exit transition after the logo, text, and brand display have completed (3.6s)
     const exitTriggerTimer = setTimeout(() => {
-      setIsFadingOut(true);
+      startGracefulExit();
     }, 3600);
 
-    // Unmount ONLY after the full 850ms exit transition has finished playing (4.45s)
-    const unmountTimer = setTimeout(() => {
-      setShowIntro(false);
-      setIsFadingOut(false);
-      notifyComplete();
-    }, 4350);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' || e.key === ' ' || e.key === 'Enter') {
+        startGracefulExit();
+      }
+    };
 
-    const handleKeyDown = () => handleSkip();
+    const handleNavRequest = (e: Event) => {
+      const customEvent = e as CustomEvent<{ path: string }>;
+      if (customEvent.detail?.path) {
+        startGracefulExit(customEvent.detail.path);
+      }
+    };
+
     window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('indus:navigate-request', handleNavRequest);
 
     return () => {
       clearTimeout(exitTriggerTimer);
-      clearTimeout(unmountTimer);
       if (skipTimerRef.current) clearTimeout(skipTimerRef.current);
       window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('indus:navigate-request', handleNavRequest);
     };
   }, [showIntro]);
 
@@ -96,7 +121,11 @@ export const BrandedPageLoader: React.FC = () => {
   return (
     <div 
       className={`cinematic-intro-overlay ${isFadingOut ? 'is-fading-out' : ''}`}
-      onClick={handleSkip}
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        startGracefulExit();
+      }}
       title="Click anywhere to continue"
       role="dialog"
       aria-label="Welcome to Indus Crop Care"

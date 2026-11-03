@@ -53,7 +53,7 @@ export function useScrollReveal() {
     const t1 = setTimeout(observeTargets, 150);
     const t2 = setTimeout(observeTargets, 600);
 
-    // Watch for newly mounted DOM elements with rAF debouncing to prevent thrashing
+    // Watch for newly mounted DOM elements in page content with rAF debouncing to prevent thrashing
     let mutationObserver: MutationObserver | null = null;
     let rafId: number | null = null;
     if ('MutationObserver' in window) {
@@ -64,7 +64,8 @@ export function useScrollReveal() {
           rafId = null;
         });
       });
-      mutationObserver.observe(document.body, {
+      const targetContainer = document.querySelector('main') || document.body;
+      mutationObserver.observe(targetContainer, {
         childList: true,
         subtree: true
       });

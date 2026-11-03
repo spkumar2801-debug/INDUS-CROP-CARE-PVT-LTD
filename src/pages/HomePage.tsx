@@ -31,6 +31,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [videoPlaybackError, setVideoPlaybackError] = useState(false);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const { settings } = useSiteSettings();
 
@@ -47,40 +48,25 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
     return false;
   });
 
-  // Track when hero is actively revealing immediately following intro completion
-  const [isIntroRevealing, setIsIntroRevealing] = useState(false);
-
   useEffect(() => {
     if (heroReady) return;
 
     const onIntroComplete = () => {
-      setIsIntroRevealing(true);
       setHeroReady(true);
     };
 
-    window.addEventListener('indus:intro-complete', onIntroComplete);
+    window.addEventListener('indus:intro-complete', onIntroComplete, { once: true });
 
     // Safety fallback: ensure hero section is never stuck
     const safetyTimer = setTimeout(() => {
-      setIsIntroRevealing(true);
       setHeroReady(true);
-    }, 4600);
+    }, 4500);
 
     return () => {
       window.removeEventListener('indus:intro-complete', onIntroComplete);
       clearTimeout(safetyTimer);
     };
   }, [heroReady]);
-
-  // Cleanly remove revealing class after animation settles
-  useEffect(() => {
-    if (isIntroRevealing) {
-      const timer = setTimeout(() => {
-        setIsIntroRevealing(false);
-      }, 700);
-      return () => clearTimeout(timer);
-    }
-  }, [isIntroRevealing]);
 
   useEffect(() => {
     document.documentElement.classList.add('page-home');
@@ -96,7 +82,21 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
         });
     };
 
-    fetchProducts();
+    if (heroReady) {
+      fetchProducts();
+    } else {
+      // Defer non-critical product fetching until after intro finishes to keep transition 60fps
+      const onComplete = () => {
+        setTimeout(fetchProducts, 350);
+      };
+      window.addEventListener('indus:intro-complete', onComplete, { once: true });
+      return () => {
+        document.documentElement.classList.remove('page-home');
+        isMounted = false;
+        window.removeEventListener('indus:intro-complete', onComplete);
+      };
+    }
+
     const unsubscribe = subscribeToProducts(fetchProducts);
 
     return () => {
@@ -104,7 +104,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
       isMounted = false;
       unsubscribe();
     };
-  }, []);
+  }, [heroReady]);
 
   // Track device viewport for independent media selection (Desktop, Tablet, Mobile)
   const [activeDevice, setActiveDevice] = useState<'desktop' | 'tablet' | 'mobile'>(() => {
@@ -181,17 +181,29 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
   const heroVideoLoop = hero?.videoLoop !== false;
   const heroVideoMuted = hero?.videoMuted !== false;
 
-  // Guarantee mobile browser autoplay (iOS Safari and Android Chrome) by setting DOM attributes directly
+  // Controlled video playback starting only after intro has finished or if user bypassed intro
   useEffect(() => {
-    if (currentMediaType === 'video' && videoRef.current) {
-      setVideoPlaybackError(false);
-      videoRef.current.defaultMuted = true;
-      videoRef.current.muted = heroVideoMuted;
-      videoRef.current.play().catch((err) => {
+    if (!heroReady || currentMediaType !== 'video' || !videoRef.current) return;
+
+    setVideoPlaybackError(false);
+    const video = videoRef.current;
+    video.defaultMuted = true;
+    video.muted = heroVideoMuted;
+
+    // Use requestAnimationFrame so the first Home frame renders smoothly before playback initiates
+    const rafId = requestAnimationFrame(() => {
+      video.play().catch((err) => {
         console.info('[Indus Hero Video] Autoplay handled by browser:', err);
       });
-    }
-  }, [currentMediaType, currentVideoUrl, heroVideoMuted]);
+    });
+
+    return () => cancelAnimationFrame(rafId);
+  }, [heroReady, currentMediaType, currentVideoUrl, heroVideoMuted]);
+
+  // Reset video playback state when video source changes
+  useEffect(() => {
+    setIsVideoPlaying(false);
+  }, [currentVideoUrl]);
 
   // Subtle cinematic hero background parallax during scroll
   useEffect(() => {
@@ -256,7 +268,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
         aria-label="Indus Crop Care Hero"
       >
         <div 
-          className={`hero-cinematic-bg ${isIntroRevealing ? "hero-bg-revealing" : ""}`} 
+          className={`hero-cinematic-bg ${heroReady ? "hero-bg-revealing" : ""}`} 
           aria-hidden="true"
           style={{
             backgroundImage: currentMediaType === 'image' 
@@ -278,14 +290,15 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
                 }
               }}
               key={currentVideoUrl}
-              className="hero-video-element"
-              autoPlay
+              className={`hero-video-element ${isVideoPlaying ? 'is-playing' : ''}`}
+              autoPlay={heroReady}
               muted={heroVideoMuted}
               loop={heroVideoLoop}
               playsInline
               preload="auto"
               poster={currentPosterUrl || undefined}
               aria-hidden="true"
+              onPlaying={() => setIsVideoPlaying(true)}
               onError={() => {
                 console.warn('[Indus Hero Video] Playback encountered an issue, showing fallback poster smoothly.');
                 setVideoPlaybackError(true);

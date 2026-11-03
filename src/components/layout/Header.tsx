@@ -43,6 +43,14 @@ export const Header: React.FC<HeaderProps> = ({ onOpenQuoteModal: _onOpenQuoteMo
     return false;
   };
 
+  const handleNavClick = (e: React.MouseEvent, targetPath: string) => {
+    if (typeof document !== 'undefined' && document.documentElement.classList.contains('intro-active')) {
+      e.preventDefault();
+      e.stopPropagation();
+      window.dispatchEvent(new CustomEvent('indus:navigate-request', { detail: { path: targetPath } }));
+    }
+  };
+
   const handleContactAction = () => {
     handleCustomerCareWhatsApp();
   };
@@ -53,7 +61,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenQuoteModal: _onOpenQuoteMo
         <div className="site-header-pill">
 
           {/* Brand Logo */}
-          <Link to="/" className="brand-logo-link" aria-label="Indus Crop Care Home">
+          <Link to="/" className="brand-logo-link" aria-label="Indus Crop Care Home" onClick={(e) => handleNavClick(e, '/')}>
             <div className="brand-logo-frame">
               <img
                 src="/images/branding/indus/indus-logo.png"
@@ -69,23 +77,23 @@ export const Header: React.FC<HeaderProps> = ({ onOpenQuoteModal: _onOpenQuoteMo
 
           {/* Desktop Navigation with Animated Indicators */}
           <nav className="nav-desktop" aria-label="Main Navigation">
-            <Link to="/" className={`nav-link ${isActive('/') ? 'active' : ''}`}>
+            <Link to="/" className={`nav-link ${isActive('/') ? 'active' : ''}`} onClick={(e) => handleNavClick(e, '/')}>
               <span>Home</span>
               {isActive('/') && <span className="nav-link-indicator" />}
             </Link>
-            <Link to="/about" className={`nav-link ${isActive('/about') ? 'active' : ''}`}>
+            <Link to="/about" className={`nav-link ${isActive('/about') ? 'active' : ''}`} onClick={(e) => handleNavClick(e, '/about')}>
               <span>About Us</span>
               {isActive('/about') && <span className="nav-link-indicator" />}
             </Link>
-            <Link to="/products" className={`nav-link ${isActive('/products') ? 'active' : ''}`}>
+            <Link to="/products" className={`nav-link ${isActive('/products') ? 'active' : ''}`} onClick={(e) => handleNavClick(e, '/products')}>
               <span>Products</span>
               {isActive('/products') && <span className="nav-link-indicator" />}
             </Link>
-            <Link to="/gallery" className={`nav-link ${isActive('/gallery') ? 'active' : ''}`}>
+            <Link to="/gallery" className={`nav-link ${isActive('/gallery') ? 'active' : ''}`} onClick={(e) => handleNavClick(e, '/gallery')}>
               <span>Gallery</span>
               {isActive('/gallery') && <span className="nav-link-indicator" />}
             </Link>
-            <Link to="/contact" className={`nav-link ${isActive('/contact') ? 'active' : ''}`}>
+            <Link to="/contact" className={`nav-link ${isActive('/contact') ? 'active' : ''}`} onClick={(e) => handleNavClick(e, '/contact')}>
               <span>Contact</span>
               {isActive('/contact') && <span className="nav-link-indicator" />}
             </Link>

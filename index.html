@@ -8,6 +8,23 @@
     <meta name="description" content="Official website of Indus Crop Care Pvt. Ltd. Renowned agri-input company with over 15 years of leadership in Organic Fertilizers, Water-Soluble Fertilizers, Plant Micronutrients, Biofertilizers, Crop Protection Chemicals, Biopesticides, and Biostimulants." />
     <meta name="keywords" content="Indus Crop Care, Indus Crop Care Pvt Ltd, Agricultural Inputs, Crop Protection, Biofertilizers, Organic Fertilizers, Water Soluble Fertilizers, Micronutrients, Biostimulants, Insecticides, Herbicides, Fungicides, Telangana, India Agriculture" />
     <meta name="theme-color" content="#0E6B38" />
+    <script>
+      (function() {
+        try {
+          if (!sessionStorage.getItem('indus_intro_played') && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            document.documentElement.classList.add('intro-active');
+          }
+        } catch (e) {}
+      })();
+    </script>
+    <style>
+      html.intro-active,
+      html.intro-active body {
+        background-color: #03140A !important;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
