@@ -36,6 +36,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
   const { settings } = useSiteSettings();
 
   // Coordinate Home hero reveal with intro lifecycle so hero content never shows prematurely
+  // Distinguish fresh intro-to-hero transition from direct load/refresh for instant refresh stability
+  const [isIntroTransition, setIsIntroTransition] = useState(false);
   const [heroReady, setHeroReady] = useState(() => {
     try {
       if (typeof window !== 'undefined') {
@@ -52,6 +54,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
     if (heroReady) return;
 
     const onIntroComplete = () => {
+      setIsIntroTransition(true);
       setHeroReady(true);
     };
 
@@ -59,6 +62,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
 
     // Safety fallback: ensure hero section is never stuck
     const safetyTimer = setTimeout(() => {
+      setIsIntroTransition(true);
       setHeroReady(true);
     }, 4500);
 
@@ -106,12 +110,11 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
     };
   }, [heroReady]);
 
-  // Track device viewport for independent media selection (Desktop, Tablet, Mobile)
+  // Track device viewport synchronously with matchMedia for immediate, flicker-free media selection
   const [activeDevice, setActiveDevice] = useState<'desktop' | 'tablet' | 'mobile'>(() => {
     if (typeof window !== 'undefined') {
-      const w = window.innerWidth;
-      if (w <= 640) return 'mobile';
-      if (w <= 1024) return 'tablet';
+      if (window.matchMedia('(max-width: 768px)').matches) return 'mobile';
+      if (window.matchMedia('(max-width: 1024px)').matches) return 'tablet';
       return 'desktop';
     }
     return 'desktop';
@@ -119,35 +122,56 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const handleResize = () => {
-      const w = window.innerWidth;
-      const nextDevice = w <= 640 ? 'mobile' : w <= 1024 ? 'tablet' : 'desktop';
-      setActiveDevice(prev => prev !== nextDevice ? nextDevice : prev);
+
+    const mqlMobile = window.matchMedia('(max-width: 768px)');
+    const mqlTablet = window.matchMedia('(min-width: 769px) and (max-width: 1024px)');
+
+    const updateDevice = () => {
+      const nextDevice: 'desktop' | 'tablet' | 'mobile' = mqlMobile.matches
+        ? 'mobile'
+        : mqlTablet.matches
+        ? 'tablet'
+        : 'desktop';
+      setActiveDevice(prev => (prev !== nextDevice ? nextDevice : prev));
     };
 
-    window.addEventListener('resize', handleResize, { passive: true });
-    return () => window.removeEventListener('resize', handleResize);
+    mqlMobile.addEventListener('change', updateDevice);
+    mqlTablet.addEventListener('change', updateDevice);
+    window.addEventListener('orientationchange', updateDevice);
+    window.addEventListener('resize', updateDevice, { passive: true });
+
+    return () => {
+      mqlMobile.removeEventListener('change', updateDevice);
+      mqlTablet.removeEventListener('change', updateDevice);
+      window.removeEventListener('orientationchange', updateDevice);
+      window.removeEventListener('resize', updateDevice);
+    };
   }, []);
 
   const hero = settings?.hero;
+
+  const fallbackDesktopVideo = 'https://res.cloudinary.com/qnkatbvo/video/upload/v1793688544/indas_agri/hero/vub9lmxpnskplpbsz8jh.mp4';
+  const fallbackDesktopPoster = 'https://res.cloudinary.com/qnkatbvo/video/upload/v1793688544/indas_agri/hero/vub9lmxpnskplpbsz8jh.jpg';
+  const fallbackMobileVideo = 'https://res.cloudinary.com/qnkatbvo/video/upload/v1793620123/indas_agri/hero/vvhvlf0bumszeurp2os3.mp4';
+  const fallbackMobilePoster = 'https://res.cloudinary.com/qnkatbvo/video/upload/v1793620123/indas_agri/hero/vvhvlf0bumszeurp2os3.jpg';
 
   // Desktop Media (always preserved and independent)
   const desktopMediaType = hero?.mediaType === 'video' ? 'video' : 'image';
   const desktopImageUrl = (hero?.imageUrl && !hero.imageUrl.startsWith('blob:')) 
     ? hero.imageUrl 
-    : '/assets/indus-crop-hero.webp';
+    : fallbackDesktopPoster;
   const desktopVideoUrl = (hero?.videoUrl && !hero.videoUrl.startsWith('blob:')) 
     ? hero.videoUrl 
-    : '/videos/hero-cinematic.mp4';
+    : fallbackDesktopVideo;
   const autoDerivedDesktopPoster = (desktopVideoUrl && !desktopVideoUrl.startsWith('blob:'))
     ? desktopVideoUrl.replace(/\.(mp4|webm)$/i, '.jpg')
     : '';
   const rawPosterUrl = hero?.videoPosterUrl || '';
   const desktopVideoPoster = (rawPosterUrl && !rawPosterUrl.startsWith('blob:') && !rawPosterUrl.includes('indus-crop-hero.webp')) 
     ? rawPosterUrl 
-    : (autoDerivedDesktopPoster || desktopImageUrl);
+    : (autoDerivedDesktopPoster || desktopImageUrl || fallbackDesktopPoster);
 
-  // Dedicated Mobile Media (with automatic fallback to Desktop)
+  // Dedicated Mobile Media (strictly isolated to mobile media - mobile devices never fall back to desktop video)
   const hasConfiguredMobileMedia = Boolean(
     hero?.mobileMediaUrl && 
     !hero.mobileMediaUrl.startsWith('blob:') && 
@@ -156,24 +180,30 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
 
   const mobileMediaType = hasConfiguredMobileMedia
     ? (hero?.mobileMediaType || (/\.(mp4|webm)$/i.test(hero!.mobileMediaUrl!) ? 'video' : 'image'))
-    : desktopMediaType;
+    : (hero?.mobileMediaActive === false ? desktopMediaType : 'video');
 
   const mobileMediaUrl = hasConfiguredMobileMedia
     ? hero!.mobileMediaUrl!
-    : (desktopMediaType === 'video' ? desktopVideoUrl : desktopImageUrl);
+    : (hero?.mobileMediaActive === false 
+        ? (desktopMediaType === 'video' ? desktopVideoUrl : desktopImageUrl)
+        : fallbackMobileVideo);
 
-  const mobileVideoPoster = hasConfiguredMobileMedia
-    ? (hero?.mobileVideoPosterUrl || (mobileMediaType === 'video' ? mobileMediaUrl.replace(/\.(mp4|webm)$/i, '.jpg') : mobileMediaUrl))
-    : desktopVideoPoster;
+  const rawMobilePosterUrl = hero?.mobileVideoPosterUrl || '';
+  const mobileVideoPoster = (rawMobilePosterUrl && !rawMobilePosterUrl.startsWith('blob:'))
+    ? rawMobilePosterUrl
+    : (hasConfiguredMobileMedia && mobileMediaType === 'video'
+        ? mobileMediaUrl.replace(/\.(mp4|webm)$/i, '.jpg')
+        : (hero?.mobileMediaActive === false ? desktopVideoPoster : fallbackMobilePoster));
 
   // Active media for current viewport:
   // Desktop (>1024px): Desktop media
-  // Tablet (641px - 1024px): Desktop media (16:9 cinematic widescreen)
-  // Mobile (<=640px): Dedicated mobile media if configured, otherwise fallback to Desktop media
-  const currentMediaType = activeDevice === 'mobile' ? mobileMediaType : desktopMediaType;
-  const currentVideoUrl = activeDevice === 'mobile' ? (mobileMediaType === 'video' ? mobileMediaUrl : '') : desktopVideoUrl;
-  const currentImageUrl = activeDevice === 'mobile' ? (mobileMediaType === 'image' ? mobileMediaUrl : desktopImageUrl) : desktopImageUrl;
-  const currentPosterUrl = activeDevice === 'mobile' ? mobileVideoPoster : desktopVideoPoster;
+  // Tablet (769px - 1024px): Desktop media (16:9 cinematic widescreen)
+  // Mobile (<=768px): Dedicated mobile media
+  const isMobile = activeDevice === 'mobile';
+  const currentMediaType = isMobile ? mobileMediaType : desktopMediaType;
+  const currentVideoUrl = isMobile ? (mobileMediaType === 'video' ? mobileMediaUrl : '') : desktopVideoUrl;
+  const currentImageUrl = isMobile ? (mobileMediaType === 'image' ? mobileMediaUrl : desktopImageUrl) : desktopImageUrl;
+  const currentPosterUrl = isMobile ? mobileVideoPoster : desktopVideoPoster;
 
   const heroPositionDesktop = hero?.imagePositionDesktop || 'center 36%';
   const heroPositionMobile = hero?.imagePositionMobile || 'center center';
@@ -181,7 +211,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
   const heroVideoLoop = hero?.videoLoop !== false;
   const heroVideoMuted = hero?.videoMuted !== false;
 
-  // Controlled video playback starting only after intro has finished or if user bypassed intro
+  // Controlled video playback starting automatically from 00:00 when hero is ready
   useEffect(() => {
     if (!heroReady || currentMediaType !== 'video' || !videoRef.current) return;
 
@@ -190,14 +220,56 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
     video.defaultMuted = true;
     video.muted = heroVideoMuted;
 
-    // Use requestAnimationFrame so the first Home frame renders smoothly before playback initiates
-    const rafId = requestAnimationFrame(() => {
-      video.play().catch((err) => {
-        console.info('[Indus Hero Video] Autoplay handled by browser:', err);
-      });
-    });
+    // Reset playback to beginning (00:00) when transitioning from intro
+    try {
+      if (video.currentTime !== 0) {
+        video.currentTime = 0;
+      }
+    } catch {}
 
-    return () => cancelAnimationFrame(rafId);
+    let isCancelled = false;
+
+    const startPlayback = () => {
+      if (isCancelled || !videoRef.current) return;
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            if (!isCancelled) {
+              setIsVideoPlaying(true);
+            }
+          })
+          .catch((err) => {
+            console.info('[Indus Hero Video] Autoplay handled by browser:', err);
+            if (!isCancelled && video.paused) {
+              const onCanPlay = () => {
+                video.removeEventListener('canplay', onCanPlay);
+                if (!isCancelled) {
+                  video.play().then(() => setIsVideoPlaying(true)).catch(() => {});
+                }
+              };
+              video.addEventListener('canplay', onCanPlay, { once: true });
+            }
+          });
+      }
+    };
+
+    if (video.readyState >= 2) {
+      startPlayback();
+    } else {
+      const onReady = () => {
+        video.removeEventListener('canplay', onReady);
+        video.removeEventListener('loadeddata', onReady);
+        startPlayback();
+      };
+      video.addEventListener('canplay', onReady, { once: true });
+      video.addEventListener('loadeddata', onReady, { once: true });
+      startPlayback();
+    }
+
+    return () => {
+      isCancelled = true;
+    };
   }, [heroReady, currentMediaType, currentVideoUrl, heroVideoMuted]);
 
   // Reset video playback state when video source changes
@@ -268,7 +340,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
         aria-label="Indus Crop Care Hero"
       >
         <div 
-          className={`hero-cinematic-bg ${heroReady ? "hero-bg-revealing" : ""}`} 
+          className={`hero-cinematic-bg ${isIntroTransition ? "hero-bg-revealing" : ""}`} 
           aria-hidden="true"
           style={{
             backgroundImage: currentMediaType === 'image' 
@@ -287,10 +359,14 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
                 if (node) {
                   node.defaultMuted = true;
                   node.muted = heroVideoMuted;
+                  if (heroReady && node.paused) {
+                    node.play().catch(() => {});
+                  }
                 }
               }}
-              key={currentVideoUrl}
-              className={`hero-video-element ${isVideoPlaying ? 'is-playing' : ''}`}
+              key={isMobile ? 'mobile-hero-video' : 'desktop-hero-video'}
+              src={currentVideoUrl}
+              className={`hero-video-element ${isMobile ? 'hero-video-mobile' : 'hero-video-desktop'} ${isVideoPlaying ? 'is-playing' : ''}`}
               autoPlay={heroReady}
               muted={heroVideoMuted}
               loop={heroVideoLoop}
@@ -298,6 +374,12 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
               preload="auto"
               poster={currentPosterUrl || undefined}
               aria-hidden="true"
+              onLoadedData={() => {
+                if (heroReady) setIsVideoPlaying(true);
+              }}
+              onCanPlay={() => {
+                if (heroReady) setIsVideoPlaying(true);
+              }}
               onPlaying={() => setIsVideoPlaying(true)}
               onError={() => {
                 console.warn('[Indus Hero Video] Playback encountered an issue, showing fallback poster smoothly.');

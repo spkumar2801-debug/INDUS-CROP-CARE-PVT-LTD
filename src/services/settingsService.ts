@@ -5,7 +5,7 @@ import { INITIAL_SETTINGS } from '../data/initialProducts';
 
 const SETTINGS_COLLECTION = 'siteSettings';
 const SETTINGS_DOC_ID = 'general';
-const LOCAL_STORAGE_KEY = 'indus_settings_cache_v3';
+const LOCAL_STORAGE_KEY = 'indus_settings_cache_v4';
 
 /**
  * Sanitizes hero media settings to ensure that browser-session-local blob: URLs
@@ -44,16 +44,16 @@ export function sanitizeHeroSettings(hero?: Partial<HeroSettings>): HeroSettings
     merged.videoPosterUrl = merged.imageUrl || base.videoPosterUrl;
   }
 
-  // Sanitize mobile media URLs
-  if (merged.mobileMediaUrl && merged.mobileMediaUrl.startsWith('blob:')) {
-    merged.mobileMediaUrl = '';
-    merged.mobileMediaActive = false;
+  // Ensure canonical production fallback if mobile media is missing in cached settings
+  if (!merged.mobileMediaUrl || merged.mobileMediaUrl.startsWith('blob:')) {
+    merged.mobileMediaUrl = base.mobileMediaUrl || 'https://res.cloudinary.com/qnkatbvo/video/upload/v1793620123/indas_agri/hero/vvhvlf0bumszeurp2os3.mp4';
+    merged.mobileMediaActive = true;
   }
-  if (merged.mobileVideoPosterUrl && merged.mobileVideoPosterUrl.startsWith('blob:')) {
-    merged.mobileVideoPosterUrl = '';
+  if (!merged.mobileVideoPosterUrl || merged.mobileVideoPosterUrl.startsWith('blob:')) {
+    merged.mobileVideoPosterUrl = base.mobileVideoPosterUrl || 'https://res.cloudinary.com/qnkatbvo/video/upload/v1793620123/indas_agri/hero/vvhvlf0bumszeurp2os3.jpg';
   }
   if (merged.mobileMediaType && merged.mobileMediaType !== 'video' && merged.mobileMediaType !== 'image') {
-    merged.mobileMediaType = undefined;
+    merged.mobileMediaType = 'video';
   }
 
   // Ensure mediaType is strictly 'image' or 'video'
@@ -73,7 +73,10 @@ export function getLocalSettings(): SiteSettings {
       return {
         ...INITIAL_SETTINGS,
         ...parsed,
-        hero: sanitizeHeroSettings(parsed.hero),
+        hero: sanitizeHeroSettings({
+          ...INITIAL_SETTINGS.hero,
+          ...(parsed.hero || {})
+        }),
         customerCareWhatsAppNumber: unified,
         whatsappNumber: unified
       };

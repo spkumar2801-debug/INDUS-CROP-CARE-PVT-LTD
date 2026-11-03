@@ -164,8 +164,7 @@ html.intro-active .site-header-wrapper {
   transform: translateZ(0);
   backface-visibility: hidden;
   will-change: transform, opacity;
-  opacity: 0;
-  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 1;
 }
 
 .hero-video-element.is-playing {
@@ -181,6 +180,22 @@ html.intro-active .hero-video-element {
 @media (max-width: 768px) {
   .hero-video-element {
     object-position: center center;
+  }
+
+  .hero-video-desktop {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .hero-video-mobile {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
   }
 }
 
