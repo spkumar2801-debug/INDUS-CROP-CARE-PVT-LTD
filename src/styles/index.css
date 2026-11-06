@@ -474,11 +474,11 @@ button {
 .card.reveal-on-scroll,
 .credential-item.reveal-on-scroll,
 .crop-system-artwork-col.reveal-on-scroll {
-  transition: opacity 0.72s cubic-bezier(0.16, 1, 0.3, 1), 
-              transform 0.72s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.32s cubic-bezier(0.16, 1, 0.3, 1),
-              border-color 0.28s ease,
-              background-color 0.28s ease;
+  transition: opacity 0.72s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.72s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.28s ease,
+    background-color 0.28s ease;
 }
 
 .card.reveal-on-scroll:not(.is-revealed),
@@ -522,6 +522,23 @@ button {
 .credential-item.reveal-on-scroll.is-revealed:active {
   transform: translateY(-1px) scale(0.992);
   transition-duration: 0.12s;
+}
+
+/* Staggered entrance cascade for Company Credentials Highlight Cards (Card 1 -> 2 -> 3 -> 4) */
+.credentials-grid .credential-item.reveal-on-scroll.stagger-1 {
+  transition-delay: 0.05s;
+}
+
+.credentials-grid .credential-item.reveal-on-scroll.stagger-2 {
+  transition-delay: 0.22s;
+}
+
+.credentials-grid .credential-item.reveal-on-scroll.stagger-3 {
+  transition-delay: 0.39s;
+}
+
+.credentials-grid .credential-item.reveal-on-scroll.stagger-4 {
+  transition-delay: 0.56s;
 }
 
 .stagger-1 {
@@ -581,6 +598,7 @@ button {
     opacity: 0;
     transform: translateY(16px) scale(0.994);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -650,6 +668,7 @@ button {
     transform: translate(-50%, -50%) scale(0.92);
     opacity: 0.65;
   }
+
   100% {
     transform: translate(-50%, -50%) scale(1.08);
     opacity: 1;
@@ -666,9 +685,9 @@ button {
   text-align: center;
   max-width: 520px;
   width: 100%;
-  transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1), 
-              opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1), 
-              filter 0.85s ease;
+  transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 0.85s ease;
   will-change: transform, opacity, filter;
 }
 
@@ -698,6 +717,7 @@ button {
     opacity: 0;
     transform: translate(-50%, -50%) scale(0.6);
   }
+
   100% {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
@@ -710,9 +730,9 @@ button {
   background: #FFFFFF;
   padding: 16px 36px;
   border-radius: 18px;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.55), 
-              0 0 32px rgba(37, 211, 102, 0.22),
-              0 0 0 1.5px rgba(253, 224, 71, 0.4);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.55),
+    0 0 32px rgba(37, 211, 102, 0.22),
+    0 0 0 1.5px rgba(253, 224, 71, 0.4);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -727,6 +747,7 @@ button {
     transform: scale(0.85) translateY(14px);
     filter: blur(4px);
   }
+
   100% {
     opacity: 1;
     transform: scale(1) translateY(0);
@@ -749,14 +770,12 @@ button {
   left: -120%;
   width: 70%;
   height: 100%;
-  background: linear-gradient(
-    105deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.2) 30%,
-    rgba(255, 255, 255, 0.75) 50%,
-    rgba(253, 224, 71, 0.55) 65%,
-    transparent 85%
-  );
+  background: linear-gradient(105deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.2) 30%,
+      rgba(255, 255, 255, 0.75) 50%,
+      rgba(253, 224, 71, 0.55) 65%,
+      transparent 85%);
   transform: skewX(-22deg);
   animation: introLightSweep 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 1.80s both;
   pointer-events: none;
@@ -767,9 +786,11 @@ button {
     left: -120%;
     opacity: 0;
   }
+
   20% {
     opacity: 1;
   }
+
   100% {
     left: 220%;
     opacity: 0;
@@ -791,6 +812,7 @@ button {
     opacity: 0;
     transform: translateY(12px);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0);
@@ -844,6 +866,7 @@ button {
   0% {
     opacity: 0;
   }
+
   100% {
     opacity: 1;
   }
@@ -1356,9 +1379,9 @@ div[id] {
   opacity: 0;
   transform: translateY(28px) scale(0.90);
   transition: opacity 0.72s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.72s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.35s ease,
-              border-color 0.35s ease;
+    transform 0.72s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.35s ease,
+    border-color 0.35s ease;
   will-change: opacity, transform;
 }
 
@@ -1386,11 +1409,13 @@ div[id] {
 }
 
 @media (max-width: 640px) {
+
   .gallery-card-reveal.stagger-1,
   .gallery-card-reveal.stagger-2,
   .gallery-card-reveal.stagger-3 {
     transition-delay: 0.04s;
   }
+
   .gallery-card.gallery-card-reveal.is-revealed:hover {
     transform: translateY(-4px) scale(1.01);
   }
@@ -1449,6 +1474,53 @@ div[id] {
   display: inline-flex;
   align-items: center;
   gap: 5px;
+}
+
+.gallery-video-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: rgba(6, 26, 15, 0.9);
+  color: #FBBF24;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.gallery-card-play-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(6, 95, 70, 0.92);
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  transition: transform 0.28s var(--ease-out-expo), background-color 0.2s ease;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.gallery-card:hover .gallery-card-play-btn {
+  transform: translate(-50%, -50%) scale(1.15);
+  background: rgba(16, 185, 129, 0.95);
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.45);
 }
 
 .gallery-hover-indicator {
@@ -1537,6 +1609,7 @@ div[id] {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -1563,6 +1636,7 @@ div[id] {
     opacity: 0;
     transform: scale(0.94) translateY(12px);
   }
+
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
@@ -1619,6 +1693,17 @@ div[id] {
   border-radius: 6px;
   filter: drop-shadow(0 12px 30px rgba(0, 0, 0, 0.55));
   transition: transform 0.25s ease;
+}
+
+.gallery-lightbox-video {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  border-radius: 8px;
+  outline: none;
+  background-color: #000000;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.65);
 }
 
 .gallery-lightbox-nav-btn {
@@ -1684,6 +1769,21 @@ div[id] {
   border: 1px solid rgba(74, 222, 128, 0.25);
 }
 
+.gallery-lightbox-video-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #FCD34D;
+  background: rgba(245, 158, 11, 0.18);
+  padding: 4px 12px;
+  border-radius: 9999px;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  margin-left: 8px;
+}
+
 .gallery-lightbox-counter {
   font-size: 0.82rem;
   color: rgba(255, 255, 255, 0.6);
@@ -1722,16 +1822,20 @@ div[id] {
     height: 48vh;
     padding: 8px;
   }
+
   .gallery-lightbox-nav-btn {
     width: 36px;
     height: 36px;
   }
+
   .gallery-lightbox-nav-btn.prev {
     left: 8px;
   }
+
   .gallery-lightbox-nav-btn.next {
     right: 8px;
   }
+
   .gallery-lightbox-info {
     padding: 14px 16px 18px;
   }

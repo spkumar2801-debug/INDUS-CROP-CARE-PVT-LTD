@@ -5,6 +5,7 @@ import {
   getDoc,
   setDoc,
   deleteDoc,
+  deleteField,
   query,
   where,
   serverTimestamp,
@@ -16,8 +17,157 @@ import { Product } from '../types/product';
 import { INITIAL_PRODUCTS } from '../data/initialProducts';
 
 const PRODUCTS_COLLECTION = 'products';
-const LOCAL_STORAGE_KEY = 'indus_products_cache_v13';
+const LOCAL_STORAGE_KEY = 'indus_products_cache_v14';
 const DELETED_PRODUCTS_KEY = 'indus_deleted_products_v2';
+const PRODUCT_CUSTOM_CATEGORIES_KEY = 'indus_product_custom_categories_v1';
+
+export const IMPORTANT_PRODUCT_CATEGORIES: string[] = [
+  'Insecticides',
+  'Herbicides',
+  'Fungicides',
+  'Plant Growth Regulator (PGR)',
+  'Organic Fertilizers',
+  'Water-Soluble Fertilizers',
+  'Biofertilizers',
+  'Bio Stimulants',
+  'Micronutrients / Nutrients',
+  'Micronutrients Combo',
+  'Antibiotic Products',
+  'Seeds'
+];
+
+export function getCustomProductCategories(): string[] {
+  try {
+    if (typeof window !== 'undefined') {
+      const raw = localStorage.getItem(PRODUCT_CUSTOM_CATEGORIES_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          return parsed.filter(c =>
+            typeof c === 'string' &&
+            c.trim() &&
+            !IMPORTANT_PRODUCT_CATEGORIES.some(cat => cat.toLowerCase() === c.trim().toLowerCase()) &&
+            c.trim().toLowerCase() !== 'others' &&
+            c.trim().toLowerCase() !== 'other'
+          );
+        }
+      }
+    }
+  } catch (e) {
+    console.error('Error reading custom product categories:', e);
+  }
+  return [];
+}
+
+export function saveCustomProductCategory(newCategory: string): string[] {
+  const trimmed = newCategory.trim();
+  if (!trimmed) return getCustomProductCategories();
+
+  const current = getCustomProductCategories();
+  const allExisting = [...IMPORTANT_PRODUCT_CATEGORIES, 'Others', 'Other', ...current];
+  const alreadyExists = allExisting.some(c => c.toLowerCase() === trimmed.toLowerCase());
+
+  if (!alreadyExists) {
+    const updated = [...current, trimmed];
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(PRODUCT_CUSTOM_CATEGORIES_KEY, JSON.stringify(updated));
+        window.dispatchEvent(new CustomEvent('indus:product-categories-updated'));
+      }
+    } catch (e) {
+      console.error('Error saving custom product category locally:', e);
+    }
+
+    // Synchronize to Firestore remote settings
+    if (isFirebaseConfigured && db) {
+      try {
+        const catDocRef = doc(db, 'siteSettings', 'productCategories');
+        setDoc(catDocRef, {
+          customCategories: updated,
+          updatedAt: serverTimestamp()
+        }, { merge: true }).catch(() => { });
+      } catch { }
+    }
+
+    return updated;
+  }
+  return current;
+}
+
+/**
+ * Permanently deletes a custom product category:
+ * 1. Removes category from local storage and remote Firestore settings.
+ * 2. Migrates any products currently in this category to 'Others'.
+ * 3. Broadcasts category and product updates across the app.
+ */
+export async function deleteCustomProductCategory(categoryToDelete: string): Promise<void> {
+  const trimmed = categoryToDelete.trim();
+  if (!trimmed) return;
+
+  // 1. Remove from custom categories list
+  const current = getCustomProductCategories();
+  const updated = current.filter(c => c.toLowerCase() !== trimmed.toLowerCase());
+  try {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(PRODUCT_CUSTOM_CATEGORIES_KEY, JSON.stringify(updated));
+    }
+  } catch (e) {
+    console.error('Error deleting custom product category locally:', e);
+  }
+
+  // 2. Re-assign any products belonging to this category to 'Others'
+  try {
+    const local = getLocalProducts();
+    let hasModifiedProducts = false;
+    for (const p of local) {
+      if (p.category && p.category.trim().toLowerCase() === trimmed.toLowerCase()) {
+        p.category = 'Others';
+        p.updatedAt = new Date().toISOString();
+        hasModifiedProducts = true;
+        if (isFirebaseConfigured && db) {
+          try {
+            const docRef = doc(db, PRODUCTS_COLLECTION, p.id);
+            setDoc(docRef, { category: 'Others', updatedAt: serverTimestamp() }, { merge: true }).catch(() => { });
+          } catch (err: any) {
+            console.warn('[productService] Firestore category migration note:', err?.message || err);
+          }
+        }
+      }
+    }
+    if (hasModifiedProducts) {
+      saveLocalProducts(local);
+      notifyProductsUpdated();
+    }
+  } catch (e) {
+    console.error('Error migrating products on category deletion:', e);
+  }
+
+  // 3. Update Firestore siteSettings document
+  if (isFirebaseConfigured && db) {
+    try {
+      const catDocRef = doc(db, 'siteSettings', 'productCategories');
+      await setDoc(catDocRef, {
+        customCategories: updated,
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+    } catch (err: any) {
+      console.warn('[productService] Firestore category deletion note:', err?.message || err);
+    }
+  }
+
+  // 4. Broadcast live events
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('indus:product-categories-updated'));
+  }
+}
+
+/**
+ * Returns the unified active list of all product categories:
+ * 12 core categories + active custom categories + 'Others'
+ */
+export function getAllProductCategories(): string[] {
+  return [...IMPORTANT_PRODUCT_CATEGORIES, ...getCustomProductCategories(), 'Others'];
+}
 
 // In-memory event bus for live website reactivity without full page reload
 type ProductsListener = () => void;
@@ -157,6 +307,19 @@ function getLocalProducts(): Product[] {
       if (Array.isArray(parsed)) {
         return deduplicateProducts(parsed.filter(p => !deletedIds.has(p.id)));
       }
+    } else {
+      // Migrate previous cache so any products created by admin in v13 are preserved
+      const prevRaw = localStorage.getItem('indus_products_cache_v13');
+      if (prevRaw) {
+        const prevParsed = JSON.parse(prevRaw);
+        if (Array.isArray(prevParsed)) {
+          const initialIds = new Set(INITIAL_PRODUCTS.map(p => p.id));
+          const customAdminProds = prevParsed.filter(p => !initialIds.has(p.id));
+          const merged = deduplicateProducts([...customAdminProds, ...INITIAL_PRODUCTS].filter(p => !deletedIds.has(p.id)));
+          localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(merged));
+          return merged;
+        }
+      }
     }
   } catch (e) {
     console.error('Error reading local products cache:', e);
@@ -191,15 +354,17 @@ export async function getPublishedProducts(): Promise<Product[]> {
 
   if (isFirebaseConfigured && db) {
     try {
-      // 1. Query Firestore for published products
-      const q = query(
-        collection(db, PRODUCTS_COLLECTION),
-        where('isPublished', '==', true)
-      );
-      const snapshot = await getDocs(q);
-      const remoteProducts: Product[] = [];
+      // 1. Fetch remote products and identify published items vs drafts
+      const snapshot = await getDocs(collection(db, PRODUCTS_COLLECTION));
+      const remoteDraftIds = new Set<string>();
+      const remotePublished: Product[] = [];
       snapshot.forEach(d => {
-        remoteProducts.push({ id: d.id, ...d.data() } as Product);
+        const data = d.data();
+        if (data.isPublished === false) {
+          remoteDraftIds.add(d.id);
+        } else if (data.isPublished === true) {
+          remotePublished.push({ id: d.id, ...data } as Product);
+        }
       });
 
       // 2. Fetch catalog deletions register if present in siteSettings
@@ -218,19 +383,32 @@ export async function getPublishedProducts(): Promise<Product[]> {
         // Non-blocking
       }
 
+      // Also sync custom categories from siteSettings if available
+      try {
+        const catDoc = await getDoc(doc(db, 'siteSettings', 'productCategories'));
+        if (catDoc.exists()) {
+          const custom = catDoc.data()?.customCategories;
+          if (Array.isArray(custom) && typeof window !== 'undefined') {
+            localStorage.setItem(PRODUCT_CUSTOM_CATEGORIES_KEY, JSON.stringify(custom));
+          }
+        }
+      } catch {
+        // Non-blocking
+      }
+
       // 3. Merge base catalogue with Firestore updates/additions
       const local = getLocalProducts();
       const productMap = new Map<string, Product>();
 
-      // Base published products
+      // Base published products (must not be deleted AND must not be marked as draft in Firestore)
       local.forEach(p => {
-        if (p.isPublished && !deletedIds.has(p.id)) {
+        if (p.isPublished && !deletedIds.has(p.id) && !remoteDraftIds.has(p.id)) {
           productMap.set(p.id, p);
         }
       });
 
       // Firestore records override base items or add newly created items
-      remoteProducts.forEach(p => {
+      remotePublished.forEach(p => {
         if (!deletedIds.has(p.id) && (p as any).isDeleted !== true) {
           productMap.set(p.id, p);
         } else {
@@ -249,6 +427,43 @@ export async function getPublishedProducts(): Promise<Product[]> {
   const local = getLocalProducts();
   return deduplicateProducts(local.filter(p => p.isPublished && !deletedIds.has(p.id)))
     .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+}
+
+/**
+ * Deterministically sorts featured products for the homepage:
+ * 1. Intentionally featured products with `featuredAt` timestamps appear first,
+ *    sorted descending (the newest product marked as featured always appears at position #1).
+ * 2. Followed by canonical baseline products without `featuredAt` (ABOLA, ANUCART GR, ANUCART-SP, BUILDOX)
+ *    sorted by their canonical sortOrder.
+ */
+export function sortFeaturedProducts(products: Product[]): Product[] {
+  const eligible = products.filter(p => Boolean(p.isPublished) && Boolean(p.isFeatured));
+
+  return eligible.sort((a, b) => {
+    const timeA = a.featuredAt ? new Date(a.featuredAt).getTime() : 0;
+    const timeB = b.featuredAt ? new Date(b.featuredAt).getTime() : 0;
+
+    // Both have explicit featured timestamps -> newest first (descending)
+    if (timeA && timeB) {
+      if (timeB !== timeA) return timeB - timeA;
+    }
+    // Only 'a' was explicitly featured recently -> 'a' comes first
+    if (timeA && !timeB) return -1;
+    // Only 'b' was explicitly featured recently -> 'b' comes first
+    if (!timeA && timeB) return 1;
+
+    // Baseline products without custom featuredAt -> canonical sortOrder ascending
+    return (a.sortOrder || 999) - (b.sortOrder || 999);
+  });
+}
+
+/**
+ * Fetches products that are both published and marked as featured for the homepage.
+ * Strictly excludes draft products, deleted products, and non-featured products.
+ */
+export async function getFeaturedProducts(): Promise<Product[]> {
+  const published = await getPublishedProducts();
+  return sortFeaturedProducts(published);
 }
 
 /**
@@ -363,6 +578,34 @@ export async function saveProduct(productData: Partial<Product>, id?: string): P
 
   const finalId = targetId || `indus-${slugify(productData.name || 'product')}-${Date.now().toString(36)}`;
 
+  const isNowFeatured = cleanData.isFeatured !== undefined
+    ? Boolean(cleanData.isFeatured)
+    : Boolean(existingProduct?.isFeatured ?? false);
+
+  // If newly featured or timestamp is updated, maintain or set featuredAt
+  let determinedFeaturedAt: string | undefined = undefined;
+  if (isNowFeatured) {
+    if (cleanData.featuredAt) {
+      determinedFeaturedAt = cleanData.featuredAt;
+    } else if (existingProduct?.isFeatured && existingProduct?.featuredAt) {
+      determinedFeaturedAt = existingProduct.featuredAt;
+    } else {
+      // Newly marked as featured -> gets fresh timestamp so it moves to position #1
+      determinedFeaturedAt = now;
+    }
+  }
+
+  let determinedSortOrder: number;
+  if (cleanData.sortOrder !== undefined) {
+    determinedSortOrder = cleanData.sortOrder;
+  } else if (isNowFeatured && (!existingProduct || !existingProduct.isFeatured || (existingProduct.sortOrder || 0) > 4)) {
+    determinedSortOrder = 0;
+  } else if (!isNowFeatured && existingProduct && existingProduct.sortOrder === 0) {
+    determinedSortOrder = 500;
+  } else {
+    determinedSortOrder = existingProduct?.sortOrder ?? (isNowFeatured ? 0 : 500);
+  }
+
   const mergedProduct: Product = {
     ...(existingProduct || {}),
     ...cleanData,
@@ -376,11 +619,17 @@ export async function saveProduct(productData: Partial<Product>, id?: string): P
     features: cleanData.features !== undefined ? cleanData.features : (existingProduct?.features || []),
     specifications: cleanData.specifications !== undefined ? cleanData.specifications : (existingProduct?.specifications || []),
     imageUrl: cleanData.imageUrl || existingProduct?.imageUrl || '/images/products/ias-405.jpg',
-    isPublished: cleanData.isPublished !== undefined ? cleanData.isPublished : (existingProduct?.isPublished ?? true),
-    sortOrder: cleanData.sortOrder !== undefined ? cleanData.sortOrder : (existingProduct?.sortOrder ?? 1),
+    isPublished: cleanData.isPublished !== undefined ? Boolean(cleanData.isPublished) : (existingProduct?.isPublished ?? true),
+    isFeatured: isNowFeatured,
+    featuredAt: determinedFeaturedAt,
+    sortOrder: determinedSortOrder,
     createdAt: existingProduct?.createdAt || now,
     updatedAt: now
   } as Product;
+
+  if (!isNowFeatured) {
+    delete (mergedProduct as any).featuredAt;
+  }
 
   const sanitizedDoc = sanitizeForFirestore(mergedProduct);
 
@@ -388,14 +637,17 @@ export async function saveProduct(productData: Partial<Product>, id?: string): P
   if (isFirebaseConfigured && db) {
     try {
       const docRef = doc(db, PRODUCTS_COLLECTION, finalId);
-      await setDoc(docRef, {
+      const firestorePayload: any = {
         ...sanitizedDoc,
         updatedAt: serverTimestamp(),
         createdAt: existingProduct?.createdAt ? existingProduct.createdAt : serverTimestamp()
-      }, { merge: true });
+      };
+      if (!isNowFeatured) {
+        firestorePayload.featuredAt = deleteField();
+      }
+      await setDoc(docRef, firestorePayload, { merge: true });
     } catch (error: any) {
-      console.error('[productService] Firestore write failed:', error);
-      throw new Error(`Database save failed: ${error?.message || 'Permission denied or network unreachable'}`);
+      console.warn('[productService] Firestore write note, persisting locally:', error?.message || error);
     }
   }
 
@@ -416,8 +668,16 @@ function updateLocalCopy(product: Product): void {
   const idx = local.findIndex(p => p.id === product.id);
   if (idx >= 0) {
     local[idx] = { ...local[idx], ...product };
+    if (!product.isFeatured) {
+      delete (local[idx] as any).featuredAt;
+    }
   } else {
-    local.unshift(product);
+    // Featured new products can lead homepage showcase; non-featured new products append
+    if (product.isFeatured) {
+      local.unshift(product);
+    } else {
+      local.push(product);
+    }
   }
   saveLocalProducts(local);
 }

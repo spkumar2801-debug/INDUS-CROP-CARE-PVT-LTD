@@ -33,3 +33,6 @@ gallery images/
 gallery_red_arrows_crop.png
 *.backup*
 *.backup
+scratch/
+cleanup_backup_*.zip
+Client_Documentation/

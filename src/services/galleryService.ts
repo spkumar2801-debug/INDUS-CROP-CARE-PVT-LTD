@@ -1,12 +1,12 @@
-import { 
-  collection, 
-  getDocs, 
-  doc, 
+import {
+  collection,
+  getDocs,
+  doc,
   getDoc,
   setDoc,
-  deleteDoc, 
-  query, 
-  where, 
+  deleteDoc,
+  query,
+  where,
   serverTimestamp,
   writeBatch
 } from 'firebase/firestore';
@@ -16,6 +16,152 @@ import { INITIAL_GALLERY_ITEMS } from '../data/initialProducts';
 
 const GALLERY_COLLECTION = 'gallery';
 const LOCAL_STORAGE_KEY = 'indas_gallery_cache_v8';
+const GALLERY_CUSTOM_CATEGORIES_KEY = 'indus_gallery_custom_categories_v1';
+
+export const DEFAULT_GALLERY_CATEGORIES: string[] = [
+  'Corporate Events',
+  'Field Trials & Crop Health',
+  'Farmer Interactions',
+  'Farmer Seminars',
+  'Distribution Network',
+  'Others'
+];
+
+export function getCustomGalleryCategories(): string[] {
+  try {
+    if (typeof window !== 'undefined') {
+      const raw = localStorage.getItem(GALLERY_CUSTOM_CATEGORIES_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          return parsed.filter(c => typeof c === 'string' && c.trim() && !DEFAULT_GALLERY_CATEGORIES.includes(c.trim()));
+        }
+      }
+    }
+  } catch (e) {
+    console.error('Error reading custom categories:', e);
+  }
+  return [];
+}
+
+export function saveCustomGalleryCategory(newCategory: string): string[] {
+  const trimmed = newCategory.trim();
+  if (!trimmed) return getCustomGalleryCategories();
+
+  const current = getCustomGalleryCategories();
+  // Check case-insensitive duplication against default and existing
+  const allExisting = [...DEFAULT_GALLERY_CATEGORIES, ...current];
+  const alreadyExists = allExisting.some(c => c.toLowerCase() === trimmed.toLowerCase());
+
+  if (!alreadyExists) {
+    const updated = [...current, trimmed];
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(GALLERY_CUSTOM_CATEGORIES_KEY, JSON.stringify(updated));
+        window.dispatchEvent(new CustomEvent('indus:gallery-categories-updated'));
+      }
+    } catch (e) {
+      console.error('Error saving custom category:', e);
+    }
+    notifyGalleryUpdated();
+    return updated;
+  }
+  return current;
+}
+
+export async function deleteCustomGalleryCategory(categoryToDelete: string): Promise<string[]> {
+  const trimmed = categoryToDelete.trim();
+  if (!trimmed) return getCustomGalleryCategories();
+
+  // Guard: Do not allow deletion of default categories
+  const isDefault = DEFAULT_GALLERY_CATEGORIES.some(c => c.toLowerCase() === trimmed.toLowerCase());
+  if (isDefault) {
+    throw new Error(`Cannot delete default category "${trimmed}".`);
+  }
+
+  // 1. Remove from custom categories in localStorage
+  const current = getCustomGalleryCategories();
+  const updated = current.filter(c => c.toLowerCase() !== trimmed.toLowerCase());
+
+  try {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(GALLERY_CUSTOM_CATEGORIES_KEY, JSON.stringify(updated));
+    }
+  } catch (e) {
+    console.error('Error deleting custom category from storage:', e);
+  }
+
+  // 2. Reassign any existing media in this category to "Others" so no media is lost
+  const localItems = getLocalGallery();
+  let modifiedCount = 0;
+  const updatedItems = localItems.map(item => {
+    if (item.category && item.category.trim().toLowerCase() === trimmed.toLowerCase()) {
+      modifiedCount++;
+      return { ...item, category: 'Others', updatedAt: new Date().toISOString() };
+    }
+    return item;
+  });
+
+  if (modifiedCount > 0) {
+    saveLocalGallery(updatedItems);
+
+    // Also update in Firestore if active
+    if (isFirebaseConfigured && db) {
+      try {
+        const firestoreDb = db;
+        const q = query(collection(firestoreDb, GALLERY_COLLECTION), where('category', '==', trimmed));
+        const snapshot = await getDocs(q);
+        if (!snapshot.empty) {
+          const batch = writeBatch(firestoreDb);
+          snapshot.docs.forEach(d => {
+            batch.update(doc(firestoreDb, GALLERY_COLLECTION, d.id), {
+              category: 'Others',
+              updatedAt: serverTimestamp()
+            });
+          });
+          await batch.commit();
+        }
+      } catch (err) {
+        console.warn('[galleryService] Firestore category migration note:', err);
+      }
+    }
+  }
+
+  // 3. Broadcast category update to all components and tabs
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('indus:gallery-categories-updated', { detail: { deleted: trimmed } }));
+  }
+  notifyGalleryUpdated();
+
+  return updated;
+}
+
+export function getAllGalleryCategories(items?: GalleryItem[]): string[] {
+  const custom = getCustomGalleryCategories();
+  const set = new Set<string>();
+
+  // 1. Add default categories except "Others" first
+  DEFAULT_GALLERY_CATEGORIES.filter(c => c !== 'Others').forEach(c => set.add(c));
+
+  // 2. Add custom categories
+  custom.forEach(c => set.add(c));
+
+  // 3. Add any categories found in items (excluding "Others")
+  // Only retain if it is either a default category or an active custom category
+  if (items && Array.isArray(items)) {
+    items.forEach(i => {
+      const cat = i.category ? i.category.trim() : '';
+      if (cat && cat !== 'Others' && (DEFAULT_GALLERY_CATEGORIES.includes(cat) || custom.includes(cat))) {
+        set.add(cat);
+      }
+    });
+  }
+
+  // 4. "Others" category goes at the end
+  set.add('Others');
+
+  return Array.from(set);
+}
 
 type GalleryListener = () => void;
 const listeners = new Set<GalleryListener>();
@@ -196,14 +342,18 @@ export async function saveGalleryItem(itemData: Partial<GalleryItem>, id?: strin
   const finalId = targetId || `gallery-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 7)}`;
 
   // 2. Build complete merged item with explicit fallback to preserve existing data
+  const isVideo = cleanData.mediaType === 'video' || (!cleanData.mediaType && Boolean(cleanData.videoUrl || existingItem?.videoUrl));
   const mergedItem: GalleryItem = {
     ...(existingItem || {}),
     ...cleanData,
     id: finalId,
     title: cleanData.title !== undefined ? cleanData.title : (existingItem?.title || ''),
     category: cleanData.category || existingItem?.category || 'Corporate Events',
-    imageUrl: cleanData.imageUrl || existingItem?.imageUrl || '/images/products/ias-405.jpg',
+    mediaType: isVideo ? 'video' : 'image',
+    imageUrl: cleanData.imageUrl || existingItem?.imageUrl || (isVideo ? '/assets/indus-crop-hero.webp' : '/images/products/ias-405.jpg'),
     imagePublicId: cleanData.imagePublicId !== undefined ? cleanData.imagePublicId : (existingItem?.imagePublicId || undefined),
+    videoUrl: cleanData.videoUrl !== undefined ? cleanData.videoUrl : (existingItem?.videoUrl || undefined),
+    videoPublicId: cleanData.videoPublicId !== undefined ? cleanData.videoPublicId : (existingItem?.videoPublicId || undefined),
     altText: cleanData.altText !== undefined ? cleanData.altText : (existingItem?.altText || cleanData.title || existingItem?.title || ''),
     caption: cleanData.caption !== undefined ? cleanData.caption : (existingItem?.caption || ''),
     description: cleanData.description !== undefined ? cleanData.description : (existingItem?.description || ''),
@@ -275,6 +425,22 @@ export async function replaceGalleryImage(
     updatedAt: new Date().toISOString()
   };
   await saveGalleryItem(updateData, id);
+}
+
+export async function replaceGalleryMedia(
+  id: string,
+  mediaData: {
+    imageUrl?: string;
+    imagePublicId?: string;
+    videoUrl?: string;
+    videoPublicId?: string;
+    mediaType?: 'image' | 'video';
+  }
+): Promise<void> {
+  await saveGalleryItem({
+    ...mediaData,
+    updatedAt: new Date().toISOString()
+  }, id);
 }
 
 export async function reorderGalleryItems(

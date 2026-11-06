@@ -1,7 +1,12 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { Image as ImageIcon, Eye, Tag } from 'lucide-react';
+import { Image as ImageIcon, Eye, Tag, Video as VideoIcon, Play } from 'lucide-react';
 import { GalleryItem } from '../types/gallery';
-import { getPublishedGalleryItems, subscribeToGallery } from '../services/galleryService';
+import { 
+  getPublishedGalleryItems, 
+  subscribeToGallery, 
+  getAllGalleryCategories,
+  getCustomGalleryCategories 
+} from '../services/galleryService';
 import { GalleryLightbox } from '../components/gallery/GalleryLightbox';
 
 export const GalleryPage: React.FC = () => {
@@ -9,6 +14,17 @@ export const GalleryPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [activeItem, setActiveItem] = useState<GalleryItem | null>(null);
+  const [customCategories, setCustomCategories] = useState<string[]>(() => getCustomGalleryCategories());
+
+  useEffect(() => {
+    const handleCategoryUpdate = () => {
+      setCustomCategories(getCustomGalleryCategories());
+    };
+    window.addEventListener('indus:gallery-categories-updated', handleCategoryUpdate);
+    return () => {
+      window.removeEventListener('indus:gallery-categories-updated', handleCategoryUpdate);
+    };
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -33,12 +49,15 @@ export const GalleryPage: React.FC = () => {
   }, []);
 
   const categories = useMemo(() => {
-    const set = new Set<string>();
-    items.forEach(i => {
-      if (i.category) set.add(i.category);
-    });
-    return ['All', ...Array.from(set)];
-  }, [items]);
+    const all = getAllGalleryCategories(items);
+    return ['All', ...all];
+  }, [items, customCategories]);
+
+  useEffect(() => {
+    if (selectedCategory !== 'All' && !categories.includes(selectedCategory)) {
+      setSelectedCategory('All');
+    }
+  }, [categories, selectedCategory]);
 
   const filteredItems = useMemo(() => {
     if (selectedCategory === 'All') return items;
@@ -152,7 +171,7 @@ export const GalleryPage: React.FC = () => {
                     role="button"
                     tabIndex={0}
                     onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveItem(item); } }}
-                    aria-label={`View photography for ${item.title}`}
+                    aria-label={item.mediaType === 'video' || item.videoUrl ? `Play video for ${item.title}` : `View photography for ${item.title}`}
                   >
                   <div className="gallery-img-wrap">
                     <img
@@ -168,9 +187,26 @@ export const GalleryPage: React.FC = () => {
                       {item.category}
                     </span>
 
+                    {(item.mediaType === 'video' || item.videoUrl) && (
+                      <span className="gallery-video-badge">
+                        <VideoIcon size={12} />
+                        Video
+                      </span>
+                    )}
+
+                    {(item.mediaType === 'video' || item.videoUrl) && (
+                      <div className="gallery-card-play-btn" aria-hidden="true">
+                        <Play size={22} fill="#FFFFFF" style={{ marginLeft: '3px' }} />
+                      </div>
+                    )}
+
                     <div className="gallery-hover-indicator">
                       <div className="gallery-zoom-button">
-                        <Eye size={22} />
+                        {(item.mediaType === 'video' || item.videoUrl) ? (
+                          <Play size={22} fill="var(--color-primary-green-dark)" style={{ marginLeft: '2px' }} />
+                        ) : (
+                          <Eye size={22} />
+                        )}
                       </div>
                     </div>
                   </div>

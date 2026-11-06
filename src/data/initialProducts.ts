@@ -39,7 +39,7 @@ const SEED_PRODUCTS: Product[] = [
     imageUrl: '/images/products/ias-405.jpg',
     sheetImageUrl: '/images/products/ias-405-sheet.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 1,
     cropSeason: 'Year Round / Kharif & Rabi',
     daysToHarvest: '50 - 55 Days',
@@ -83,7 +83,7 @@ const SEED_PRODUCTS: Product[] = [
     imageUrl: '/images/products/ias-404.jpg',
     sheetImageUrl: '/images/products/ias-404-sheet.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 2,
     cropSeason: 'Year Round / Kharif & Summer',
     daysToHarvest: '50 - 55 Days',
@@ -128,7 +128,7 @@ const SEED_PRODUCTS: Product[] = [
     imageUrl: '/images/products/ias-503.jpg',
     sheetImageUrl: '/images/products/ias-503-sheet.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 3,
     cropSeason: 'Kharif, Rabi & Summer',
     daysToHarvest: '40 - 45 Days',
@@ -173,7 +173,7 @@ const SEED_PRODUCTS: Product[] = [
     imageUrl: '/images/products/ias-504.jpg',
     sheetImageUrl: '/images/products/ias-504-sheet.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 4,
     cropSeason: 'Kharif, Rabi & Summer',
     daysToHarvest: '40 - 45 Days',
@@ -216,7 +216,7 @@ const SEED_PRODUCTS: Product[] = [
     imageUrl: '/images/products/ias-701.jpg',
     sheetImageUrl: '/images/products/ias-701-sheet.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 5,
     cropSeason: 'Kharif, Rabi & Summer',
     daysToHarvest: '45 - 47 Days',
@@ -258,7 +258,7 @@ const SEED_PRODUCTS: Product[] = [
     imageUrl: '/images/products/ias-603.jpg',
     sheetImageUrl: '/images/products/ias-603-sheet.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 6,
     cropSeason: 'Kharif & Rabi',
     daysToHarvest: '60 - 65 Days',
@@ -300,7 +300,7 @@ const SEED_PRODUCTS: Product[] = [
     imageUrl: '/images/products/ias-604.jpg',
     sheetImageUrl: '/images/products/ias-604-sheet.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 7,
     cropSeason: 'Kharif & Rabi',
     daysToHarvest: '60 - 65 Days',
@@ -345,7 +345,7 @@ const SEED_PRODUCTS: Product[] = [
     imageUrl: '/images/products/ias-406.jpg',
     sheetImageUrl: '/images/products/ias-406-sheet.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 8,
     cropSeason: 'Year Round / Kharif & Summer',
     daysToHarvest: '50 - 55 Days',
@@ -387,7 +387,7 @@ const SEED_PRODUCTS: Product[] = [
     imageUrl: '/images/products/ias-611.jpg',
     sheetImageUrl: '/images/products/ias-611-sheet.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 9,
     cropSeason: 'Kharif & Rabi',
     daysToHarvest: '60 - 65 Days',
@@ -430,7 +430,7 @@ const SEED_PRODUCTS: Product[] = [
     imageUrl: '/images/products/ias-703.jpg',
     sheetImageUrl: '/images/products/ias-703-sheet.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 10,
     cropSeason: 'Kharif, Rabi & Summer',
     daysToHarvest: '45 - 47 Days',
@@ -473,7 +473,7 @@ const SEED_PRODUCTS: Product[] = [
     imageUrl: '/images/products/ias-801.jpg',
     sheetImageUrl: '/images/products/ias-801-sheet.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 11,
     cropSeason: 'Kharif, Rabi & Summer',
     daysToHarvest: '60 - 65 Days',
@@ -516,7 +516,7 @@ const SEED_PRODUCTS: Product[] = [
     imageUrl: '/images/products/ias-305.jpg',
     sheetImageUrl: '/images/products/ias-305-sheet.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 12,
     cropSeason: 'Year Round / Commercial Festive',
     daysToHarvest: '42 - 45 Days',
@@ -559,7 +559,7 @@ const SEED_PRODUCTS: Product[] = [
     imageUrl: '/images/products/ias-702.jpg',
     sheetImageUrl: '/images/products/ias-702-sheet.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 13,
     cropSeason: 'Kharif, Rabi & Summer',
     daysToHarvest: '45 - 47 Days',
@@ -601,7 +601,7 @@ const SEED_PRODUCTS: Product[] = [
     imageUrl: '/images/products/ias-612.jpg',
     sheetImageUrl: '/images/products/ias-612-sheet.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 14,
     cropSeason: 'Kharif & Rabi',
     daysToHarvest: '60 - 65 Days',
@@ -643,7 +643,7 @@ const SEED_PRODUCTS: Product[] = [
     imageUrl: '/images/products/ias-306.jpg',
     sheetImageUrl: '/images/products/ias-306-sheet.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 15,
     cropSeason: 'Year Round / Festival Seasons',
     daysToHarvest: '45 - 50 Days',
@@ -684,7 +684,7 @@ const SEED_PRODUCTS: Product[] = [
     imageUrl: '/images/products/ias-613.jpg',
     sheetImageUrl: '/images/products/ias-613-sheet.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 16,
     cropSeason: 'Kharif & Rabi',
     daysToHarvest: '60 - 65 Days',
@@ -728,7 +728,7 @@ const SEED_PRODUCTS: Product[] = [
     imageUrl: '/images/products/ias-800.jpg',
     sheetImageUrl: '/images/products/ias-800-sheet.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 17,
     cropSeason: 'Year Round / Kharif & Rabi',
     daysToHarvest: '60 - 65 Days',
@@ -1479,7 +1479,7 @@ export const MICRONUTRIENTS_COMBO_PRODUCTS: Product[] = [
     imageUrl: '/images/indus-products/indus-dharthi-combo-paddy.jpg',
     sheetImageUrl: '/images/indus-products/indus-dharthi-combo-paddy.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 111,
     cropSeason: 'Kharif / Rabi'
   },
@@ -1515,7 +1515,7 @@ export const MICRONUTRIENTS_COMBO_PRODUCTS: Product[] = [
     imageUrl: '/images/indus-products/indus-dharthi-combo-cotton.jpg',
     sheetImageUrl: '/images/indus-products/indus-dharthi-combo-cotton.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 112,
     cropSeason: 'Kharif / Annual'
   },
@@ -1551,7 +1551,7 @@ export const MICRONUTRIENTS_COMBO_PRODUCTS: Product[] = [
     imageUrl: '/images/indus-products/indus-dharthi-combo-chilli.jpg',
     sheetImageUrl: '/images/indus-products/indus-dharthi-combo-chilli.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 113,
     cropSeason: 'Year Round / Kharif & Rabi'
   },
@@ -1587,7 +1587,7 @@ export const MICRONUTRIENTS_COMBO_PRODUCTS: Product[] = [
     imageUrl: '/images/indus-products/indus-dharthi-combo-turmeric.jpg',
     sheetImageUrl: '/images/indus-products/indus-dharthi-combo-turmeric.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 114,
     cropSeason: 'Kharif / Rabi'
   }
@@ -1628,7 +1628,7 @@ export const NEW_HERBICIDE_AND_INSECTICIDE_PRODUCTS: Product[] = [
     imageUrl: '/images/indus-products/indus-strong.jpg',
     sheetImageUrl: '/images/indus-products/indus-strong.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 115
   },
   {
@@ -1664,7 +1664,7 @@ export const NEW_HERBICIDE_AND_INSECTICIDE_PRODUCTS: Product[] = [
     imageUrl: '/images/indus-products/indus-metristar.jpg',
     sheetImageUrl: '/images/indus-products/indus-metristar.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 116
   },
   {
@@ -1700,7 +1700,7 @@ export const NEW_HERBICIDE_AND_INSECTICIDE_PRODUCTS: Product[] = [
     imageUrl: '/images/indus-products/indus-weedstar.jpg',
     sheetImageUrl: '/images/indus-products/indus-weedstar.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 117
   },
   {
@@ -1735,7 +1735,7 @@ export const NEW_HERBICIDE_AND_INSECTICIDE_PRODUCTS: Product[] = [
     imageUrl: '/images/indus-products/indus-aceda-gold.jpg',
     sheetImageUrl: '/images/indus-products/indus-aceda-gold.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 118
   },
   {
@@ -1771,7 +1771,7 @@ export const NEW_HERBICIDE_AND_INSECTICIDE_PRODUCTS: Product[] = [
     imageUrl: '/images/indus-products/indus-pendi-queen.jpg',
     sheetImageUrl: '/images/indus-products/indus-pendi-queen.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 119
   },
   {
@@ -1809,7 +1809,7 @@ export const NEW_HERBICIDE_AND_INSECTICIDE_PRODUCTS: Product[] = [
     imageUrl: '/images/indus-products/indus-power.jpg',
     sheetImageUrl: '/images/indus-products/indus-power.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 120
   },
   {
@@ -1846,7 +1846,7 @@ export const NEW_HERBICIDE_AND_INSECTICIDE_PRODUCTS: Product[] = [
     imageUrl: '/images/indus-products/indus-preguard-ultra.jpg',
     sheetImageUrl: '/images/indus-products/indus-preguard-ultra.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 121
   },
 
@@ -1884,7 +1884,7 @@ export const NEW_HERBICIDE_AND_INSECTICIDE_PRODUCTS: Product[] = [
     imageUrl: '/images/indus-products/indus-super-neem-pro-10000.jpg',
     sheetImageUrl: '/images/indus-products/indus-super-neem-pro-10000.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 122
   },
   {
@@ -1921,7 +1921,7 @@ export const NEW_HERBICIDE_AND_INSECTICIDE_PRODUCTS: Product[] = [
     imageUrl: '/images/indus-products/indus-super-neem-3000.jpg',
     sheetImageUrl: '/images/indus-products/indus-super-neem-3000.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 123
   },
   {
@@ -1957,7 +1957,7 @@ export const NEW_HERBICIDE_AND_INSECTICIDE_PRODUCTS: Product[] = [
     imageUrl: '/images/indus-products/indus-ematin-plus.jpg',
     sheetImageUrl: '/images/indus-products/indus-ematin-plus.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 124
   },
   {
@@ -1993,7 +1993,7 @@ export const NEW_HERBICIDE_AND_INSECTICIDE_PRODUCTS: Product[] = [
     imageUrl: '/images/indus-products/indus-icc-525.jpg',
     sheetImageUrl: '/images/indus-products/indus-icc-525.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 125
   },
   {
@@ -2029,7 +2029,7 @@ export const NEW_HERBICIDE_AND_INSECTICIDE_PRODUCTS: Product[] = [
     imageUrl: '/images/indus-products/indus-thydus.jpg',
     sheetImageUrl: '/images/indus-products/indus-thydus.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 126
   },
   {
@@ -2066,7 +2066,7 @@ export const NEW_HERBICIDE_AND_INSECTICIDE_PRODUCTS: Product[] = [
     imageUrl: '/images/indus-products/indus-thydus-plus.jpg',
     sheetImageUrl: '/images/indus-products/indus-thydus-plus.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 127
   },
   {
@@ -2103,7 +2103,7 @@ export const NEW_HERBICIDE_AND_INSECTICIDE_PRODUCTS: Product[] = [
     imageUrl: '/images/indus-products/indus-imidus.jpg',
     sheetImageUrl: '/images/indus-products/indus-imidus.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 128
   },
   {
@@ -2139,7 +2139,7 @@ export const NEW_HERBICIDE_AND_INSECTICIDE_PRODUCTS: Product[] = [
     imageUrl: '/images/indus-products/indus-imidus-super.jpg',
     sheetImageUrl: '/images/indus-products/indus-imidus-super.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 129
   }
 ];
@@ -2179,7 +2179,7 @@ export const NEW_FUNGICIDE_AND_BIOSTIMULANT_PRODUCTS: Product[] = [
     imageUrl: '/images/indus-products/indus-stop.jpg',
     sheetImageUrl: '/images/indus-products/indus-stop.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 130
   },
 
@@ -2219,7 +2219,7 @@ export const NEW_FUNGICIDE_AND_BIOSTIMULANT_PRODUCTS: Product[] = [
     imageUrl: '/images/indus-products/indus-auxyboom.jpg',
     sheetImageUrl: '/images/indus-products/indus-auxyboom.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 131
   },
   {
@@ -2254,7 +2254,7 @@ export const NEW_FUNGICIDE_AND_BIOSTIMULANT_PRODUCTS: Product[] = [
     imageUrl: '/images/indus-products/indus-rudra.jpg',
     sheetImageUrl: '/images/indus-products/indus-rudra.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 132
   },
   {
@@ -2291,7 +2291,7 @@ export const NEW_FUNGICIDE_AND_BIOSTIMULANT_PRODUCTS: Product[] = [
     imageUrl: '/images/indus-products/indus-raana.jpg',
     sheetImageUrl: '/images/indus-products/indus-raana.jpg',
     isPublished: true,
-    isFeatured: true,
+    isFeatured: false,
     sortOrder: 133
   }
 ];

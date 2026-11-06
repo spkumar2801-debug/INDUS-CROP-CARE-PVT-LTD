@@ -1,6 +1,7 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { 
   PlusCircle, 
+  Plus,
   Trash2, 
   Eye, 
   EyeOff, 
@@ -18,7 +19,9 @@ import {
   UploadCloud, 
   Loader2, 
   Layers,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Video as VideoIcon,
+  Play
 } from 'lucide-react';
 import { AdminNav } from '../../components/admin/AdminNav';
 import { GalleryItem } from '../../types/gallery';
@@ -27,18 +30,25 @@ import {
   saveGalleryItem, 
   deleteGalleryItem, 
   replaceGalleryImage,
+  replaceGalleryMedia,
   reorderGalleryItems,
   saveMultipleGalleryItems,
-  subscribeToGallery 
+  subscribeToGallery,
+  getAllGalleryCategories,
+  saveCustomGalleryCategory,
+  deleteCustomGalleryCategory,
+  DEFAULT_GALLERY_CATEGORIES,
+  getCustomGalleryCategories
 } from '../../services/galleryService';
-import { uploadToCloudinary } from '../../lib/cloudinary';
+import { uploadToCloudinary, uploadVideoToCloudinary } from '../../lib/cloudinary';
 
-const OFFICIAL_CATEGORIES = [
+const DEFAULT_CATEGORIES = [
   'Corporate Events',
   'Field Trials & Crop Health',
   'Farmer Interactions',
   'Farmer Seminars',
-  'Distribution Network'
+  'Distribution Network',
+  'Others'
 ];
 
 const CLIENT_TOP_3_IDS = [
@@ -47,12 +57,17 @@ const CLIENT_TOP_3_IDS = [
   'indus-conf-executive-table'
 ];
 
-interface MultiFileItem {
-  file: File;
+export interface UnifiedUploadItem {
+  id: string;
+  file?: File;
+  mediaType: 'image' | 'video';
   preview: string;
   title: string;
+  description: string;
   category: string;
-  caption: string;
+  fileSizeFormatted: string;
+  sourceType: 'file' | 'url';
+  directVideoUrl?: string;
   progress: number;
   status: 'idle' | 'uploading' | 'done' | 'error';
   error?: string;
@@ -71,7 +86,6 @@ export const AdminGalleryPage: React.FC = () => {
 
   // Modals
   const [showAddModal, setShowAddModal] = useState(false);
-  const [addMode, setAddMode] = useState<'single' | 'multiple'>('single');
   const [showEditModal, setShowEditModal] = useState(false);
   const [showReplaceModal, setShowReplaceModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -84,20 +98,11 @@ export const AdminGalleryPage: React.FC = () => {
   const [deletingItem, setDeletingItem] = useState<GalleryItem | null>(null);
   const [reorderList, setReorderList] = useState<GalleryItem[]>([]);
 
-  // Form states for Single Add
-  const [singleTitle, setSingleTitle] = useState('');
-  const [singleCategory, setSingleCategory] = useState('Corporate Events');
-  const [singleCaption, setSingleCaption] = useState('');
-  const [singleDescription, setSingleDescription] = useState('');
-  const [singleAltText, setSingleAltText] = useState('');
-  const [singleFile, setSingleFile] = useState<File | null>(null);
-  const [singlePreview, setSinglePreview] = useState<string | null>(null);
-  const [singleProgress, setSingleProgress] = useState(0);
-  const [singleIsPublished, setSingleIsPublished] = useState(true);
-
-  // Form states for Multi Add
-  const [multiFiles, setMultiFiles] = useState<MultiFileItem[]>([]);
-  const [multiCommonCategory, setMultiCommonCategory] = useState('Corporate Events');
+  // Unified Upload Queue States
+  const [uploadQueue, setUploadQueue] = useState<UnifiedUploadItem[]>([]);
+  const [uploadProgressIndex, setUploadProgressIndex] = useState(0);
+  const [isDragOver, setIsDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Form states for Replace
   const [replaceFile, setReplaceFile] = useState<File | null>(null);
@@ -106,6 +111,108 @@ export const AdminGalleryPage: React.FC = () => {
 
   // Loading indicator for ongoing mutations
   const [saving, setSaving] = useState(false);
+
+  // Dynamic gallery categories (Standard, Custom, and Others)
+  const [allCategories, setAllCategories] = useState<string[]>(() => getAllGalleryCategories());
+  const [showNewCategoryModal, setShowNewCategoryModal] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [categoryTarget, setCategoryTarget] = useState<number | 'quick_all' | 'edit_item' | null>(null);
+
+  useEffect(() => {
+    const updateCats = () => {
+      setAllCategories(getAllGalleryCategories(items));
+    };
+    updateCats();
+    window.addEventListener('indus:gallery-categories-updated', updateCats);
+    return () => {
+      window.removeEventListener('indus:gallery-categories-updated', updateCats);
+    };
+  }, [items]);
+
+  const handleCreateCategory = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const trimmed = newCategoryName.trim();
+    if (!trimmed) {
+      showNotification(undefined, 'Please enter a category name.');
+      return;
+    }
+
+    if (allCategories.some(c => c.toLowerCase() === trimmed.toLowerCase())) {
+      showNotification(undefined, `Category "${trimmed}" already exists.`);
+      return;
+    }
+
+    saveCustomGalleryCategory(trimmed);
+    const updated = getAllGalleryCategories(items);
+    setAllCategories(updated);
+
+    if (typeof categoryTarget === 'number') {
+      setUploadQueue(prev => prev.map((q, i) => i === categoryTarget ? { ...q, category: trimmed } : q));
+    } else if (categoryTarget === 'quick_all') {
+      setUploadQueue(prev => prev.map(item => ({ ...item, category: trimmed })));
+    } else if (categoryTarget === 'edit_item' && editingItem) {
+      setEditingItem({ ...editingItem, category: trimmed });
+    }
+
+    showNotification(`Category "${trimmed}" created successfully!`);
+    setShowNewCategoryModal(false);
+    setNewCategoryName('');
+    setCategoryTarget(null);
+  };
+
+  const [showDeleteCategoryModal, setShowDeleteCategoryModal] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
+  const [deletingCategory, setDeletingCategory] = useState(false);
+
+  const handleConfirmDeleteCategory = async () => {
+    if (!categoryToDelete) return;
+    setDeletingCategory(true);
+    const cat = categoryToDelete;
+    try {
+      await deleteCustomGalleryCategory(cat);
+
+      // If the admin was viewing this category filter, reset to 'All'
+      if (selectedCategory.toLowerCase() === cat.toLowerCase()) {
+        setSelectedCategory('All');
+      }
+
+      // Update local state items so any item with this category is moved to 'Others'
+      setItems(prev => prev.map(item => 
+        (item.category && item.category.trim().toLowerCase() === cat.toLowerCase())
+          ? { ...item, category: 'Others' }
+          : item
+      ));
+
+      // Update queue items if any
+      setUploadQueue(prev => prev.map(q => 
+        (q.category && q.category.trim().toLowerCase() === cat.toLowerCase())
+          ? { ...q, category: 'Others' }
+          : q
+      ));
+
+      // Update editingItem if currently editing
+      if (editingItem && editingItem.category && editingItem.category.trim().toLowerCase() === cat.toLowerCase()) {
+        setEditingItem({ ...editingItem, category: 'Others' });
+      }
+
+      const updatedCats = getAllGalleryCategories(items);
+      setAllCategories(updatedCats);
+
+      setShowDeleteCategoryModal(false);
+      setCategoryToDelete(null);
+      showNotification(`Category "${cat}" permanently deleted. Assigned media safely moved to "Others".`);
+    } catch (err: any) {
+      showNotification(undefined, `Failed to delete category: ${err?.message || 'Error occurred'}`);
+    } finally {
+      setDeletingCategory(false);
+    }
+  };
+
+  const handleCloseNewCategoryModal = () => {
+    setShowNewCategoryModal(false);
+    setNewCategoryName('');
+    setCategoryTarget(null);
+  };
 
   const showNotification = (successMsg?: string, errorMsg?: string) => {
     if (successMsg) {
@@ -210,160 +317,183 @@ export const AdminGalleryPage: React.FC = () => {
     }
   };
 
-  // 1. ADD NEW (Single)
-  const handleSingleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setSingleFile(file);
-    const objUrl = URL.createObjectURL(file);
-    setSinglePreview(objUrl);
-    if (!singleTitle) {
-      // derive nice title from filename
-      const baseName = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
-      setSingleTitle(baseName.charAt(0).toUpperCase() + baseName.slice(1));
-    }
+  // 1. UNIFIED UPLOAD HELPERS & HANDLERS
+  const formatFileSize = (bytes?: number): string => {
+    if (!bytes || bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
   };
 
-  const handleSingleCreate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!singleTitle.trim()) {
-      showNotification(undefined, 'Please provide a photograph title.');
-      return;
-    }
-    if (!singleFile && !singlePreview) {
-      showNotification(undefined, 'Please choose a photograph to upload.');
-      return;
-    }
-
-    setSaving(true);
-    setSingleProgress(10);
-    try {
-      let finalUrl = singlePreview || '/images/products/ias-405.jpg';
-      let publicId: string | undefined = undefined;
-
-      if (singleFile) {
-        try {
-          const res = await uploadToCloudinary(singleFile, 'gallery', (pct) => {
-            setSingleProgress(pct);
-          });
-          finalUrl = res.secureUrl;
-          publicId = res.publicId;
-        } catch (uploadErr) {
-          console.warn('Cloudinary upload fallback to local preview:', uploadErr);
-          // Keep local preview
-        }
-      }
-
-      await saveGalleryItem({
-        title: singleTitle.trim(),
-        category: singleCategory,
-        caption: singleCaption.trim() || singleTitle.trim(),
-        description: singleDescription.trim() || singleCaption.trim() || singleTitle.trim(),
-        altText: singleAltText.trim() || singleTitle.trim(),
-        imageUrl: finalUrl,
-        imagePublicId: publicId,
-        isPublished: singleIsPublished,
-        sortOrder: items.length + 1
-      });
-
-      setShowAddModal(false);
-      resetSingleForm();
-      showNotification(`Photograph "${singleTitle}" successfully published to gallery!`);
-      loadGallery();
-    } catch (err: any) {
-      showNotification(undefined, `Failed to add visual: ${err?.message || 'Database error'}`);
-    } finally {
-      setSaving(false);
-      setSingleProgress(0);
-    }
-  };
-
-  const resetSingleForm = () => {
-    setSingleTitle('');
-    setSingleCategory('Corporate Events');
-    setSingleCaption('');
-    setSingleDescription('');
-    setSingleAltText('');
-    setSingleFile(null);
-    setSinglePreview(null);
-    setSingleProgress(0);
-    setSingleIsPublished(true);
-  };
-
-  // 1. ADD NEW (Multiple)
-  const handleMultiFilesSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
+  const processSelectedFiles = (fileList: FileList | File[]) => {
+    const files = Array.from(fileList);
     if (!files || files.length === 0) return;
 
-    const newMulti: MultiFileItem[] = Array.from(files).map(file => {
-      const baseName = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+    const newItems: UnifiedUploadItem[] = files.map((file, idx) => {
+      const isVideo = file.type.startsWith('video/') || /\.(mp4|webm|mov|mkv|avi|m4v)$/i.test(file.name);
+      const baseName = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ').trim();
+      const formattedTitle = baseName ? baseName.charAt(0).toUpperCase() + baseName.slice(1) : 'Untitled Visual';
+
       return {
+        id: `queue-${Date.now()}-${idx}-${Math.random().toString(36).substring(2, 7)}`,
         file,
+        mediaType: isVideo ? 'video' : 'image',
         preview: URL.createObjectURL(file),
-        title: baseName.charAt(0).toUpperCase() + baseName.slice(1),
-        category: multiCommonCategory,
-        caption: '',
+        title: formattedTitle,
+        description: '',
+        category: 'Field Trials & Crop Health',
+        fileSizeFormatted: formatFileSize(file.size),
+        sourceType: 'file',
         progress: 0,
         status: 'idle'
       };
     });
 
-    setMultiFiles(prev => [...prev, ...newMulti]);
+    setUploadQueue(prev => [...prev, ...newItems]);
   };
 
-  const handleMultiCreate = async () => {
-    if (multiFiles.length === 0) {
-      showNotification(undefined, 'Please select one or more photographs to upload.');
+  const handleAddDirectVideoUrl = () => {
+    const newItem: UnifiedUploadItem = {
+      id: `queue-url-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+      mediaType: 'video',
+      preview: '/assets/indus-crop-hero.webp',
+      title: 'Field Demonstration Video',
+      description: '',
+      category: 'Field Trials & Crop Health',
+      fileSizeFormatted: 'Direct URL',
+      sourceType: 'url',
+      directVideoUrl: '',
+      progress: 0,
+      status: 'idle'
+    };
+    setUploadQueue(prev => [...prev, newItem]);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+    if (e.dataTransfer?.files && e.dataTransfer.files.length > 0) {
+      processSelectedFiles(e.dataTransfer.files);
+    }
+  };
+
+  const handleUploadAll = async () => {
+    if (uploadQueue.length === 0) {
+      showNotification(undefined, 'Please select one or more images or videos to upload.');
       return;
+    }
+
+    // Validation: Ensure all items have a title
+    for (let i = 0; i < uploadQueue.length; i++) {
+      const item = uploadQueue[i];
+      if (!item.title.trim()) {
+        showNotification(undefined, `File #${i + 1} (${item.file?.name || 'Media'}) is missing a title.`);
+        return;
+      }
+      if (item.sourceType === 'url' && !item.directVideoUrl?.trim()) {
+        showNotification(undefined, `Please enter a valid video URL for "${item.title}".`);
+        return;
+      }
     }
 
     setSaving(true);
     let successCount = 0;
     const itemsToSave: Array<Partial<GalleryItem>> = [];
 
-    for (let i = 0; i < multiFiles.length; i++) {
-      const mf = multiFiles[i];
-      setMultiFiles(prev => prev.map((f, idx) => idx === i ? { ...f, status: 'uploading' } : f));
+    for (let i = 0; i < uploadQueue.length; i++) {
+      setUploadProgressIndex(i + 1);
+      const item = uploadQueue[i];
       
-      let finalUrl = mf.preview;
-      let pubId: string | undefined = undefined;
+      setUploadQueue(prev => prev.map((it, idx) => idx === i ? { ...it, status: 'uploading', progress: 15 } : it));
+
+      let finalMediaUrl = item.preview;
+      let finalPublicId: string | undefined = undefined;
+      let posterUrl = item.mediaType === 'video' ? '/assets/indus-crop-hero.webp' : item.preview;
 
       try {
-        const res = await uploadToCloudinary(mf.file, 'gallery', (pct) => {
-          setMultiFiles(prev => prev.map((f, idx) => idx === i ? { ...f, progress: pct } : f));
+        if (item.sourceType === 'url') {
+          finalMediaUrl = item.directVideoUrl!.trim();
+          posterUrl = '/assets/indus-crop-hero.webp';
+        } else if (item.file) {
+          if (item.mediaType === 'video') {
+            try {
+              const res = await uploadVideoToCloudinary(item.file, 'gallery', (pct) => {
+                setUploadQueue(prev => prev.map((it, idx) => idx === i ? { ...it, progress: pct } : it));
+              });
+              finalMediaUrl = res.secureUrl;
+              finalPublicId = res.publicId;
+              posterUrl = '/assets/indus-crop-hero.webp';
+            } catch (vErr) {
+              console.warn(`Video upload fallback for ${item.file.name}:`, vErr);
+              if (item.preview) finalMediaUrl = item.preview;
+            }
+          } else {
+            // Image upload
+            try {
+              const res = await uploadToCloudinary(item.file, 'gallery', (pct) => {
+                setUploadQueue(prev => prev.map((it, idx) => idx === i ? { ...it, progress: pct } : it));
+              });
+              finalMediaUrl = res.secureUrl;
+              finalPublicId = res.publicId;
+              posterUrl = res.secureUrl;
+            } catch (imgErr) {
+              console.warn(`Image upload fallback for ${item.file.name}:`, imgErr);
+              if (item.preview) finalMediaUrl = item.preview;
+            }
+          }
+        }
+
+        const isVid = item.mediaType === 'video';
+        itemsToSave.push({
+          title: item.title.trim(),
+          category: item.category || 'Field Trials & Crop Health',
+          caption: item.description.trim() || item.title.trim(),
+          description: item.description.trim() || item.title.trim(),
+          altText: item.title.trim(),
+          mediaType: item.mediaType,
+          imageUrl: isVid ? posterUrl : finalMediaUrl,
+          imagePublicId: isVid ? undefined : finalPublicId,
+          videoUrl: isVid ? finalMediaUrl : undefined,
+          videoPublicId: isVid ? finalPublicId : undefined,
+          isPublished: true,
+          sortOrder: items.length + i + 1
         });
-        finalUrl = res.secureUrl;
-        pubId = res.publicId;
-      } catch (e: any) {
-        console.warn(`Multi-upload Cloudinary notice for ${mf.file.name}:`, e);
+
+        setUploadQueue(prev => prev.map((it, idx) => idx === i ? { ...it, status: 'done', progress: 100 } : it));
+        successCount++;
+      } catch (err: any) {
+        console.error(`Error uploading item ${item.title}:`, err);
+        setUploadQueue(prev => prev.map((it, idx) => idx === i ? { ...it, status: 'error', error: err?.message || 'Upload failed' } : it));
       }
-
-      itemsToSave.push({
-        title: mf.title.trim() || 'Untitled Photograph',
-        category: mf.category || multiCommonCategory,
-        caption: mf.caption.trim() || mf.title.trim(),
-        description: mf.caption.trim() || mf.title.trim(),
-        altText: mf.title.trim(),
-        imageUrl: finalUrl,
-        imagePublicId: pubId,
-        isPublished: true,
-        sortOrder: items.length + i + 1
-      });
-
-      setMultiFiles(prev => prev.map((f, idx) => idx === i ? { ...f, status: 'done', progress: 100 } : f));
-      successCount++;
     }
 
     try {
-      await saveMultipleGalleryItems(itemsToSave);
-      setShowAddModal(false);
-      setMultiFiles([]);
-      showNotification(`Successfully added ${successCount} photographs to the gallery!`);
-      loadGallery();
-    } catch (err: any) {
-      showNotification(undefined, `Failed to save batch visuals: ${err?.message || 'Database error'}`);
+      if (itemsToSave.length > 0) {
+        await saveMultipleGalleryItems(itemsToSave);
+        setShowAddModal(false);
+        setUploadQueue([]);
+        showNotification(`Successfully uploaded and published ${successCount} visual(s) to the gallery!`);
+        await loadGallery();
+      }
+    } catch (saveErr: any) {
+      showNotification(undefined, `Failed to save gallery records: ${saveErr?.message || 'Database error'}`);
     } finally {
       setSaving(false);
+      setUploadProgressIndex(0);
     }
   };
 
@@ -394,6 +524,9 @@ export const AdminGalleryPage: React.FC = () => {
               caption: currentItem.caption?.trim() || '',
               description: currentItem.description?.trim() || '',
               altText: currentItem.altText?.trim() || currentItem.title.trim(),
+              mediaType: currentItem.mediaType || (currentItem.videoUrl ? 'video' : 'image'),
+              videoUrl: currentItem.videoUrl || undefined,
+              imageUrl: currentItem.imageUrl,
               isPublished: currentItem.isPublished,
               updatedAt: new Date().toISOString()
             }
@@ -406,6 +539,9 @@ export const AdminGalleryPage: React.FC = () => {
         caption: currentItem.caption?.trim() || '',
         description: currentItem.description?.trim() || '',
         altText: currentItem.altText?.trim() || currentItem.title.trim(),
+        mediaType: currentItem.mediaType || (currentItem.videoUrl ? 'video' : 'image'),
+        videoUrl: currentItem.videoUrl || undefined,
+        imageUrl: currentItem.imageUrl,
         isPublished: currentItem.isPublished
       }, currentItem.id);
 
@@ -438,35 +574,80 @@ export const AdminGalleryPage: React.FC = () => {
 
   const handleConfirmReplace = async () => {
     if (!replacingItem || !replaceFile) {
-      showNotification(undefined, 'Please select a replacement image.');
+      showNotification(undefined, 'Please select a replacement file.');
       return;
     }
 
     setSaving(true);
     setReplaceProgress(15);
     try {
-      let finalUrl = replacePreview || replacingItem.imageUrl;
-      let pubId: string | undefined = undefined;
+      const isVideoFile = replaceFile.type.includes('video') || 
+                          replaceFile.name.toLowerCase().endsWith('.mp4') || 
+                          replaceFile.name.toLowerCase().endsWith('.webm');
 
-      try {
-        const res = await uploadToCloudinary(replaceFile, 'gallery', (pct) => {
-          setReplaceProgress(pct);
-        });
-        finalUrl = res.secureUrl;
-        pubId = res.publicId;
-      } catch (err) {
-        console.warn('Replace image fallback to local:', err);
+      if (isVideoFile || replacingItem.mediaType === 'video') {
+        if (isVideoFile) {
+          let finalVideoUrl = replacePreview || replacingItem.videoUrl || '';
+          let videoPubId: string | undefined = undefined;
+          try {
+            const res = await uploadVideoToCloudinary(replaceFile, 'gallery', (pct) => {
+              setReplaceProgress(pct);
+            });
+            finalVideoUrl = res.secureUrl;
+            videoPubId = res.publicId;
+          } catch (err) {
+            console.warn('Replace video notice, using preview:', err);
+          }
+
+          await replaceGalleryMedia(replacingItem.id, {
+            videoUrl: finalVideoUrl,
+            videoPublicId: videoPubId,
+            mediaType: 'video'
+          });
+        } else {
+          // Replaced the poster image for the video
+          let finalImageUrl = replacePreview || replacingItem.imageUrl;
+          let imgPubId: string | undefined = undefined;
+          try {
+            const res = await uploadToCloudinary(replaceFile, 'gallery', (pct) => {
+              setReplaceProgress(pct);
+            });
+            finalImageUrl = res.secureUrl;
+            imgPubId = res.publicId;
+          } catch (err) {
+            console.warn('Replace poster image notice, using preview:', err);
+          }
+
+          await replaceGalleryMedia(replacingItem.id, {
+            imageUrl: finalImageUrl,
+            imagePublicId: imgPubId
+          });
+        }
+      } else {
+        let finalUrl = replacePreview || replacingItem.imageUrl;
+        let pubId: string | undefined = undefined;
+
+        try {
+          const res = await uploadToCloudinary(replaceFile, 'gallery', (pct) => {
+            setReplaceProgress(pct);
+          });
+          finalUrl = res.secureUrl;
+          pubId = res.publicId;
+        } catch (err) {
+          console.warn('Replace image fallback to local:', err);
+        }
+
+        await replaceGalleryImage(replacingItem.id, finalUrl, pubId);
       }
 
-      await replaceGalleryImage(replacingItem.id, finalUrl, pubId);
       setShowReplaceModal(false);
       setReplacingItem(null);
       setReplaceFile(null);
       setReplacePreview(null);
-      showNotification(`Photograph for "${replacingItem.title}" successfully replaced!`);
+      showNotification(`Media for "${replacingItem.title}" successfully replaced!`);
       loadGallery();
     } catch (err: any) {
-      showNotification(undefined, `Failed to replace photograph: ${err?.message || 'Database error'}`);
+      showNotification(undefined, `Failed to replace media: ${err?.message || 'Database error'}`);
     } finally {
       setSaving(false);
       setReplaceProgress(0);
@@ -567,13 +748,13 @@ export const AdminGalleryPage: React.FC = () => {
               type="button" 
               className="btn btn-primary btn-sm"
               onClick={() => {
-                resetSingleForm();
-                setMultiFiles([]);
+                setUploadQueue([]);
                 setShowAddModal(true);
               }}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
             >
-              <PlusCircle size={15} style={{ marginRight: '6px' }} />
-              <span>Add Photograph(s)</span>
+              <PlusCircle size={15} />
+              <span>+ Add Images / Videos</span>
             </button>
           </div>
         </header>
@@ -725,19 +906,63 @@ export const AdminGalleryPage: React.FC = () => {
                 >
                   All Categories ({items.length})
                 </button>
-                {OFFICIAL_CATEGORIES.map(cat => {
+                {allCategories.map(cat => {
                   const count = items.filter(i => i.category === cat).length;
+                  const isCustom = !DEFAULT_GALLERY_CATEGORIES.includes(cat);
                   return (
-                    <button 
-                      key={cat}
-                      type="button" 
-                      className={`gallery-filter-chip ${selectedCategory === cat ? 'active' : ''}`}
-                      onClick={() => setSelectedCategory(cat)}
-                    >
-                      {cat} ({count})
-                    </button>
+                    <div key={cat} style={{ display: 'inline-flex', alignItems: 'center', position: 'relative' }}>
+                      <button 
+                        type="button" 
+                        className={`gallery-filter-chip ${selectedCategory === cat ? 'active' : ''}`}
+                        onClick={() => setSelectedCategory(cat)}
+                        style={isCustom ? { paddingRight: '28px' } : undefined}
+                      >
+                        {cat} ({count})
+                      </button>
+                      {isCustom && (
+                        <button
+                          type="button"
+                          className="gallery-delete-category-btn"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setCategoryToDelete(cat);
+                            setShowDeleteCategoryModal(true);
+                          }}
+                          title={`Delete custom category "${cat}"`}
+                          style={{
+                            position: 'absolute',
+                            right: '7px',
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            color: selectedCategory === cat ? '#FCA5A5' : '#EF4444',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            padding: '2px',
+                            borderRadius: '50%'
+                          }}
+                        >
+                          <Trash2 size={12} />
+                        </button>
+                      )}
+                    </div>
                   );
                 })}
+                <button
+                  type="button"
+                  className="gallery-filter-chip"
+                  style={{ borderStyle: 'dashed', borderColor: 'var(--color-primary-green)', color: 'var(--color-primary-green)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                  onClick={() => {
+                    setCategoryTarget(null);
+                    setNewCategoryName('');
+                    setShowNewCategoryModal(true);
+                  }}
+                  title="Create a new gallery category"
+                >
+                  <Plus size={13} /> New Category
+                </button>
               </div>
             </div>
 
@@ -806,18 +1031,38 @@ export const AdminGalleryPage: React.FC = () => {
                               title="Click to view full preview"
                             >
                               <img 
-                                src={item.imageUrl} 
+                                src={item.imageUrl || '/assets/indus-crop-hero.webp'} 
                                 alt={item.title} 
                                 className="table-thumb" 
                                 style={{ width: '74px', height: '54px', objectFit: 'cover', borderRadius: '6px', border: '1px solid #D1D5DB' }}
                               />
+                              {(item.mediaType === 'video' || item.videoUrl) && (
+                                <div style={{ 
+                                  position: 'absolute', 
+                                  inset: 0, 
+                                  display: 'flex', 
+                                  alignItems: 'center', 
+                                  justifyContent: 'center', 
+                                  background: 'rgba(0,0,0,0.38)', 
+                                  borderRadius: '6px' 
+                                }}>
+                                  <div style={{ width: '22px', height: '22px', borderRadius: '50%', background: 'rgba(6,95,70,0.95)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <Play size={11} fill="#FFFFFF" style={{ marginLeft: '1px' }} />
+                                  </div>
+                                </div>
+                              )}
                             </div>
                           </td>
 
                           {/* Title & Caption */}
                           <td>
-                            <div style={{ fontWeight: 700, color: 'var(--color-text-title)', fontSize: '0.95rem' }}>
-                              {item.title}
+                            <div style={{ fontWeight: 700, color: 'var(--color-text-title)', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                              <span>{item.title}</span>
+                              {(item.mediaType === 'video' || item.videoUrl) && (
+                                <span className="badge badge-gold" style={{ fontSize: '0.68rem', padding: '2px 7px', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                                  <VideoIcon size={10} /> Video
+                                </span>
+                              )}
                             </div>
                             {item.caption && (
                               <div style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', marginTop: '2px', lineHeight: '1.4' }}>
@@ -920,275 +1165,476 @@ export const AdminGalleryPage: React.FC = () => {
       {/* ========================================================
           1. ADD NEW VISUAL(S) MODAL (Single & Multiple Modes)
           ======================================================== */}
+      {/* ========================================================
+          1. ADD NEW IMAGES & VIDEOS MODAL (Unified Experience)
+          ======================================================== */}
       {showAddModal && (
-        <div className="modal-overlay" onClick={() => setShowAddModal(false)}>
-          <div className="modal-dialog" style={{ maxWidth: '680px' }} onClick={e => e.stopPropagation()}>
+        <div className="modal-overlay" onClick={() => !saving && setShowAddModal(false)}>
+          <div 
+            className="modal-dialog" 
+            style={{ maxWidth: '840px', width: '95%' }} 
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Modal Header */}
             <div className="modal-header">
               <div>
-                <h3 style={{ fontSize: '1.25rem', color: 'var(--color-primary-green-dark)', margin: '0 0 4px 0' }}>
-                  Add Visual Photography
+                <h3 style={{ fontSize: '1.25rem', color: 'var(--color-primary-green-dark)', margin: '0 0 4px 0', fontWeight: 700 }}>
+                  Add Images & Videos
                 </h3>
-                <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', margin: 0 }}>
-                  Upload new corporate conference, field trial, or agricultural exhibition photos
+                <p style={{ fontSize: '0.84rem', color: 'var(--color-text-muted)', margin: 0 }}>
+                  Upload company photographs and field trial videos to the media gallery
                 </p>
               </div>
-              <button type="button" className="modal-close-btn" onClick={() => setShowAddModal(false)}>
+              <button 
+                type="button" 
+                className="modal-close-btn" 
+                onClick={() => !saving && setShowAddModal(false)}
+                disabled={saving}
+              >
                 ✕
               </button>
             </div>
 
-            {/* Mode Selector Tabs */}
-            <div style={{ display: 'flex', borderBottom: '1px solid #E5E7EB', padding: '0 28px' }}>
-              <button 
-                type="button" 
-                className={`btn btn-sm ${addMode === 'single' ? 'btn-primary' : ''}`}
-                style={{ borderRadius: '6px 6px 0 0', margin: '8px 6px 0 0', borderBottom: 'none' }}
-                onClick={() => setAddMode('single')}
+            <div className="gallery-modal-body-scroll" style={{ padding: '20px 28px' }}>
+              
+              {/* Drag and drop selection area */}
+              <div 
+                className={`gallery-unified-dropzone ${isDragOver ? 'is-dragover' : ''} ${uploadQueue.length > 0 ? 'compact' : ''}`}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                onClick={() => fileInputRef.current?.click()}
               >
-                Single Photograph
-              </button>
-              <button 
-                type="button" 
-                className={`btn btn-sm ${addMode === 'multiple' ? 'btn-primary' : ''}`}
-                style={{ borderRadius: '6px 6px 0 0', margin: '8px 0 0 0', borderBottom: 'none' }}
-                onClick={() => setAddMode('multiple')}
-              >
-                <Layers size={14} style={{ marginRight: '6px' }} />
-                Batch / Multi-Upload
-              </button>
-            </div>
-
-            {/* SINGLE UPLOAD MODE */}
-            {addMode === 'single' ? (
-              <form onSubmit={handleSingleCreate} className="gallery-modal-body-scroll">
-                <div className="form-group">
-                  <label className="form-label">
-                    Visual Title <span className="req">*</span>
-                  </label>
-                  <input 
-                    type="text" 
-                    className="form-control"
-                    placeholder="e.g. Annual Conference 2026–27 Directorate Address"
-                    value={singleTitle}
-                    onChange={e => setSingleTitle(e.target.value)}
-                    required
-                  />
+                <input 
+                  ref={fileInputRef}
+                  type="file" 
+                  multiple 
+                  accept="image/*,video/*,image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime"
+                  onChange={e => {
+                    if (e.target.files) {
+                      processSelectedFiles(e.target.files);
+                      e.target.value = '';
+                    }
+                  }}
+                  style={{ display: 'none' }}
+                  disabled={saving}
+                />
+                
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '8px' }}>
+                    <UploadCloud size={32} style={{ color: 'var(--color-primary-green)' }} />
+                    <ImageIcon size={22} style={{ color: '#059669' }} />
+                    <VideoIcon size={22} style={{ color: '#D97706' }} />
+                  </div>
+                  <p style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--color-text-title)', margin: '0 0 4px 0' }}>
+                    Select or drag and drop images and videos here. You can select multiple files together.
+                  </p>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', margin: 0 }}>
+                    Supports JPG, PNG, WebP photos & MP4, WebM videos (up to 25MB each)
+                  </p>
                 </div>
+              </div>
 
-                <div className="form-group">
-                  <label className="form-label">Category <span className="req">*</span></label>
-                  <select 
-                    className="form-control"
-                    value={singleCategory}
-                    onChange={e => setSingleCategory(e.target.value)}
-                  >
-                    {OFFICIAL_CATEGORIES.map(cat => (
-                      <option key={cat} value={cat}>{cat}</option>
-                    ))}
-                  </select>
-                </div>
+              {/* Action bar when files are selected */}
+              {uploadQueue.length > 0 && (
+                <div style={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center', 
+                  flexWrap: 'wrap', 
+                  gap: '12px',
+                  margin: '16px 0 12px 0',
+                  padding: '10px 14px',
+                  backgroundColor: '#F8FAFC',
+                  borderRadius: '8px',
+                  border: '1px solid #E2E8F0'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--color-text-title)' }}>
+                      Selected Files ({uploadQueue.length}):
+                    </span>
+                    <span className="badge badge-green" style={{ fontSize: '0.75rem' }}>
+                      {uploadQueue.filter(q => q.mediaType === 'image').length} Image(s)
+                    </span>
+                    <span className="badge badge-amber" style={{ fontSize: '0.75rem', backgroundColor: '#FEF3C7', color: '#92400E' }}>
+                      {uploadQueue.filter(q => q.mediaType === 'video').length} Video(s)
+                    </span>
+                  </div>
 
-                <div className="form-group">
-                  <label className="form-label">Caption / Key Highlights</label>
-                  <input 
-                    type="text" 
-                    className="form-control"
-                    placeholder="e.g. Executive board members inaugurating conference deliberations"
-                    value={singleCaption}
-                    onChange={e => setSingleCaption(e.target.value)}
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Description (Optional)</label>
-                  <textarea 
-                    className="form-control"
-                    rows={2}
-                    placeholder="Extended background notes or location details..."
-                    value={singleDescription}
-                    onChange={e => setSingleDescription(e.target.value)}
-                  />
-                </div>
-
-                {/* Dropzone with preview */}
-                <div className="form-group">
-                  <label className="form-label">Photograph File <span className="req">*</span></label>
-                  <div className="image-uploader-dropzone">
-                    <input 
-                      type="file" 
-                      accept="image/jpeg,image/png,image/webp,image/jpg" 
-                      onChange={handleSingleFileSelect}
-                      style={{ display: 'none' }}
-                      id="single-photo-input"
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <button 
+                      type="button" 
+                      className="btn btn-outline btn-sm"
+                      style={{ fontSize: '0.78rem', padding: '3px 10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                      onClick={() => fileInputRef.current?.click()}
                       disabled={saving}
-                    />
-                    <label htmlFor="single-photo-input" style={{ cursor: 'pointer', display: 'block' }}>
-                      {singlePreview ? (
-                        <div>
-                          <img src={singlePreview} alt="Preview" className="uploader-preview-img" style={{ maxHeight: '180px' }} />
-                          <p style={{ fontSize: '0.85rem', color: 'var(--color-primary-green)', fontWeight: 600, margin: '8px 0 0 0' }}>
-                            Click to change photograph
-                          </p>
-                        </div>
-                      ) : (
-                        <div>
-                          <UploadCloud size={38} style={{ color: 'var(--color-primary-green)', margin: '0 auto 8px auto' }} />
-                          <p style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--color-text-title)', margin: '0 0 4px 0' }}>
-                            Click or drag photograph here
-                          </p>
-                          <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: 0 }}>
-                            Supports JPG, PNG, WebP up to 10MB
-                          </p>
-                        </div>
-                      )}
-                    </label>
+                    >
+                      <Plus size={13} />
+                      Add More Files
+                    </button>
+                    <button 
+                      type="button" 
+                      className="btn btn-outline btn-sm"
+                      style={{ fontSize: '0.78rem', padding: '3px 10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                      onClick={handleAddDirectVideoUrl}
+                      disabled={saving}
+                    >
+                      <VideoIcon size={13} />
+                      Add Video URL
+                    </button>
+                    <button 
+                      type="button" 
+                      className="btn btn-outline btn-sm"
+                      style={{ fontSize: '0.78rem', padding: '3px 10px', color: '#DC2626', borderColor: '#FECACA' }}
+                      onClick={() => setUploadQueue([])}
+                      disabled={saving}
+                    >
+                      Clear All
+                    </button>
                   </div>
                 </div>
+              )}
 
-                {/* Progress bar if saving */}
-                {saving && (
-                  <div style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <Loader2 size={16} className="animate-spin" style={{ color: 'var(--color-primary-green)' }} />
-                    <div style={{ flex: 1, backgroundColor: '#E0E0E0', height: '6px', borderRadius: '3px', overflow: 'hidden' }}>
-                      <div style={{ width: `${singleProgress}%`, backgroundColor: 'var(--color-primary-green)', height: '100%', transition: 'width 0.2s' }} />
-                    </div>
-                    <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-primary-green)' }}>{singleProgress}%</span>
-                  </div>
-                )}
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '14px' }}>
-                  <input 
-                    type="checkbox" 
-                    id="single-publish-check" 
-                    checked={singleIsPublished} 
-                    onChange={e => setSingleIsPublished(e.target.checked)} 
-                  />
-                  <label htmlFor="single-publish-check" style={{ fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer' }}>
-                    Publish to public gallery immediately
-                  </label>
-                </div>
-
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '24px' }}>
-                  <button type="button" className="btn btn-outline" onClick={() => setShowAddModal(false)} disabled={saving}>
-                    Cancel
-                  </button>
-                  <button type="submit" className="btn btn-primary" disabled={saving || (!singleFile && !singlePreview)}>
-                    {saving ? 'Publishing...' : 'Publish to Gallery'}
-                  </button>
-                </div>
-              </form>
-            ) : (
-              /* MULTIPLE UPLOAD MODE */
-              <div className="gallery-modal-body-scroll">
-                <div className="form-group">
-                  <label className="form-label">Apply Common Category to All</label>
+              {/* Quick apply common category helper */}
+              {uploadQueue.length > 1 && (
+                <div style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '10px', 
+                  marginBottom: '14px', 
+                  padding: '8px 12px', 
+                  backgroundColor: '#ECFDF5', 
+                  borderRadius: '6px',
+                  border: '1px solid #A7F3D0'
+                }}>
+                  <Tag size={15} style={{ color: '#047857' }} />
+                  <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#065F46' }}>
+                    Quick Category: Apply to all:
+                  </span>
                   <select 
                     className="form-control"
-                    value={multiCommonCategory}
+                    style={{ padding: '3px 8px', fontSize: '0.8rem', width: 'auto', flex: 1, maxWidth: '260px', height: 'auto' }}
+                    defaultValue=""
                     onChange={e => {
-                      setMultiCommonCategory(e.target.value);
-                      setMultiFiles(prev => prev.map(f => ({ ...f, category: e.target.value })));
+                      if (e.target.value === '__CREATE_NEW__') {
+                        setCategoryTarget('quick_all');
+                        setNewCategoryName('');
+                        setShowNewCategoryModal(true);
+                        e.target.value = '';
+                      } else if (e.target.value) {
+                        const newCat = e.target.value;
+                        setUploadQueue(prev => prev.map(item => ({ ...item, category: newCat })));
+                      }
                     }}
+                    disabled={saving}
                   >
-                    {OFFICIAL_CATEGORIES.map(cat => (
+                    <option value="">-- Choose Category to Apply to All --</option>
+                    {allCategories.map(cat => (
                       <option key={cat} value={cat}>{cat}</option>
                     ))}
+                    <option value="__CREATE_NEW__" style={{ fontWeight: 700, color: '#047857' }}>
+                      + Create New Category
+                    </option>
                   </select>
+                  <span style={{ fontSize: '0.74rem', color: '#047857', fontStyle: 'italic' }}>
+                    (You can still change each item's category individually below)
+                  </span>
                 </div>
+              )}
 
-                <div className="form-group">
-                  <label className="form-label">Select Multiple Photographs</label>
-                  <div className="image-uploader-dropzone">
-                    <input 
-                      type="file" 
-                      multiple 
-                      accept="image/jpeg,image/png,image/webp,image/jpg" 
-                      onChange={handleMultiFilesSelect}
-                      style={{ display: 'none' }}
-                      id="multi-photos-input"
-                      disabled={saving}
-                    />
-                    <label htmlFor="multi-photos-input" style={{ cursor: 'pointer', display: 'block' }}>
-                      <Layers size={38} style={{ color: 'var(--color-primary-green)', margin: '0 auto 8px auto' }} />
-                      <p style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--color-text-title)', margin: '0 0 4px 0' }}>
-                        Click to select multiple photographs (Hold Ctrl or Shift)
-                      </p>
-                      <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: 0 }}>
-                        Select 2, 5, 10 or more images at once
-                      </p>
-                    </label>
-                  </div>
-                </div>
+              {/* Scrollable list of file cards with INDIVIDUAL details */}
+              {uploadQueue.length > 0 && (
+                <div style={{ maxHeight: '420px', overflowY: 'auto', paddingRight: '4px' }}>
+                  {uploadQueue.map((item, idx) => (
+                    <div key={item.id} className="gallery-queue-item">
+                      
+                      {/* Left: Preview & Badges */}
+                      <div className="gallery-queue-preview-box">
+                        <div style={{ position: 'relative', width: '120px', height: '80px' }}>
+                          {item.mediaType === 'video' ? (
+                            item.sourceType === 'file' ? (
+                              <video 
+                                src={item.preview} 
+                                className="gallery-queue-thumb" 
+                                muted 
+                                preload="metadata" 
+                              />
+                            ) : (
+                              <img 
+                                src={item.preview || '/assets/indus-crop-hero.webp'} 
+                                alt="Video preview" 
+                                className="gallery-queue-thumb" 
+                              />
+                            )
+                          ) : (
+                            <img 
+                              src={item.preview} 
+                              alt="Thumbnail" 
+                              className="gallery-queue-thumb" 
+                            />
+                          )}
 
-                {multiFiles.length > 0 && (
-                  <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                      <span style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--color-text-title)' }}>
-                        Selected Files ({multiFiles.length}):
-                      </span>
-                      <button 
-                        type="button" 
-                        className="btn btn-outline btn-sm"
-                        style={{ fontSize: '0.75rem', padding: '2px 8px' }}
-                        onClick={() => setMultiFiles([])}
-                        disabled={saving}
-                      >
-                        Clear All
-                      </button>
-                    </div>
+                          {item.mediaType === 'video' && (
+                            <div style={{
+                              position: 'absolute',
+                              inset: 0,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              backgroundColor: 'rgba(0,0,0,0.3)',
+                              borderRadius: '6px',
+                              pointerEvents: 'none'
+                            }}>
+                              <Play size={20} fill="#FFFFFF" color="#FFFFFF" />
+                            </div>
+                          )}
+                        </div>
 
-                    <div style={{ maxHeight: '240px', overflowY: 'auto' }}>
-                      {multiFiles.map((mf, idx) => (
-                        <div key={idx} className="gallery-multi-file-item">
-                          <img src={mf.preview} alt="Thumb" className="gallery-multi-file-thumb" />
-                          <div style={{ flex: 1, minWidth: 0 }}>
+                        {/* Media Type Badge */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          {item.mediaType === 'video' ? (
+                            <span 
+                              className="badge" 
+                              style={{ 
+                                backgroundColor: '#FEF3C7', 
+                                color: '#92400E', 
+                                border: '1px solid #FDE68A',
+                                fontSize: '0.72rem',
+                                padding: '1px 6px',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '3px'
+                              }}
+                            >
+                              <VideoIcon size={10} />
+                              Video
+                            </span>
+                          ) : (
+                            <span 
+                              className="badge badge-green" 
+                              style={{ 
+                                fontSize: '0.72rem', 
+                                padding: '1px 6px',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '3px'
+                              }}
+                            >
+                              <ImageIcon size={10} />
+                              Image
+                            </span>
+                          )}
+                          <span style={{ fontSize: '0.7rem', color: '#64748B' }}>
+                            {item.fileSizeFormatted}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Right: Individual Editable Details */}
+                      <div className="gallery-queue-fields">
+                        
+                        {/* Title and Category Row */}
+                        <div className="gallery-queue-fields-row">
+                          <div>
+                            <label className="form-label" style={{ fontSize: '0.78rem', marginBottom: '3px' }}>
+                              Title <span className="req">*</span>
+                            </label>
+                            <input 
+                              type="text" 
+                              className="form-control"
+                              style={{ padding: '6px 10px', fontSize: '0.86rem', fontWeight: 600 }}
+                              value={item.title}
+                              onChange={e => {
+                                const newTitle = e.target.value;
+                                setUploadQueue(prev => prev.map((q, i) => i === idx ? { ...q, title: newTitle } : q));
+                              }}
+                              placeholder="Title for this item"
+                              disabled={saving}
+                              required
+                            />
+                          </div>
+
+                          <div>
+                            <label className="form-label" style={{ fontSize: '0.78rem', marginBottom: '3px' }}>
+                              Category <span className="req">*</span>
+                            </label>
+                            <select 
+                              className="form-control"
+                              style={{ padding: '6px 10px', fontSize: '0.84rem' }}
+                              value={item.category}
+                              onChange={e => {
+                                if (e.target.value === '__CREATE_NEW__') {
+                                  setCategoryTarget(idx);
+                                  setNewCategoryName('');
+                                  setShowNewCategoryModal(true);
+                                } else {
+                                  const newCat = e.target.value;
+                                  setUploadQueue(prev => prev.map((q, i) => i === idx ? { ...q, category: newCat } : q));
+                                }
+                              }}
+                              disabled={saving}
+                            >
+                              {allCategories.map(cat => (
+                                <option key={cat} value={cat}>{cat}</option>
+                              ))}
+                              <option value="__CREATE_NEW__" style={{ fontWeight: 700, color: '#047857' }}>
+                                + Create New Category
+                              </option>
+                            </select>
+                          </div>
+                        </div>
+
+                        {/* Description Field (Individual per file!) */}
+                        <div>
+                          <label className="form-label" style={{ fontSize: '0.78rem', marginBottom: '3px' }}>
+                            Description <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', fontWeight: 400 }}>(Specific to this item)</span>
+                          </label>
+                          <textarea 
+                            className="form-control"
+                            rows={2}
+                            style={{ padding: '6px 10px', fontSize: '0.84rem', resize: 'vertical' }}
+                            value={item.description}
+                            onChange={e => {
+                              const newDesc = e.target.value;
+                              setUploadQueue(prev => prev.map((q, i) => i === idx ? { ...q, description: newDesc } : q));
+                            }}
+                            placeholder="Add description, location, or crop highlights for this specific photo/video..."
+                            disabled={saving}
+                          />
+                        </div>
+
+                        {/* If Direct URL mode for video */}
+                        {item.sourceType === 'url' && (
+                          <div>
+                            <label className="form-label" style={{ fontSize: '0.78rem', marginBottom: '3px' }}>
+                              Direct Video URL <span className="req">*</span>
+                            </label>
                             <input 
                               type="text" 
                               className="form-control"
                               style={{ padding: '6px 10px', fontSize: '0.84rem' }}
-                              value={mf.title}
+                              value={item.directVideoUrl || ''}
                               onChange={e => {
-                                const newTitle = e.target.value;
-                                setMultiFiles(prev => prev.map((f, i) => i === idx ? { ...f, title: newTitle } : f));
+                                const newUrl = e.target.value;
+                                setUploadQueue(prev => prev.map((q, i) => i === idx ? { 
+                                  ...q, 
+                                  directVideoUrl: newUrl,
+                                  preview: newUrl.trim() || '/assets/indus-crop-hero.webp' 
+                                } : q));
                               }}
-                              placeholder="Title"
+                              placeholder="e.g. /videos/hero-cinematic.mp4 or https://res.cloudinary.com/.../video.mp4"
                               disabled={saving}
                             />
-                            {mf.status === 'uploading' && (
-                              <div style={{ width: '100%', backgroundColor: '#E5E7EB', height: '4px', borderRadius: '2px', marginTop: '6px', overflow: 'hidden' }}>
-                                <div style={{ width: `${mf.progress}%`, backgroundColor: '#0E6B38', height: '100%' }} />
-                              </div>
-                            )}
                           </div>
-                          <button 
-                            type="button" 
-                            className="btn-icon delete"
-                            onClick={() => setMultiFiles(prev => prev.filter((_, i) => i !== idx))}
-                            disabled={saving}
-                          >
-                            <X size={14} />
-                          </button>
-                        </div>
-                      ))}
+                        )}
+
+                        {/* Individual Upload Progress / Status */}
+                        {item.status === 'uploading' && (
+                          <div style={{ marginTop: '4px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.74rem', color: '#047857', fontWeight: 600, marginBottom: '2px' }}>
+                              <span>Uploading to Cloudinary...</span>
+                              <span>{item.progress}%</span>
+                            </div>
+                            <div style={{ width: '100%', backgroundColor: '#E2E8F0', height: '4px', borderRadius: '2px', overflow: 'hidden' }}>
+                              <div style={{ width: `${item.progress}%`, backgroundColor: '#059669', height: '100%', transition: 'width 0.2s' }} />
+                            </div>
+                          </div>
+                        )}
+
+                        {item.status === 'done' && (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.76rem', color: '#059669', fontWeight: 600 }}>
+                            <CheckCircle2 size={13} />
+                            <span>Uploaded successfully</span>
+                          </div>
+                        )}
+
+                        {item.status === 'error' && (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.76rem', color: '#DC2626', fontWeight: 600 }}>
+                            <AlertCircle size={13} />
+                            <span>{item.error || 'Upload error'}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Remove item button */}
+                      <button 
+                        type="button" 
+                        className="btn-icon delete"
+                        style={{ alignSelf: 'flex-start', marginTop: '2px' }}
+                        onClick={() => setUploadQueue(prev => prev.filter((_, i) => i !== idx))}
+                        disabled={saving}
+                        title="Remove this file from upload queue"
+                      >
+                        <Trash2 size={15} />
+                      </button>
+
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Overall Progress when saving */}
+              {saving && (
+                <div style={{ 
+                  marginTop: '16px', 
+                  padding: '12px 16px', 
+                  backgroundColor: '#ECFDF5', 
+                  borderRadius: '8px', 
+                  border: '1px solid #A7F3D0',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px'
+                }}>
+                  <Loader2 size={18} className="animate-spin" style={{ color: '#059669' }} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', fontWeight: 700, color: '#065F46', marginBottom: '4px' }}>
+                      <span>Processing uploads ({uploadProgressIndex} of {uploadQueue.length})...</span>
+                      <span>Please keep this window open</span>
                     </div>
                   </div>
-                )}
-
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '24px' }}>
-                  <button type="button" className="btn btn-outline" onClick={() => setShowAddModal(false)} disabled={saving}>
-                    Cancel
-                  </button>
-                  <button 
-                    type="button" 
-                    className="btn btn-primary" 
-                    onClick={handleMultiCreate} 
-                    disabled={saving || multiFiles.length === 0}
-                  >
-                    {saving ? 'Uploading Batch...' : `Upload & Save All (${multiFiles.length})`}
-                  </button>
                 </div>
+              )}
+
+              {/* Modal Footer Actions */}
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'flex-end', 
+                alignItems: 'center', 
+                gap: '12px', 
+                marginTop: '24px',
+                paddingTop: '16px',
+                borderTop: '1px solid #E2E8F0'
+              }}>
+                <button 
+                  type="button" 
+                  className="btn btn-outline" 
+                  onClick={() => setShowAddModal(false)} 
+                  disabled={saving}
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="button" 
+                  className="btn btn-primary" 
+                  onClick={handleUploadAll}
+                  disabled={saving || uploadQueue.length === 0}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', minWidth: '160px', justifyContent: 'center' }}
+                >
+                  {saving ? (
+                    <>
+                      <Loader2 size={15} className="animate-spin" />
+                      <span>Uploading All...</span>
+                    </>
+                  ) : (
+                    <>
+                      <UploadCloud size={15} />
+                      <span>{uploadQueue.length > 0 ? `Upload All (${uploadQueue.length})` : 'Upload All'}</span>
+                    </>
+                  )}
+                </button>
               </div>
-            )}
+
+            </div>
           </div>
         </div>
       )}
@@ -1217,14 +1663,29 @@ export const AdminGalleryPage: React.FC = () => {
               
               {/* Highlight photo being edited */}
               <div className="gallery-preview-card-large">
-                <img 
-                  src={editingItem.imageUrl} 
-                  alt={editingItem.title} 
-                  className="gallery-preview-img-large" 
-                />
+                {(editingItem.mediaType === 'video' || editingItem.videoUrl) ? (
+                  <video 
+                    src={editingItem.videoUrl} 
+                    poster={editingItem.imageUrl}
+                    controls
+                    className="gallery-preview-img-large"
+                    style={{ objectFit: 'cover' }}
+                  />
+                ) : (
+                  <img 
+                    src={editingItem.imageUrl} 
+                    alt={editingItem.title} 
+                    className="gallery-preview-img-large" 
+                  />
+                )}
                 <div>
-                  <div style={{ fontSize: '0.78rem', color: '#6B7280', textTransform: 'uppercase', fontWeight: 700 }}>
-                    Visual Record #{editingItem.sortOrder}
+                  <div style={{ fontSize: '0.78rem', color: '#6B7280', textTransform: 'uppercase', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span>Visual Record #{editingItem.sortOrder}</span>
+                    {(editingItem.mediaType === 'video' || editingItem.videoUrl) && (
+                      <span className="badge badge-gold" style={{ fontSize: '0.68rem', padding: '1px 6px' }}>
+                        <VideoIcon size={10} style={{ marginRight: '3px' }} /> Video
+                      </span>
+                    )}
                   </div>
                   <h4 style={{ fontSize: '1rem', fontWeight: 700, color: '#111827', margin: '4px 0 6px 0' }}>
                     {editingItem.title}
@@ -1254,11 +1715,22 @@ export const AdminGalleryPage: React.FC = () => {
                 <select 
                   className="form-control"
                   value={editingItem.category}
-                  onChange={e => setEditingItem({ ...editingItem, category: e.target.value })}
+                  onChange={e => {
+                    if (e.target.value === '__CREATE_NEW__') {
+                      setCategoryTarget('edit_item');
+                      setNewCategoryName('');
+                      setShowNewCategoryModal(true);
+                    } else {
+                      setEditingItem({ ...editingItem, category: e.target.value });
+                    }
+                  }}
                 >
-                  {OFFICIAL_CATEGORIES.map(cat => (
+                  {allCategories.map(cat => (
                     <option key={cat} value={cat}>{cat}</option>
                   ))}
+                  <option value="__CREATE_NEW__" style={{ fontWeight: 700, color: '#047857' }}>
+                    + Create New Category
+                  </option>
                 </select>
               </div>
 
@@ -1294,6 +1766,31 @@ export const AdminGalleryPage: React.FC = () => {
                   placeholder="Accessible screen-reader description"
                 />
               </div>
+
+              {(editingItem.mediaType === 'video' || editingItem.videoUrl) && (
+                <>
+                  <div className="form-group">
+                    <label className="form-label">Video URL</label>
+                    <input 
+                      type="text" 
+                      className="form-control"
+                      value={editingItem.videoUrl || ''}
+                      onChange={e => setEditingItem({ ...editingItem, videoUrl: e.target.value })}
+                      placeholder="e.g. /videos/hero-cinematic.mp4 or https://..."
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Video Cover / Poster Image URL</label>
+                    <input 
+                      type="text" 
+                      className="form-control"
+                      value={editingItem.imageUrl || ''}
+                      onChange={e => setEditingItem({ ...editingItem, imageUrl: e.target.value })}
+                      placeholder="e.g. /assets/indus-crop-hero.webp or image URL"
+                    />
+                  </div>
+                </>
+              )}
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '12px' }}>
                 <input 
@@ -1357,16 +1854,20 @@ export const AdminGalleryPage: React.FC = () => {
                   <h4>New Replacement Image</h4>
                   {replacePreview ? (
                     <div>
-                      <img src={replacePreview} alt="New Replacement" className="gallery-replace-thumb" />
+                      {replaceFile && (replaceFile.type.includes('video') || replaceFile.name.toLowerCase().endsWith('.mp4') || replaceFile.name.toLowerCase().endsWith('.webm')) ? (
+                        <video src={replacePreview} controls className="gallery-replace-thumb" style={{ background: '#000' }} />
+                      ) : (
+                        <img src={replacePreview} alt="New Replacement" className="gallery-replace-thumb" />
+                      )}
                       <label htmlFor="replace-photo-input" style={{ display: 'block', fontSize: '0.8rem', color: 'var(--color-primary-green)', fontWeight: 600, marginTop: '8px', cursor: 'pointer' }}>
-                        Click to choose different image
+                        Click to choose different file
                       </label>
                     </div>
                   ) : (
                     <div style={{ padding: '24px 10px' }}>
                       <input 
                         type="file" 
-                        accept="image/jpeg,image/png,image/webp,image/jpg" 
+                        accept={replacingItem.mediaType === 'video' || replacingItem.videoUrl ? "image/jpeg,image/png,image/webp,image/jpg,video/mp4,video/webm" : "image/jpeg,image/png,image/webp,image/jpg"} 
                         onChange={handleReplaceFileChange} 
                         style={{ display: 'none' }} 
                         id="replace-photo-input"
@@ -1375,14 +1876,14 @@ export const AdminGalleryPage: React.FC = () => {
                       <label htmlFor="replace-photo-input" style={{ cursor: 'pointer', display: 'block' }}>
                         <UploadCloud size={36} style={{ color: 'var(--color-primary-green)', margin: '0 auto 8px auto' }} />
                         <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#111827' }}>
-                          Select New Photograph
+                          {replacingItem.mediaType === 'video' || replacingItem.videoUrl ? 'Select Replacement Video or Cover' : 'Select New Photograph'}
                         </span>
                       </label>
                     </div>
                   )}
                   <input 
                     type="file" 
-                    accept="image/jpeg,image/png,image/webp,image/jpg" 
+                    accept={replacingItem.mediaType === 'video' || replacingItem.videoUrl ? "image/jpeg,image/png,image/webp,image/jpg,video/mp4,video/webm" : "image/jpeg,image/png,image/webp,image/jpg"} 
                     onChange={handleReplaceFileChange} 
                     style={{ display: 'none' }} 
                     id="replace-photo-input"
@@ -1603,7 +2104,14 @@ export const AdminGalleryPage: React.FC = () => {
           <div className="modal-dialog" style={{ maxWidth: '800px', backgroundColor: '#0B1B10', color: '#FFFFFF', border: '1px solid rgba(255,255,255,0.1)' }} onClick={e => e.stopPropagation()}>
             <div className="modal-header" style={{ backgroundColor: '#0B1B10', borderBottomColor: 'rgba(255,255,255,0.1)' }}>
               <div>
-                <span className="badge badge-green" style={{ marginBottom: '6px' }}>{previewModalItem.category}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                  <span className="badge badge-green">{previewModalItem.category}</span>
+                  {(previewModalItem.mediaType === 'video' || previewModalItem.videoUrl) && (
+                    <span className="badge badge-gold" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      <VideoIcon size={12} /> Video
+                    </span>
+                  )}
+                </div>
                 <h3 style={{ fontSize: '1.2rem', color: '#FFFFFF', margin: 0 }}>{previewModalItem.title}</h3>
               </div>
               <button type="button" className="modal-close-btn" style={{ color: '#FFFFFF' }} onClick={() => setPreviewModalItem(null)}>
@@ -1611,16 +2119,223 @@ export const AdminGalleryPage: React.FC = () => {
               </button>
             </div>
             <div style={{ padding: '20px', textAlign: 'center' }}>
-              <img 
-                src={previewModalItem.imageUrl} 
-                alt={previewModalItem.title} 
-                style={{ maxWidth: '100%', maxHeight: '65vh', objectFit: 'contain', borderRadius: '8px' }} 
-              />
+              {(previewModalItem.mediaType === 'video' || previewModalItem.videoUrl) ? (
+                <video 
+                  src={previewModalItem.videoUrl} 
+                  poster={previewModalItem.imageUrl}
+                  controls 
+                  autoPlay 
+                  style={{ maxWidth: '100%', maxHeight: '65vh', borderRadius: '8px', background: '#000000', boxShadow: '0 8px 24px rgba(0,0,0,0.5)' }} 
+                >
+                  Your browser does not support HTML5 video.
+                </video>
+              ) : (
+                <img 
+                  src={previewModalItem.imageUrl} 
+                  alt={previewModalItem.title} 
+                  style={{ maxWidth: '100%', maxHeight: '65vh', objectFit: 'contain', borderRadius: '8px' }} 
+                />
+              )}
               {previewModalItem.caption && (
                 <p style={{ color: '#D1D5DB', fontSize: '0.92rem', marginTop: '14px', lineHeight: '1.5' }}>
                   {previewModalItem.caption}
                 </p>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================
+          7. CREATE NEW CATEGORY MODAL
+          ======================================================== */}
+      {showNewCategoryModal && (
+        <div className="modal-overlay" style={{ zIndex: 1400 }} onClick={handleCloseNewCategoryModal}>
+          <div className="modal-dialog" style={{ maxWidth: '480px' }} onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{
+                  width: '34px',
+                  height: '34px',
+                  borderRadius: '6px',
+                  backgroundColor: '#ECFDF5',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'var(--color-primary-green)'
+                }}>
+                  <Tag size={18} />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '1.15rem', color: 'var(--color-primary-green-dark)', margin: 0 }}>
+                    Create New Category
+                  </h3>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', margin: 0 }}>
+                    Add a custom category for photographs and videos
+                  </p>
+                </div>
+              </div>
+              <button type="button" className="modal-close-btn" onClick={handleCloseNewCategoryModal}>
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateCategory} style={{ padding: '20px' }}>
+              <div className="form-group" style={{ marginBottom: '16px' }}>
+                <label className="form-label" style={{ fontWeight: 600, fontSize: '0.88rem' }}>
+                  Category Name <span className="req">*</span>
+                </label>
+                <input 
+                  type="text" 
+                  className="form-control"
+                  value={newCategoryName}
+                  onChange={e => setNewCategoryName(e.target.value)}
+                  placeholder="e.g. Export Shipments, Research & Labs, Awards..."
+                  autoFocus
+                  required
+                  style={{ padding: '9px 12px', fontSize: '0.92rem' }}
+                />
+                <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', marginTop: '6px', marginBottom: 0 }}>
+                  This category will immediately be available in upload dropdowns and as a filter chip on the website.
+                </p>
+              </div>
+
+              {/* Existing Categories Preview */}
+              <div style={{ marginBottom: '20px', padding: '10px 12px', backgroundColor: '#F8FAFC', borderRadius: '6px', border: '1px solid #E2E8F0' }}>
+                <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#64748B', display: 'block', marginBottom: '6px', textTransform: 'uppercase' }}>
+                  Current Categories:
+                </span>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                  {allCategories.map(c => {
+                    const isCustom = !DEFAULT_GALLERY_CATEGORIES.includes(c);
+                    return (
+                      <span 
+                        key={c} 
+                        style={{ 
+                          fontSize: '0.74rem', 
+                          padding: isCustom ? '2px 6px 2px 8px' : '2px 8px', 
+                          borderRadius: '12px', 
+                          backgroundColor: isCustom ? '#FEF2F2' : '#E2E8F0', 
+                          color: isCustom ? '#991B1B' : '#334155',
+                          border: isCustom ? '1px solid #FECACA' : 'none',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}
+                      >
+                        <span>{c}</span>
+                        {isCustom && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setCategoryToDelete(c);
+                              setShowDeleteCategoryModal(true);
+                            }}
+                            title={`Delete custom category "${c}"`}
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              cursor: 'pointer',
+                              color: '#DC2626',
+                              padding: 0,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}
+                          >
+                            <Trash2 size={11} />
+                          </button>
+                        )}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', paddingTop: '12px', borderTop: '1px solid #E2E8F0' }}>
+                <button 
+                  type="button" 
+                  className="btn btn-outline btn-sm" 
+                  onClick={handleCloseNewCategoryModal}
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  className="btn btn-primary btn-sm"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                >
+                  <Plus size={14} />
+                  <span>Save Category</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================
+          8. DELETE CUSTOM CATEGORY CONFIRMATION MODAL
+          ======================================================== */}
+      {showDeleteCategoryModal && categoryToDelete && (
+        <div className="modal-overlay" style={{ zIndex: 1500 }} onClick={() => setShowDeleteCategoryModal(false)}>
+          <div className="modal-dialog" style={{ maxWidth: '440px', padding: '24px' }} onClick={e => e.stopPropagation()}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                backgroundColor: '#FEF2F2',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#DC2626',
+                flexShrink: 0
+              }}>
+                <AlertCircle size={22} />
+              </div>
+              <div>
+                <h3 style={{ fontSize: '1.15rem', color: '#111827', margin: 0, fontWeight: 700 }}>
+                  Delete Category
+                </h3>
+                <span style={{ fontSize: '0.85rem', color: '#DC2626', fontWeight: 600 }}>
+                  {categoryToDelete}
+                </span>
+              </div>
+            </div>
+
+            <p style={{ fontSize: '0.92rem', color: '#374151', lineHeight: '1.5', margin: '0 0 12px 0' }}>
+              <strong>Are you sure you want to permanently delete this category?</strong>
+            </p>
+
+            <p style={{ fontSize: '0.8rem', color: '#6B7280', margin: '0 0 20px 0', lineHeight: '1.4' }}>
+              Existing images and videos will not be deleted. Any media currently in this category will be safely moved to <strong>Others</strong>.
+            </p>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+              <button 
+                type="button" 
+                className="btn btn-outline btn-sm" 
+                onClick={() => {
+                  setShowDeleteCategoryModal(false);
+                  setCategoryToDelete(null);
+                }}
+                disabled={deletingCategory}
+              >
+                Cancel
+              </button>
+              <button 
+                type="button" 
+                className="btn btn-sm"
+                style={{ backgroundColor: '#DC2626', color: '#FFFFFF', borderColor: '#DC2626', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                onClick={handleConfirmDeleteCategory}
+                disabled={deletingCategory}
+              >
+                {deletingCategory ? <Loader2 size={13} className="animate-spin" /> : <Trash2 size={13} />}
+                <span>Delete Permanently</span>
+              </button>
             </div>
           </div>
         </div>

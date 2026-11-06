@@ -27,6 +27,7 @@ export interface Product {
   galleryImages?: string[];
   isPublished: boolean;
   isFeatured?: boolean;
+  featuredAt?: string; // ISO timestamp when product was marked as featured
   sortOrder: number;
   cropSeason?: string;
   daysToHarvest?: string; // e.g. "50-55 days", "40-45 days"

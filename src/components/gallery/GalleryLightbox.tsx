@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Tag, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, Tag, ChevronLeft, ChevronRight, Video as VideoIcon } from 'lucide-react';
 import { GalleryItem } from '../../types/gallery';
 
 interface GalleryLightboxProps {
@@ -82,15 +82,29 @@ export const GalleryLightbox: React.FC<GalleryLightboxProps> = ({
           <X size={20} strokeWidth={2.5} />
         </button>
 
-        {/* Centered High-Resolution Image Presentation Stage */}
+        {/* Centered Presentation Stage (Image or Video) */}
         <div className="gallery-lightbox-stage">
-          <img 
-            src={item.imageUrl} 
-            alt={item.altText || item.title} 
-            className="gallery-lightbox-image"
-            loading="eager"
-            decoding="sync"
-          />
+          {item.mediaType === 'video' || item.videoUrl ? (
+            <video 
+              key={item.id}
+              src={item.videoUrl} 
+              poster={item.imageUrl}
+              controls 
+              autoPlay 
+              playsInline
+              className="gallery-lightbox-video"
+            >
+              Your browser does not support HTML5 video.
+            </video>
+          ) : (
+            <img 
+              src={item.imageUrl} 
+              alt={item.altText || item.title} 
+              className="gallery-lightbox-image"
+              loading="eager"
+              decoding="sync"
+            />
+          )}
 
           {/* Navigation Chevron: Previous */}
           {onPrev && (
@@ -126,6 +140,12 @@ export const GalleryLightbox: React.FC<GalleryLightboxProps> = ({
               <Tag size={12} style={{ marginRight: '5px' }} />
               {item.category}
             </span>
+            {(item.mediaType === 'video' || item.videoUrl) && (
+              <span className="gallery-lightbox-video-badge">
+                <VideoIcon size={12} style={{ marginRight: '4px' }} />
+                Video
+              </span>
+            )}
             {currentIndex !== undefined && totalCount !== undefined && (
               <span className="gallery-lightbox-counter">
                 {currentIndex + 1} of {totalCount}

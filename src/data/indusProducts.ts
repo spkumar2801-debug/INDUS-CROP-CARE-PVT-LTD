@@ -111,7 +111,7 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "imageUrl": "/images/indus-products/indus-anucart-gr.png",
     "sheetImageUrl": "/images/indus-products/indus-anucart-gr-card.png",
     "isPublished": true,
-    "isFeatured": false,
+    "isFeatured": true,
     "sortOrder": 2,
     "sourcePage": 7
   },
@@ -165,7 +165,7 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "imageUrl": "/images/indus-products/indus-anucart-sp.png",
     "sheetImageUrl": "/images/indus-products/indus-anucart-sp-card.png",
     "isPublished": true,
-    "isFeatured": false,
+    "isFeatured": true,
     "sortOrder": 3,
     "sourcePage": 7
   },
@@ -219,7 +219,7 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "imageUrl": "/images/indus-products/indus-buildox.png",
     "sheetImageUrl": "/images/indus-products/indus-buildox-card.png",
     "isPublished": true,
-    "isFeatured": false,
+    "isFeatured": true,
     "sortOrder": 4,
     "sourcePage": 7
   },
@@ -381,7 +381,7 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "imageUrl": "/images/indus-products/indus-cultiwar.png",
     "sheetImageUrl": "/images/indus-products/indus-cultiwar-card.png",
     "isPublished": true,
-    "isFeatured": true,
+    "isFeatured": false,
     "sortOrder": 7,
     "sourcePage": 7
   },
@@ -705,7 +705,7 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "imageUrl": "/images/indus-products/indus-505.png",
     "sheetImageUrl": "/images/indus-products/indus-505-card.png",
     "isPublished": true,
-    "isFeatured": true,
+    "isFeatured": false,
     "sortOrder": 13,
     "sourcePage": 8
   },
@@ -813,7 +813,7 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "imageUrl": "/images/indus-products/indus-intron.png",
     "sheetImageUrl": "/images/indus-products/indus-intron-card.png",
     "isPublished": true,
-    "isFeatured": true,
+    "isFeatured": false,
     "sortOrder": 15,
     "sourcePage": 8
   },
@@ -867,7 +867,7 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "imageUrl": "/images/indus-products/indus-luxor.png",
     "sheetImageUrl": "/images/indus-products/indus-luxor-card.png",
     "isPublished": true,
-    "isFeatured": true,
+    "isFeatured": false,
     "sortOrder": 16,
     "sourcePage": 8
   },
@@ -1731,7 +1731,7 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "imageUrl": "/images/indus-products/indus-dunlop.png",
     "sheetImageUrl": "/images/indus-products/indus-dunlop-card.png",
     "isPublished": true,
-    "isFeatured": true,
+    "isFeatured": false,
     "sortOrder": 32,
     "sourcePage": 10
   },
@@ -2001,7 +2001,7 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "imageUrl": "/images/indus-products/indus-plus.png",
     "sheetImageUrl": "/images/indus-products/indus-plus-card.png",
     "isPublished": true,
-    "isFeatured": true,
+    "isFeatured": false,
     "sortOrder": 37,
     "sourcePage": 10
   },
@@ -2649,7 +2649,7 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "imageUrl": "/images/indus-products/indus-agrisol.png",
     "sheetImageUrl": "/images/indus-products/indus-agrisol-card.png",
     "isPublished": true,
-    "isFeatured": true,
+    "isFeatured": false,
     "sortOrder": 49,
     "sourcePage": 12
   },
@@ -2973,7 +2973,7 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "imageUrl": "/images/indus-products/indus-meluha.png",
     "sheetImageUrl": "/images/indus-products/indus-meluha-card.png",
     "isPublished": true,
-    "isFeatured": true,
+    "isFeatured": false,
     "sortOrder": 55,
     "sourcePage": 12
   },
@@ -3405,7 +3405,7 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "imageUrl": "/images/indus-products/indus-gabbarking.png",
     "sheetImageUrl": "/images/indus-products/indus-gabbarking-card.png",
     "isPublished": true,
-    "isFeatured": true,
+    "isFeatured": false,
     "sortOrder": 63,
     "sourcePage": 13
   },
@@ -3459,7 +3459,7 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "imageUrl": "/images/indus-products/indus-groful-prom.png",
     "sheetImageUrl": "/images/indus-products/indus-groful-prom-card.png",
     "isPublished": true,
-    "isFeatured": true,
+    "isFeatured": false,
     "sortOrder": 64,
     "sourcePage": 14
   },
@@ -3729,7 +3729,7 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "imageUrl": "/images/indus-products/indus-fermaxx.png",
     "sheetImageUrl": "/images/indus-products/indus-fermaxx-card.png",
     "isPublished": true,
-    "isFeatured": true,
+    "isFeatured": false,
     "sortOrder": 69,
     "sourcePage": 15
   },
@@ -3837,7 +3837,7 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "imageUrl": "/images/indus-products/indus-bhuvija.png",
     "sheetImageUrl": "/images/indus-products/indus-bhuvija-card.png",
     "isPublished": true,
-    "isFeatured": true,
+    "isFeatured": false,
     "sortOrder": 71,
     "sourcePage": 15
   },
@@ -4485,7 +4485,7 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "imageUrl": "/images/indus-products/indus-13-00-45.png",
     "sheetImageUrl": "/images/indus-products/indus-13-00-45-card.png",
     "isPublished": true,
-    "isFeatured": true,
+    "isFeatured": false,
     "sortOrder": 83,
     "sourcePage": 16
   },
@@ -4539,7 +4539,7 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "imageUrl": "/images/indus-products/indus-19-19-19.png",
     "sheetImageUrl": "/images/indus-products/indus-19-19-19-card.png",
     "isPublished": true,
-    "isFeatured": true,
+    "isFeatured": false,
     "sortOrder": 84,
     "sourcePage": 16
   },
@@ -4809,7 +4809,7 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "imageUrl": "/images/indus-products/indus-echo-root.png",
     "sheetImageUrl": "/images/indus-products/indus-echo-root-card.png",
     "isPublished": true,
-    "isFeatured": true,
+    "isFeatured": false,
     "sortOrder": 89,
     "sourcePage": 17
   },
@@ -5241,7 +5241,7 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "imageUrl": "/images/indus-products/indus-expro.png",
     "sheetImageUrl": "/images/indus-products/indus-expro-card.png",
     "isPublished": true,
-    "isFeatured": true,
+    "isFeatured": false,
     "sortOrder": 97,
     "sourcePage": 18
   },
@@ -5565,7 +5565,7 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "imageUrl": "/images/indus-products/indus-bactin.png",
     "sheetImageUrl": "/images/indus-products/indus-bactin-card.png",
     "isPublished": true,
-    "isFeatured": true,
+    "isFeatured": false,
     "sortOrder": 103,
     "sourcePage": 19
   },
@@ -5619,7 +5619,7 @@ export const INDUS_CATALOG_PRODUCTS: IndusCatalogProduct[] = [
     "imageUrl": "/images/indus-products/indus-activ8.png",
     "sheetImageUrl": "/images/indus-products/indus-activ8-card.png",
     "isPublished": true,
-    "isFeatured": true,
+    "isFeatured": false,
     "sortOrder": 104,
     "sourcePage": 19
   },

@@ -116,7 +116,7 @@ export async function uploadToCloudinary(
  */
 export async function uploadVideoToCloudinary(
   file: File,
-  folder: 'hero' | 'branding' = 'hero',
+  folder: 'hero' | 'branding' | 'gallery' = 'gallery',
   onProgress?: (percent: number) => void
 ): Promise<CloudinaryUploadResult> {
   const isMp4 = file.type.includes('mp4') || file.name.toLowerCase().endsWith('.mp4');

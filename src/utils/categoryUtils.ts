@@ -1,28 +1,19 @@
 import { Product } from '../types/product';
+import { IMPORTANT_PRODUCT_CATEGORIES, getCustomProductCategories } from '../services/productService';
 
 export const MAIN_CATEGORIES = [
   'All Products',
-  'Insecticides',
-  'Herbicides',
-  'Fungicides',
-  'Organic Fertilizers',
-  'Water-Soluble Fertilizers',
-  'Biofertilizers',
-  'Micronutrients / Nutrients',
-  'Micronutrients Combo',
-  'Biostimulants',
-  'Seeds',
-  'Antibiotic Products',
-  'PGR (Plant Growth Regulators)'
+  ...IMPORTANT_PRODUCT_CATEGORIES,
+  'Others'
 ] as const;
 
-export type MainCategory = typeof MAIN_CATEGORIES[number];
+export type MainCategory = string;
 
 /**
  * Normalizes any category string (from URL query param, legacy link, or product data)
- * to one of the canonical 12 MAIN_CATEGORIES.
+ * to one of the canonical categories or an active custom category.
  */
-export function normalizeCategory(raw?: string | null): MainCategory {
+export function normalizeCategory(raw?: string | null): string {
   if (!raw) return 'All Products';
   const clean = raw.trim();
   const lower = clean.toLowerCase().replace(/[\s_\-/]+/g, '');
@@ -36,6 +27,17 @@ export function normalizeCategory(raw?: string | null): MainCategory {
     lower === 'allformulations'
   ) {
     return 'All Products';
+  }
+
+  if (lower === 'others' || lower === 'other') {
+    return 'Others';
+  }
+
+  // Check active custom product categories
+  const custom = getCustomProductCategories();
+  const matchedCustom = custom.find(c => c.toLowerCase() === clean.toLowerCase());
+  if (matchedCustom) {
+    return matchedCustom;
   }
 
   if (lower === 'insecticides' || lower === 'insecticide') {
@@ -80,12 +82,12 @@ export function normalizeCategory(raw?: string | null): MainCategory {
     return 'Micronutrients / Nutrients';
   }
 
-  if (lower === 'biostimulants' || lower === 'biostimulant' || lower === 'biostimulants') {
-    return 'Biostimulants';
+  if (lower === 'biostimulants' || lower === 'biostimulant' || clean === 'Bio Stimulants') {
+    return 'Bio Stimulants';
   }
 
   if (lower === 'pgr' || lower.includes('growthregulator') || lower === 'pgrplantgrowthregulators') {
-    return 'PGR (Plant Growth Regulators)';
+    return 'Plant Growth Regulator (PGR)';
   }
 
   if (lower.includes('antibiotic')) {
@@ -100,24 +102,39 @@ export function normalizeCategory(raw?: string | null): MainCategory {
     return 'Seeds';
   }
 
-  // Fallback: check if exact match exists in MAIN_CATEGORIES
-  const exactMatch = MAIN_CATEGORIES.find(c => c.toLowerCase() === clean.toLowerCase());
+  // Fallback: check if exact match exists in IMPORTANT_PRODUCT_CATEGORIES
+  const exactMatch = IMPORTANT_PRODUCT_CATEGORIES.find(c => c.toLowerCase() === clean.toLowerCase());
   if (exactMatch) return exactMatch;
 
-  return 'All Products';
+  return clean || 'All Products';
 }
 
 /**
- * Assigns a product to its verified canonical main category.
+ * Assigns a product to its verified canonical or custom category.
  */
-export function getProductMainCategory(product: Product): Exclude<MainCategory, 'All Products'> {
+export function getProductMainCategory(product: Product): string {
+  const cat = (product.category || '').trim();
+  const lowerCat = cat.toLowerCase();
+
+  // 0. Explicit Others
+  if (lowerCat === 'others' || lowerCat === 'other') {
+    return 'Others';
+  }
+
+  // 0.1 Check custom categories
+  const custom = getCustomProductCategories();
+  const matchedCustom = custom.find(c => c.toLowerCase() === lowerCat);
+  if (matchedCustom) {
+    return matchedCustom;
+  }
+
   // 1. Seeds
   if (
     product.broadGroup === 'Seeds' ||
-    product.category === 'Seeds' ||
-    product.category === 'Hybrid Seeds' ||
+    cat === 'Seeds' ||
+    cat === 'Hybrid Seeds' ||
     product.id.startsWith('ias-') ||
-    ['Bitter Gourd', 'Cucumber', 'Okra', 'Chilli', 'Tomato', 'Marigold', 'Brinjal', 'Ridge Gourd', 'Bottle Gourd', 'Watermelon'].includes(product.category)
+    ['Bitter Gourd', 'Cucumber', 'Okra', 'Chilli', 'Tomato', 'Marigold', 'Brinjal', 'Ridge Gourd', 'Bottle Gourd', 'Watermelon'].includes(cat)
   ) {
     return 'Seeds';
   }
@@ -125,18 +142,19 @@ export function getProductMainCategory(product: Product): Exclude<MainCategory, 
   // 2. PGR (Plant Growth Regulators)
   if (
     product.broadGroup === 'PGR' ||
-    product.category === 'Plant Growth Regulator' ||
-    product.category === 'PGR (Plant Growth Regulators)' ||
-    product.category === 'PGR' ||
+    cat === 'Plant Growth Regulator (PGR)' ||
+    cat === 'Plant Growth Regulator' ||
+    cat === 'PGR (Plant Growth Regulators)' ||
+    cat === 'PGR' ||
     product.id === 'indus-gabbarking'
   ) {
-    return 'PGR (Plant Growth Regulators)';
+    return 'Plant Growth Regulator (PGR)';
   }
 
   // 3. Antibiotic Products
   if (
-    product.category === 'Antibiotic Products' ||
-    product.category === 'Antibiotics' ||
+    cat === 'Antibiotic Products' ||
+    cat === 'Antibiotics' ||
     product.broadGroup === 'Antibiotic Products' ||
     product.broadGroup === 'Antibiotics' ||
     product.id === 'indus-bactin' ||
@@ -145,29 +163,29 @@ export function getProductMainCategory(product: Product): Exclude<MainCategory, 
     return 'Antibiotic Products';
   }
 
-  // 4. Biostimulants
+  // 4. Bio Stimulants
   if (
     product.broadGroup === 'Biostimulants' ||
-    product.category === 'Bio Stimulants' ||
-    product.category === 'Biostimulants'
+    cat === 'Bio Stimulants' ||
+    cat === 'Biostimulants'
   ) {
-    return 'Biostimulants';
+    return 'Bio Stimulants';
   }
 
   // 5. Biofertilizers (distinguished from Organic Fertilizers)
   if (
-    (product.category === 'Biofertilizers' ||
-     product.category === 'Bio Fertilizers' ||
+    (cat === 'Biofertilizers' ||
+     cat === 'Bio Fertilizers' ||
      product.broadGroup === 'Biofertilizers' ||
      product.broadGroup === 'Bio Fertilizers') &&
-    product.category !== 'Organic Fertilizers'
+    cat !== 'Organic Fertilizers'
   ) {
     return 'Biofertilizers';
   }
 
   // 6. Organic Fertilizers
   if (
-    product.category === 'Organic Fertilizers' ||
+    cat === 'Organic Fertilizers' ||
     product.broadGroup === 'Organic Fertilizers'
   ) {
     return 'Organic Fertilizers';
@@ -175,8 +193,8 @@ export function getProductMainCategory(product: Product): Exclude<MainCategory, 
 
   // 7. Water-Soluble Fertilizers
   if (
-    product.category === 'Water-Soluble Fertilizers' ||
-    product.category === 'Water Soluble Fertilizers' ||
+    cat === 'Water-Soluble Fertilizers' ||
+    cat === 'Water Soluble Fertilizers' ||
     product.broadGroup === 'Water-Soluble Fertilizers'
   ) {
     return 'Water-Soluble Fertilizers';
@@ -184,8 +202,8 @@ export function getProductMainCategory(product: Product): Exclude<MainCategory, 
 
   // 8. Micronutrients Combo
   if (
-    product.category === 'Micronutrients Combo' ||
-    product.category === 'Micronutrient Combo' ||
+    cat === 'Micronutrients Combo' ||
+    cat === 'Micronutrient Combo' ||
     product.broadGroup === 'Micronutrients Combo' ||
     product.broadGroup === 'Micronutrient Combo'
   ) {
@@ -194,10 +212,10 @@ export function getProductMainCategory(product: Product): Exclude<MainCategory, 
 
   // 9. Micronutrients / Nutrients
   if (
-    product.category === 'Micronutrients / Nutrients' ||
-    product.category === 'Micro Nutrient' ||
-    product.category === 'Micro Nutrients' ||
-    product.category === 'Micronutrients' ||
+    cat === 'Micronutrients / Nutrients' ||
+    cat === 'Micro Nutrient' ||
+    cat === 'Micro Nutrients' ||
+    cat === 'Micronutrients' ||
     product.broadGroup === 'Micronutrients / Nutrients' ||
     product.broadGroup === 'Nutrients' ||
     product.broadGroup === 'Micronutrients'
@@ -205,42 +223,47 @@ export function getProductMainCategory(product: Product): Exclude<MainCategory, 
     return 'Micronutrients / Nutrients';
   }
 
-  // 9. Fungicides
+  // 10. Fungicides
   if (
-    product.category === 'Fungicides' ||
+    cat === 'Fungicides' ||
     product.broadGroup === 'Fungicides'
   ) {
     return 'Fungicides';
   }
 
-  // 10. Herbicides
+  // 11. Herbicides
   if (
-    product.category === 'Herbicides' ||
+    cat === 'Herbicides' ||
     product.broadGroup === 'Herbicides'
   ) {
     return 'Herbicides';
   }
 
-  // 11. Insecticides
+  // 12. Insecticides
   if (
-    product.category === 'Insecticides' ||
+    cat === 'Insecticides' ||
     product.broadGroup === 'Insecticides'
   ) {
     return 'Insecticides';
   }
 
-  return 'Insecticides'; // Default safe fallback
+  // Safe fallback: If non-empty, keep category; otherwise 'Others'
+  return cat || 'Others';
 }
 
 /**
  * Checks whether a product matches the selected category filter.
  */
-export function matchesCategory(product: Product, category: MainCategory | string): boolean {
+export function matchesCategory(product: Product, category: string): boolean {
   const normalizedTarget = normalizeCategory(category);
   if (normalizedTarget === 'All Products') {
     return true;
   }
-  return getProductMainCategory(product) === normalizedTarget;
+  const prodCat = getProductMainCategory(product);
+  if (normalizedTarget.toLowerCase() === 'others') {
+    return prodCat.toLowerCase() === 'others' || prodCat.toLowerCase() === 'other';
+  }
+  return prodCat.toLowerCase() === normalizedTarget.toLowerCase();
 }
 
 /**
@@ -295,29 +318,27 @@ export function matchesProductSearch(product: Product, rawQuery: string): boolea
 }
 
 /**
- * Computes exact product counts for all main categories.
+ * Computes exact product counts across all active categories.
  */
-export function computeCategoryCounts(products: Product[]): Record<MainCategory, number> {
-  const counts: Record<MainCategory, number> = {
-    'All Products': products.length,
-    'Insecticides': 0,
-    'Herbicides': 0,
-    'Fungicides': 0,
-    'Organic Fertilizers': 0,
-    'Water-Soluble Fertilizers': 0,
-    'Biofertilizers': 0,
-    'Micronutrients / Nutrients': 0,
-    'Micronutrients Combo': 0,
-    'Biostimulants': 0,
-    'Seeds': 0,
-    'Antibiotic Products': 0,
-    'PGR (Plant Growth Regulators)': 0
+export function computeCategoryCounts(products: Product[], allCategories?: string[]): Record<string, number> {
+  const categoriesToCount = (allCategories && allCategories.length > 0)
+    ? allCategories
+    : ['All Products', ...IMPORTANT_PRODUCT_CATEGORIES, ...getCustomProductCategories(), 'Others'];
+
+  const counts: Record<string, number> = {
+    'All Products': products.length
   };
+  categoriesToCount.forEach(cat => {
+    counts[cat] = 0;
+  });
 
   for (const product of products) {
     const mainCat = getProductMainCategory(product);
-    if (counts[mainCat] !== undefined) {
-      counts[mainCat]++;
+    const key = categoriesToCount.find(c => c.toLowerCase() === mainCat.toLowerCase());
+    if (key && counts[key] !== undefined) {
+      counts[key]++;
+    } else if (counts['Others'] !== undefined) {
+      counts['Others']++;
     }
   }
 

@@ -4,7 +4,14 @@ import { ArrowLeft, Save, Plus, Trash2, CheckCircle2, AlertCircle } from 'lucide
 import { AdminNav } from '../../components/admin/AdminNav';
 import { ImageUploader } from '../../components/admin/ImageUploader';
 import { Product, ProductSpecification } from '../../types/product';
-import { getProductById, saveProduct } from '../../services/productService';
+import {
+  getProductById,
+  saveProduct,
+  IMPORTANT_PRODUCT_CATEGORIES,
+  getCustomProductCategories,
+  saveCustomProductCategory,
+  deleteCustomProductCategory
+} from '../../services/productService';
 
 export const AdminProductEditorPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -15,12 +22,31 @@ export const AdminProductEditorPage: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [successMsg, setSuccessMsg] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [customProductCategories, setCustomProductCategories] = useState<string[]>(() => getCustomProductCategories());
+  const [showNewCategoryModal, setShowNewCategoryModal] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [newCategoryError, setNewCategoryError] = useState<string | null>(null);
+  const [showDeleteCategoryModal, setShowDeleteCategoryModal] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
+  const [deletingCategory, setDeletingCategory] = useState(false);
+
+  useEffect(() => {
+    const syncCategories = () => {
+      setCustomProductCategories(getCustomProductCategories());
+    };
+    window.addEventListener('indus:product-categories-updated', syncCategories);
+    window.addEventListener('storage', syncCategories);
+    return () => {
+      window.removeEventListener('indus:product-categories-updated', syncCategories);
+      window.removeEventListener('storage', syncCategories);
+    };
+  }, []);
 
   const [formData, setFormData] = useState<Partial<Product>>({
     name: '',
     code: '',
     slug: '',
-    category: 'Bitter Gourd',
+    category: 'Insecticides',
     categoryTelugu: '',
     shortDescription: '',
     description: '',
@@ -45,11 +71,66 @@ export const AdminProductEditorPage: React.FC = () => {
     if (id) {
       getProductById(id).then(prod => {
         if (prod) {
-          setFormData(prod);
+          setFormData({
+            ...prod,
+            category: prod.category === 'Other' ? 'Others' : prod.category
+          });
         }
       }).finally(() => setLoading(false));
     }
   }, [id]);
+
+  const handleSaveNewCategory = (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = newCategoryName.trim();
+    if (!trimmed) {
+      setNewCategoryError('Please enter a category name.');
+      return;
+    }
+
+    const allExisting = [
+      ...IMPORTANT_PRODUCT_CATEGORIES,
+      'Others',
+      'Other',
+      ...customProductCategories
+    ];
+    if (allExisting.some(c => c.toLowerCase() === trimmed.toLowerCase())) {
+      setNewCategoryError(`Category "${trimmed}" already exists.`);
+      return;
+    }
+
+    saveCustomProductCategory(trimmed);
+    const updated = getCustomProductCategories();
+    setCustomProductCategories(updated);
+    setFormData(prev => ({ ...prev, category: trimmed }));
+
+    setShowNewCategoryModal(false);
+    setNewCategoryName('');
+    setNewCategoryError(null);
+  };
+
+  const handleConfirmDeleteCategory = async () => {
+    if (!categoryToDelete) return;
+    setDeletingCategory(true);
+    const cat = categoryToDelete;
+    try {
+      await deleteCustomProductCategory(cat);
+      const updated = getCustomProductCategories();
+      setCustomProductCategories(updated);
+
+      // If current form has this category, move it to 'Others'
+      if (formData.category && formData.category.trim().toLowerCase() === cat.toLowerCase()) {
+        setFormData(prev => ({ ...prev, category: 'Others' }));
+      }
+
+      setShowDeleteCategoryModal(false);
+      setCategoryToDelete(null);
+    } catch (err: any) {
+      console.error('Failed to delete category:', err);
+    } finally {
+      setDeletingCategory(false);
+    }
+  };
 
   const handleSpecChange = (index: number, field: keyof ProductSpecification, val: string) => {
     const specs = [...(formData.specifications || [])];
@@ -94,11 +175,17 @@ export const AdminProductEditorPage: React.FC = () => {
       const cleanFeatures = (formData.features || []).filter(f => f.trim() !== '');
       const cleanSpecs = (formData.specifications || []).filter(s => s.label.trim() !== '');
 
+      const isPublished = formData.isPublished ?? true;
+      const isFeatured = Boolean(isPublished && formData.isFeatured);
+
       const payload: Partial<Product> = {
         ...formData,
         name: formData.name.trim(),
         code: formData.code.trim(),
         slug,
+        isPublished,
+        isFeatured,
+        featuredAt: isFeatured ? (formData.featuredAt || new Date().toISOString()) : undefined,
         features: cleanFeatures,
         specifications: cleanSpecs
       };
@@ -147,7 +234,7 @@ export const AdminProductEditorPage: React.FC = () => {
         </header>
 
         <div className="admin-content" style={{ maxWidth: '960px' }}>
-          
+
           {errorMsg && (
             <div style={{ backgroundColor: '#FFEBEE', border: '1px solid #FFCDD2', padding: '14px 20px', borderRadius: 'var(--radius-md)', color: '#C62828', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <AlertCircle size={18} />
@@ -163,7 +250,7 @@ export const AdminProductEditorPage: React.FC = () => {
           )}
 
           <form onSubmit={handleSubmit} className="card" style={{ padding: '36px', backgroundColor: '#FFFFFF' }}>
-            
+
             {/* Section 1: Basic Identifiers */}
             <h3 style={{ fontSize: '1.2rem', color: 'var(--color-primary-green-dark)', marginBottom: '16px', borderBottom: '1px solid var(--color-border)', paddingBottom: '8px' }}>
               1. Basic Identification
@@ -174,8 +261,8 @@ export const AdminProductEditorPage: React.FC = () => {
                 <label className="form-label" htmlFor="prod-code">
                   Variety Code <span className="req">*</span>
                 </label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   id="prod-code"
                   className="form-control"
                   placeholder="e.g. IAS 405"
@@ -189,8 +276,8 @@ export const AdminProductEditorPage: React.FC = () => {
                 <label className="form-label" htmlFor="prod-name">
                   Product / Crop Name <span className="req">*</span>
                 </label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   id="prod-name"
                   className="form-control"
                   placeholder="e.g. F1 Hybrid Bitter Gourd"
@@ -206,48 +293,114 @@ export const AdminProductEditorPage: React.FC = () => {
                 <label className="form-label" htmlFor="prod-category">
                   Product Category <span className="req">*</span>
                 </label>
-                <select 
+                <select
                   id="prod-category"
                   className="form-control"
-                  value={formData.category}
-                  onChange={e => setFormData({ ...formData, category: e.target.value })}
+                  value={formData.category === 'Other' ? 'Others' : (formData.category || 'Insecticides')}
+                  onChange={e => {
+                    if (e.target.value === '__CREATE_NEW__') {
+                      setNewCategoryName('');
+                      setNewCategoryError(null);
+                      setShowNewCategoryModal(true);
+                    } else {
+                      setFormData({ ...formData, category: e.target.value });
+                    }
+                  }}
                   required
                 >
-                  <optgroup label="Indus Crop Care Formulations">
-                    <option value="Insecticides">Insecticides</option>
-                    <option value="Herbicides">Herbicides</option>
-                    <option value="Fungicides">Fungicides</option>
-                    <option value="Plant Growth Regulator">Plant Growth Regulator (PGR)</option>
-                    <option value="Organic Fertilizers">Organic Fertilizers</option>
-                    <option value="Water-Soluble Fertilizers">Water-Soluble Fertilizers</option>
-                    <option value="Biofertilizers">Biofertilizers</option>
-                    <option value="Bio Stimulants">Bio Stimulants</option>
-                    <option value="Micronutrients / Nutrients">Micronutrients / Nutrients</option>
-                    <option value="Micronutrients Combo">Micronutrients Combo</option>
-                    <option value="Antibiotic Products">Antibiotic Products</option>
-                  </optgroup>
-                  <optgroup label="INDAS Seeds Division Crops">
-                    <option value="Bitter Gourd">Bitter Gourd (కాకరకాయ)</option>
-                    <option value="Cucumber">Cucumber (దోసకాయ / కీరదోస)</option>
-                    <option value="Tomato">Tomato (టమోటా)</option>
-                    <option value="Okra">Okra (బెండకాయ)</option>
-                    <option value="Brinjal">Brinjal (వంకాయ)</option>
-                    <option value="Chilli">Chilli (మిర్చి)</option>
-                    <option value="Ridge Gourd">Ridge Gourd (బీరకాయ)</option>
-                    <option value="Bottle Gourd">Bottle Gourd (సొరకాయ)</option>
-                    <option value="Watermelon">Watermelon (పుచ్చకాయ)</option>
-                    <option value="Marigold">Marigold (బంతి)</option>
-                    <option value="Seeds">General Seeds</option>
-                  </optgroup>
-                  <option value="Other">Other</option>
+                  {/* Important Existing Indus Crop Care Categories */}
+                  {IMPORTANT_PRODUCT_CATEGORIES.map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+
+                  {/* Custom Product Categories Created by Admin */}
+                  {customProductCategories.map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+
+                  {/* Preserve existing saved category if editing a product with a legacy/specific category */}
+                  {formData.category &&
+                    !IMPORTANT_PRODUCT_CATEGORIES.includes(formData.category) &&
+                    !customProductCategories.includes(formData.category) &&
+                    formData.category !== 'Others' &&
+                    formData.category !== 'Other' && (
+                      <option value={formData.category}>{formData.category}</option>
+                    )}
+
+                  {/* Exactly ONE Others option */}
+                  <option value="Others">Others</option>
+
+                  {/* Create New Category Action */}
+                  <option value="__CREATE_NEW__" style={{ fontWeight: 700, color: 'var(--color-primary-green)' }}>
+                    + Create New Category
+                  </option>
                 </select>
+
+                {/* Manage Custom Product Categories Chips */}
+                {customProductCategories.length > 0 && (
+                  <div style={{ marginTop: '10px' }}>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', marginBottom: '6px', fontWeight: 600 }}>
+                      Custom Categories:
+                    </div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                      {customProductCategories.map(cat => (
+                        <span
+                          key={cat}
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            backgroundColor: formData.category === cat ? '#E8F5E9' : '#F3F4F6',
+                            border: formData.category === cat ? '1px solid #A5D6A7' : '1px solid #E5E7EB',
+                            borderRadius: '16px',
+                            padding: '3px 10px',
+                            fontSize: '0.82rem',
+                            color: formData.category === cat ? '#1B5E20' : '#374151',
+                            fontWeight: 500
+                          }}
+                        >
+                          <span
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => setFormData({ ...formData, category: cat })}
+                            title={`Click to select "${cat}"`}
+                          >
+                            {cat}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setCategoryToDelete(cat);
+                              setShowDeleteCategoryModal(true);
+                            }}
+                            title={`Delete custom category "${cat}"`}
+                            aria-label={`Delete custom category ${cat}`}
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              padding: '2px',
+                              cursor: 'pointer',
+                              color: '#DC2626',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="form-group">
                 <label className="form-label" htmlFor="prod-broad-group">
                   Broad Navigation Group
                 </label>
-                <select 
+                <select
                   id="prod-broad-group"
                   className="form-control"
                   value={formData.broadGroup || ''}
@@ -275,8 +428,8 @@ export const AdminProductEditorPage: React.FC = () => {
                 <label className="form-label" htmlFor="prod-formulation">
                   Active Formulation / Chemical Composition
                 </label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   id="prod-formulation"
                   className="form-control"
                   placeholder="e.g. Diafenthiuron 50% WP, Azoxystrobin 11% + Tebuconazole 18.3% SC"
@@ -289,8 +442,8 @@ export const AdminProductEditorPage: React.FC = () => {
                 <label className="form-label" htmlFor="prod-source-page">
                   Official Catalogue Source Page (Pages 7–19)
                 </label>
-                <input 
-                  type="number" 
+                <input
+                  type="number"
                   id="prod-source-page"
                   className="form-control"
                   placeholder="e.g. 7"
@@ -304,8 +457,8 @@ export const AdminProductEditorPage: React.FC = () => {
             <div className="admin-metrics-grid">
               <div className="form-group">
                 <label className="form-label">Fruit Length</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   className="form-control"
                   placeholder="e.g. 10 - 12 cm"
                   value={formData.fruitLength}
@@ -315,8 +468,8 @@ export const AdminProductEditorPage: React.FC = () => {
 
               <div className="form-group">
                 <label className="form-label">Average Weight</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   className="form-control"
                   placeholder="e.g. 110 - 140 g"
                   value={formData.averageWeight}
@@ -326,8 +479,8 @@ export const AdminProductEditorPage: React.FC = () => {
 
               <div className="form-group">
                 <label className="form-label">Days to Harvest</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   className="form-control"
                   placeholder="e.g. 50 - 55 Days"
                   value={formData.daysToHarvest}
@@ -343,7 +496,7 @@ export const AdminProductEditorPage: React.FC = () => {
 
             <div className="form-group">
               <label className="form-label">Short Summary (Catalogue Card)</label>
-              <textarea 
+              <textarea
                 className="form-control"
                 rows={2}
                 placeholder="Brief commercial summary..."
@@ -354,7 +507,7 @@ export const AdminProductEditorPage: React.FC = () => {
 
             <div className="form-group">
               <label className="form-label">Detailed Agronomic Description</label>
-              <textarea 
+              <textarea
                 className="form-control"
                 rows={3}
                 placeholder="Full agronomic characterization..."
@@ -365,7 +518,7 @@ export const AdminProductEditorPage: React.FC = () => {
 
             <div className="form-group">
               <label className="form-label">తెలుగు సాంకేతిక వివరణ (Telugu Agronomic Copy)</label>
-              <textarea 
+              <textarea
                 className="form-control"
                 rows={3}
                 placeholder="తెలుగు వివరణలు..."
@@ -379,7 +532,7 @@ export const AdminProductEditorPage: React.FC = () => {
               3. Cloudinary Product Photograph
             </h3>
 
-            <ImageUploader 
+            <ImageUploader
               currentImageUrl={formData.imageUrl}
               folder="products"
               onImageUploaded={(url, publicId) => {
@@ -399,36 +552,36 @@ export const AdminProductEditorPage: React.FC = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
               {(formData.specifications || []).map((spec, i) => (
                 <div key={i} className="admin-spec-row">
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     placeholder="Trait (English)"
                     className="form-control"
                     value={spec.label}
                     onChange={e => handleSpecChange(i, 'label', e.target.value)}
                   />
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     placeholder="Value (English)"
                     className="form-control"
                     value={spec.value}
                     onChange={e => handleSpecChange(i, 'value', e.target.value)}
                   />
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     placeholder="లక్షణం (Telugu)"
                     className="form-control"
                     value={spec.labelTelugu || ''}
                     onChange={e => handleSpecChange(i, 'labelTelugu', e.target.value)}
                   />
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     placeholder="విలువ (Telugu)"
                     className="form-control"
                     value={spec.valueTelugu || ''}
                     onChange={e => handleSpecChange(i, 'valueTelugu', e.target.value)}
                   />
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     className="btn-icon delete"
                     onClick={() => removeSpec(i)}
                     title="Remove trait row"
@@ -438,8 +591,8 @@ export const AdminProductEditorPage: React.FC = () => {
                 </div>
               ))}
 
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="btn btn-outline btn-sm"
                 onClick={addSpec}
                 style={{ alignSelf: 'flex-start' }}
@@ -449,37 +602,91 @@ export const AdminProductEditorPage: React.FC = () => {
               </button>
             </div>
 
-            {/* Section 5: Publication Settings */}
-            <h3 style={{ fontSize: '1.2rem', color: 'var(--color-primary-green-dark)', marginTop: '20px', marginBottom: '16px', borderBottom: '1px solid var(--color-border)', paddingBottom: '8px' }}>
+            {/* Section 5: Publication Status */}
+            <h3 style={{ fontSize: '1.2rem', color: 'var(--color-primary-green-dark)', marginTop: '24px', marginBottom: '16px', borderBottom: '1px solid var(--color-border)', paddingBottom: '8px' }}>
               5. Publication Status
             </h3>
 
-            <div style={{ display: 'flex', gap: '24px', alignItems: 'center', marginBottom: '32px' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: 600 }}>
-                <input 
-                  type="checkbox" 
-                  checked={formData.isPublished}
-                  onChange={e => setFormData({ ...formData, isPublished: e.target.checked })}
-                  style={{ width: '18px', height: '18px', accentColor: 'var(--color-primary-green)' }}
+            <div style={{
+              backgroundColor: '#F9FAFB',
+              border: '1px solid var(--color-border-light)',
+              borderRadius: '8px',
+              padding: '20px 24px',
+              marginBottom: '32px'
+            }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  id="prod-is-published"
+                  checked={formData.isPublished ?? true}
+                  onChange={e => {
+                    const checked = e.target.checked;
+                    if (!checked) {
+                      setFormData(prev => ({
+                        ...prev,
+                        isPublished: false,
+                        isFeatured: false
+                      }));
+                    } else {
+                      setFormData(prev => ({
+                        ...prev,
+                        isPublished: true
+                      }));
+                    }
+                  }}
+                  style={{ width: '20px', height: '20px', accentColor: 'var(--color-primary-green)', cursor: 'pointer' }}
                 />
-                <span>Published on Website (Visible to Public)</span>
+                <div>
+                  <span style={{ fontSize: '1.02rem', fontWeight: 700, color: 'var(--color-primary-green-dark)' }}>
+                    Publish on Website
+                  </span>
+                  <p style={{ margin: '3px 0 0 0', fontSize: '0.84rem', color: 'var(--color-text-muted)' }}>
+                    {formData.isPublished
+                      ? 'Published — Visible to visitors on the public website and in product categories.'
+                      : 'Draft — Saved privately for administration only. Not visible on the public website.'}
+                  </p>
+                </div>
               </label>
 
-              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: 600 }}>
-                <input 
-                  type="checkbox" 
-                  checked={formData.isFeatured}
-                  onChange={e => setFormData({ ...formData, isFeatured: e.target.checked })}
-                  style={{ width: '18px', height: '18px', accentColor: 'var(--color-primary-green)' }}
-                />
-                <span>Featured on Homepage</span>
-              </label>
+              {/* Optional Homepage Spotlight Showcase */}
+              <div style={{ marginTop: '16px', paddingTop: '14px', borderTop: '1px solid #E5E7EB' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    id="prod-is-featured"
+                    checked={Boolean(formData.isFeatured)}
+                    onChange={e => {
+                      const checked = e.target.checked;
+                      if (checked && !formData.isPublished) {
+                        alert("Only published products can be featured on the homepage. Please enable 'Publish on Website' first.");
+                        return;
+                      }
+                      setFormData(prev => ({
+                        ...prev,
+                        isFeatured: checked,
+                        featuredAt: checked ? (prev.featuredAt || new Date().toISOString()) : undefined
+                      }));
+                    }}
+                    style={{ width: '17px', height: '17px', accentColor: 'var(--color-primary-green)', cursor: 'pointer' }}
+                  />
+                  <div>
+                    <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--color-charcoal-700)' }}>
+                      Featured on Homepage <span style={{ fontSize: '0.78rem', fontWeight: 400, color: 'var(--color-text-muted)' }}>(Optional Spotlight)</span>
+                    </span>
+                    <p style={{ margin: '2px 0 0 0', fontSize: '0.78rem', color: 'var(--color-text-muted)' }}>
+                      {formData.isPublished
+                        ? 'Spotlight this product on the homepage showcase. Moving newest featured products to position #1.'
+                        : 'Draft products cannot be featured. Please enable "Publish on Website" first.'}
+                    </p>
+                  </div>
+                </label>
+              </div>
             </div>
 
             {/* Form Actions */}
             <div style={{ display: 'flex', gap: '16px', borderTop: '1px solid var(--color-border)', paddingTop: '24px' }}>
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 className="btn btn-primary btn-lg"
                 disabled={saving}
               >
@@ -496,6 +703,196 @@ export const AdminProductEditorPage: React.FC = () => {
 
         </div>
       </main>
+
+      {/* ========================================================
+          CREATE NEW PRODUCT CATEGORY MODAL
+          ======================================================== */}
+      {showNewCategoryModal && (
+        <div
+          className="modal-overlay"
+          style={{ zIndex: 1400 }}
+          onClick={() => {
+            setShowNewCategoryModal(false);
+            setNewCategoryName('');
+            setNewCategoryError(null);
+          }}
+        >
+          <div
+            className="modal-dialog"
+            style={{ maxWidth: '460px', padding: '24px' }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+              <div>
+                <h3 style={{ fontSize: '1.2rem', color: 'var(--color-primary-green-dark)', margin: 0, fontWeight: 700 }}>
+                  Create New Category
+                </h3>
+                <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', margin: '4px 0 0 0' }}>
+                  Add a custom product category for Indus Crop Care products
+                </p>
+              </div>
+              <button
+                type="button"
+                className="modal-close-btn"
+                onClick={() => {
+                  setShowNewCategoryModal(false);
+                  setNewCategoryName('');
+                  setNewCategoryError(null);
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {newCategoryError && (
+              <div className="category-modal-error" style={{
+                backgroundColor: '#FEF2F2',
+                color: '#991B1B',
+                border: '1px solid #FECACA',
+                borderRadius: '6px',
+                padding: '8px 12px',
+                marginBottom: '14px',
+                fontSize: '0.84rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                <AlertCircle size={15} style={{ flexShrink: 0 }} />
+                <span>{newCategoryError}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleSaveNewCategory}>
+              <div className="form-group" style={{ marginBottom: '16px' }}>
+                <label className="form-label" style={{ fontWeight: 600, fontSize: '0.88rem' }}>
+                  Category Name <span className="req">*</span>
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="e.g. Bio Pesticides, Specialty Seeds, Foliar Nutrition..."
+                  value={newCategoryName}
+                  onChange={e => {
+                    setNewCategoryName(e.target.value);
+                    if (newCategoryError) setNewCategoryError(null);
+                  }}
+                  autoFocus
+                  required
+                  style={{ padding: '9px 12px', fontSize: '0.92rem' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', paddingTop: '12px', borderTop: '1px solid var(--color-border-light)' }}>
+                <button
+                  type="button"
+                  className="btn btn-outline btn-sm"
+                  onClick={() => {
+                    setShowNewCategoryModal(false);
+                    setNewCategoryName('');
+                    setNewCategoryError(null);
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary btn-sm"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                >
+                  <Plus size={14} />
+                  <span>Save Category</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================
+          DELETE CUSTOM PRODUCT CATEGORY CONFIRMATION MODAL
+          ======================================================== */}
+      {showDeleteCategoryModal && categoryToDelete && (
+        <div
+          className="modal-overlay"
+          style={{ zIndex: 1500 }}
+          onClick={() => {
+            if (!deletingCategory) {
+              setShowDeleteCategoryModal(false);
+              setCategoryToDelete(null);
+            }
+          }}
+        >
+          <div
+            className="modal-dialog"
+            style={{ maxWidth: '440px', padding: '24px' }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                backgroundColor: '#FEF2F2',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#DC2626',
+                flexShrink: 0
+              }}>
+                <AlertCircle size={22} />
+              </div>
+              <div>
+                <h3 style={{ fontSize: '1.15rem', color: '#111827', margin: 0, fontWeight: 700 }}>
+                  Delete Category
+                </h3>
+                <span style={{ fontSize: '0.85rem', color: '#DC2626', fontWeight: 600 }}>
+                  {categoryToDelete}
+                </span>
+              </div>
+            </div>
+
+            <p style={{ fontSize: '0.95rem', color: '#1F2937', lineHeight: '1.5', margin: '0 0 10px 0' }}>
+              <strong>Are you sure you want to permanently delete this category?</strong>
+            </p>
+
+            <p style={{ fontSize: '0.82rem', color: '#6B7280', margin: '0 0 20px 0', lineHeight: '1.45' }}>
+              Existing products will not be deleted. Any product currently in this category will be safely moved to <strong>Others</strong>.
+            </p>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+              <button
+                type="button"
+                className="btn btn-outline btn-sm"
+                onClick={() => {
+                  setShowDeleteCategoryModal(false);
+                  setCategoryToDelete(null);
+                }}
+                disabled={deletingCategory}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="btn btn-sm"
+                style={{
+                  backgroundColor: '#DC2626',
+                  color: '#FFFFFF',
+                  border: '1px solid #DC2626',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+                onClick={handleConfirmDeleteCategory}
+                disabled={deletingCategory}
+              >
+                <Trash2 size={13} />
+                <span>{deletingCategory ? 'Deleting...' : 'Delete Permanently'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

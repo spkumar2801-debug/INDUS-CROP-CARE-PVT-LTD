@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Search, Sprout, RotateCcw, Filter, CheckCircle2, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { Product } from '../types/product';
-import { getPublishedProducts, subscribeToProducts } from '../services/productService';
+import { getPublishedProducts, subscribeToProducts, IMPORTANT_PRODUCT_CATEGORIES, getCustomProductCategories } from '../services/productService';
 import { ProductCard } from '../components/products/ProductCard';
 import {
   MAIN_CATEGORIES,
@@ -24,12 +24,36 @@ export const ProductsPage: React.FC<ProductsPageProps> = ({ onOpenQuote, onOpenD
   const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [customCategories, setCustomCategories] = useState<string[]>(() => getCustomProductCategories());
+
+  // Listen for category updates across tabs or admin operations
+  useEffect(() => {
+    const handleCategoryUpdate = () => {
+      setCustomCategories(getCustomProductCategories());
+    };
+    window.addEventListener('indus:product-categories-updated', handleCategoryUpdate);
+    window.addEventListener('storage', handleCategoryUpdate);
+    return () => {
+      window.removeEventListener('indus:product-categories-updated', handleCategoryUpdate);
+      window.removeEventListener('storage', handleCategoryUpdate);
+    };
+  }, []);
+
+  // Complete list of available public categories: All Products + 12 Core + Custom + Others
+  const allCategories = useMemo(() => {
+    return [
+      'All Products',
+      ...IMPORTANT_PRODUCT_CATEGORIES,
+      ...customCategories,
+      'Others'
+    ];
+  }, [customCategories]);
 
   // Derive active category from URL (?category=... or legacy ?group=...)
-  const activeCategory: MainCategory = useMemo(() => {
+  const activeCategory: string = useMemo(() => {
     const raw = searchParams.get('category') || searchParams.get('group');
     return normalizeCategory(raw);
-  }, [searchParams]);
+  }, [searchParams, allCategories]);
 
   // Read search query from URL
   const urlSearchQuery = searchParams.get('q') || '';
@@ -68,10 +92,10 @@ export const ProductsPage: React.FC<ProductsPageProps> = ({ onOpenQuote, onOpenD
     };
   }, []);
 
-  // Compute exact product counts across all 12 main categories
+  // Compute exact product counts across all active categories
   const categoryCounts = useMemo(() => {
-    return computeCategoryCounts(products);
-  }, [products]);
+    return computeCategoryCounts(products, allCategories);
+  }, [products, allCategories]);
 
   // Filter products by selected category and active search query
   const filteredProducts = useMemo(() => {
@@ -93,7 +117,7 @@ export const ProductsPage: React.FC<ProductsPageProps> = ({ onOpenQuote, onOpenD
   }, [filteredProducts, safeCurrentPage]);
 
   // Category selection handler
-  const handleCategorySelect = (cat: MainCategory) => {
+  const handleCategorySelect = (cat: string) => {
     const newParams = new URLSearchParams(searchParams);
     if (cat === 'All Products') {
       newParams.delete('category');
@@ -259,9 +283,9 @@ export const ProductsPage: React.FC<ProductsPageProps> = ({ onOpenQuote, onOpenD
             </div>
 
             <div className="category-nav-scroll" role="tablist" aria-label="Product Categories">
-              {MAIN_CATEGORIES.map(cat => {
+              {allCategories.map(cat => {
                 const count = categoryCounts[cat] ?? 0;
-                const isActive = activeCategory === cat;
+                const isActive = activeCategory.toLowerCase() === cat.toLowerCase();
                 const cleanId = `cat-btn-${cat.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
 
                 return (

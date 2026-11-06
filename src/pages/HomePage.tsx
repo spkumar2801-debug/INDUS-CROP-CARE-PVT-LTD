@@ -17,7 +17,7 @@ import {
   TrendingUp
 } from 'lucide-react';
 import { Product } from '../types/product';
-import { getPublishedProducts, subscribeToProducts } from '../services/productService';
+import { getFeaturedProducts, sortFeaturedProducts, subscribeToProducts } from '../services/productService';
 import { ProductCard } from '../components/products/ProductCard';
 import { CountUpNumber } from '../components/common/CountUpNumber';
 import { useSiteSettings } from '../context/SettingsContext';
@@ -77,7 +77,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
     let isMounted = true;
 
     const fetchProducts = () => {
-      getPublishedProducts()
+      getFeaturedProducts()
         .then(data => {
           if (isMounted) {
             setProducts(data);
@@ -326,10 +326,9 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
   const secondaryCtaText = hero?.secondaryCtaText || 'Contact Us';
   const secondaryCtaLink = hero?.secondaryCtaLink || '/contact';
 
-  // Display premier first 4 featured formulations on homepage
+  // Display premier featured formulations on homepage (strictly published AND featured, sorted newest first)
   const displayedProducts = useMemo(() => {
-    const featured = products.filter(p => p.isFeatured || p.isPublished);
-    return featured.slice(0, 4);
+    return sortFeaturedProducts(products).slice(0, 8);
   }, [products]);
 
   return (
