@@ -5,8 +5,6 @@ import { Product } from '../types/product';
 import { getPublishedProducts, subscribeToProducts, IMPORTANT_PRODUCT_CATEGORIES, getCustomProductCategories } from '../services/productService';
 import { ProductCard } from '../components/products/ProductCard';
 import {
-  MAIN_CATEGORIES,
-  MainCategory,
   normalizeCategory,
   matchesCategory,
   matchesProductSearch,
@@ -53,7 +51,7 @@ export const ProductsPage: React.FC<ProductsPageProps> = ({ onOpenQuote, onOpenD
   const activeCategory: string = useMemo(() => {
     const raw = searchParams.get('category') || searchParams.get('group');
     return normalizeCategory(raw);
-  }, [searchParams, allCategories]);
+  }, [searchParams]);
 
   // Read search query from URL
   const urlSearchQuery = searchParams.get('q') || '';

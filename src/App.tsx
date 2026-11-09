@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { SettingsProvider, useSiteSettings } from './context/SettingsContext';
@@ -102,7 +102,13 @@ export const AppContent: React.FC = () => {
   const { handleCustomerCareWhatsApp } = useSiteSettings();
 
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-  const [detailsProduct, setDetailsProduct] = useState<Product | null>(null);
+  const [selectedDetailsProduct, setSelectedDetailsProduct] = useState<Product | null>(null);
+
+  // Derive active details product dynamically from live products list for instant reactive updates
+  const detailsProduct = useMemo(() => {
+    if (!selectedDetailsProduct) return null;
+    return products.find(p => p.id === selectedDetailsProduct.id) || selectedDetailsProduct;
+  }, [products, selectedDetailsProduct]);
 
   useEffect(() => {
     let isMounted = true;
@@ -141,7 +147,7 @@ export const AppContent: React.FC = () => {
   };
 
   const handleOpenDetails = (product: Product) => {
-    setDetailsProduct(product);
+    setSelectedDetailsProduct(product);
     setIsDetailsOpen(true);
   };
 
@@ -321,7 +327,10 @@ export const AppContent: React.FC = () => {
       {/* Product Technical Details Modal */}
       <ProductDetailsModal 
         isOpen={isDetailsOpen}
-        onClose={() => setIsDetailsOpen(false)}
+        onClose={() => {
+          setIsDetailsOpen(false);
+          setSelectedDetailsProduct(null);
+        }}
         product={detailsProduct}
         onOpenQuote={handleDirectWhatsApp}
       />

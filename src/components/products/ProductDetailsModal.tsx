@@ -43,20 +43,20 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
         
         {/* Header */}
         <div className="modal-header">
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+          <div className="modal-header-content">
+            <div className="modal-header-badges">
               <span className="product-code-badge" style={{ position: 'static' }}>{product.code}</span>
               <span className="badge badge-green">{product.category}</span>
               <span className="modal-certified-chip">
-                <ShieldCheck size={13} />
-                ISO 9001:2015 Certified
+                <ShieldCheck size={13} style={{ flexShrink: 0 }} />
+                <span>ISO 9001:2015 Certified</span>
               </span>
             </div>
-            <h2 id="product-details-title" style={{ fontFamily: 'var(--font-heading)', fontSize: '1.45rem', color: 'var(--color-charcoal-950, #0D1611)', fontWeight: 700, letterSpacing: '-0.015em' }}>
+            <h2 id="product-details-title" className="modal-title">
               {product.name} {product.formulation && <span style={{ fontSize: '1.05rem', fontWeight: 600, color: 'var(--color-primary-green-dark, #0A522A)' }}>({product.formulation})</span>}
             </h2>
             {product.categoryTelugu && (
-              <p className="telugu-quote" style={{ fontFamily: 'var(--font-telugu)', margin: '4px 0 0 0', fontSize: '1.02rem', color: 'var(--color-charcoal-700, #2C3E35)', fontWeight: 600, lineHeight: 1.5 }}>
+              <p className="telugu-quote" style={{ fontFamily: 'var(--font-telugu)', margin: '4px 0 0 0', fontSize: '1.02rem', color: 'var(--color-charcoal-700, #2C3E35)', fontWeight: 600, lineHeight: 1.5, wordBreak: 'break-word' }}>
                 {product.categoryTelugu} {product.code ? `(${product.code})` : ''}
               </p>
             )}
@@ -125,7 +125,7 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
               <Languages size={16} style={{ display: 'inline', marginRight: '6px' }} />
               తెలుగు సాంకేతిక వివరాలు (Telugu)
             </button>
-            {product.sheetImageUrl && (
+            {(product.sheetImageUrl || product.imageUrl) && (
               <button 
                 type="button" 
                 className={`modal-tab-btn ${activeTab === 'sheet' ? 'active' : ''}`}
@@ -139,7 +139,7 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
 
           {/* Tab 1: English Specifications */}
           {activeTab === 'english' && (
-            <div>
+            <div className="spec-table-container">
               <table className="spec-table">
                 <tbody>
                   {product.specifications.map((spec, idx) => (
@@ -177,22 +177,24 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
               ) : null}
 
               {product.specifications.some(s => s.labelTelugu && s.valueTelugu) ? (
-                <table className="spec-table">
-                  <tbody>
-                    {product.specifications
-                      .filter(s => s.labelTelugu && s.valueTelugu)
-                      .map((spec, idx) => (
-                        <tr key={idx}>
-                          <th style={{ fontFamily: 'var(--font-telugu)', fontSize: '0.95rem' }}>
-                            {spec.labelTelugu}
-                          </th>
-                          <td style={{ fontFamily: 'var(--font-telugu)', fontSize: '0.95rem' }}>
-                            {spec.valueTelugu}
-                          </td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
+                <div className="spec-table-container">
+                  <table className="spec-table">
+                    <tbody>
+                      {product.specifications
+                        .filter(s => s.labelTelugu && s.valueTelugu)
+                        .map((spec, idx) => (
+                          <tr key={idx}>
+                            <th style={{ fontFamily: 'var(--font-telugu)', fontSize: '0.95rem' }}>
+                              {spec.labelTelugu}
+                            </th>
+                            <td style={{ fontFamily: 'var(--font-telugu)', fontSize: '0.95rem' }}>
+                              {spec.valueTelugu}
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                </div>
               ) : (
                 <div style={{ 
                   backgroundColor: 'var(--color-sage-50, #F4F7F4)', 
@@ -214,7 +216,7 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
           )}
 
           {/* Tab 3: Official Sheet */}
-          {activeTab === 'sheet' && product.sheetImageUrl && (
+          {activeTab === 'sheet' && (product.sheetImageUrl || product.imageUrl) && (
             <div className="sheet-img-wrap">
               <div className="sheet-official-header">
                 <span className="badge badge-gold">Official Catalogue Document</span>
@@ -222,24 +224,33 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
                   Indus Crop Care Verified Document
                 </span>
               </div>
-              <img 
-                src={product.sheetImageUrl} 
-                alt={`Official catalogue specification for ${product.name} ${product.code || ''}`} 
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  if (target.src !== '/images/branding/indus/indus-logo.png') {
-                    target.src = '/images/branding/indus/indus-logo.png';
-                  }
-                }}
-              />
-              <p style={{ fontSize: '0.88rem', color: 'var(--color-charcoal-600, #4A5D52)', marginTop: '14px', lineHeight: '1.55' }}>
+
+              {/* Single Official Product Image - Dynamically bound to product.imageUrl from product record */}
+              <div className="sheet-single-image-card">
+                <span className="sheet-card-tag">Official Product Image</span>
+                <div className="sheet-single-image-frame">
+                  <img 
+                    src={product.imageUrl} 
+                    alt={`Official product image of ${product.name}`} 
+                    className="sheet-single-product-img"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      if (target.src !== '/images/branding/indus/indus-logo.png') {
+                        target.src = '/images/branding/indus/indus-logo.png';
+                      }
+                    }}
+                  />
+                </div>
+              </div>
+
+              <p style={{ fontSize: '0.88rem', color: 'var(--color-charcoal-600, #4A5D52)', marginTop: '16px', lineHeight: '1.55', textAlign: 'left', width: '100%' }}>
                 Authentic technical release document issued by Indus Crop Care Pvt. Ltd. All chemical, biological, and nutritional specifications are documented from verified manufacturing and laboratory tests.
               </p>
             </div>
           )}
 
           {/* Bottom Action Footer */}
-          <div style={{ marginTop: '28px', paddingTop: '20px', borderTop: '1px solid var(--color-border-light, #E2ECE4)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
+          <div className="modal-footer-action">
             <span style={{ fontSize: '0.86rem', color: 'var(--color-charcoal-600, #4A5D52)', fontWeight: 500 }}>
               Scientific agronomic and crop protection advisory available for commercial and retail farmers.
             </span>

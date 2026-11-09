@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  Sprout, 
-  ShieldCheck, 
-  Microscope, 
-  Award, 
-  MessageSquareShare, 
+import {
+  Sprout,
+  ShieldCheck,
+  Microscope,
+  Award,
+  MessageSquareShare,
   ArrowRight,
   Sparkles,
   PhoneCall,
@@ -41,12 +41,12 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
   const [heroReady, setHeroReady] = useState(() => {
     try {
       if (typeof window !== 'undefined') {
-        if (sessionStorage.getItem('indus_intro_played') || 
-            window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        if (sessionStorage.getItem('indus_intro_played') ||
+          window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
           return true;
         }
       }
-    } catch {}
+    } catch { }
     return false;
   });
 
@@ -130,8 +130,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
       const nextDevice: 'desktop' | 'tablet' | 'mobile' = mqlMobile.matches
         ? 'mobile'
         : mqlTablet.matches
-        ? 'tablet'
-        : 'desktop';
+          ? 'tablet'
+          : 'desktop';
       setActiveDevice(prev => (prev !== nextDevice ? nextDevice : prev));
     };
 
@@ -157,24 +157,24 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
 
   // Desktop Media (always preserved and independent)
   const desktopMediaType = hero?.mediaType === 'video' ? 'video' : 'image';
-  const desktopImageUrl = (hero?.imageUrl && !hero.imageUrl.startsWith('blob:')) 
-    ? hero.imageUrl 
+  const desktopImageUrl = (hero?.imageUrl && !hero.imageUrl.startsWith('blob:'))
+    ? hero.imageUrl
     : fallbackDesktopPoster;
-  const desktopVideoUrl = (hero?.videoUrl && !hero.videoUrl.startsWith('blob:')) 
-    ? hero.videoUrl 
+  const desktopVideoUrl = (hero?.videoUrl && !hero.videoUrl.startsWith('blob:'))
+    ? hero.videoUrl
     : fallbackDesktopVideo;
   const autoDerivedDesktopPoster = (desktopVideoUrl && !desktopVideoUrl.startsWith('blob:'))
     ? desktopVideoUrl.replace(/\.(mp4|webm)$/i, '.jpg')
     : '';
   const rawPosterUrl = hero?.videoPosterUrl || '';
-  const desktopVideoPoster = (rawPosterUrl && !rawPosterUrl.startsWith('blob:') && !rawPosterUrl.includes('indus-crop-hero.webp')) 
-    ? rawPosterUrl 
+  const desktopVideoPoster = (rawPosterUrl && !rawPosterUrl.startsWith('blob:') && !rawPosterUrl.includes('indus-crop-hero.webp'))
+    ? rawPosterUrl
     : (autoDerivedDesktopPoster || desktopImageUrl || fallbackDesktopPoster);
 
   // Dedicated Mobile Media (strictly isolated to mobile media - mobile devices never fall back to desktop video)
   const hasConfiguredMobileMedia = Boolean(
-    hero?.mobileMediaUrl && 
-    !hero.mobileMediaUrl.startsWith('blob:') && 
+    hero?.mobileMediaUrl &&
+    !hero.mobileMediaUrl.startsWith('blob:') &&
     hero.mobileMediaActive !== false
   );
 
@@ -184,16 +184,16 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
 
   const mobileMediaUrl = hasConfiguredMobileMedia
     ? hero!.mobileMediaUrl!
-    : (hero?.mobileMediaActive === false 
-        ? (desktopMediaType === 'video' ? desktopVideoUrl : desktopImageUrl)
-        : fallbackMobileVideo);
+    : (hero?.mobileMediaActive === false
+      ? (desktopMediaType === 'video' ? desktopVideoUrl : desktopImageUrl)
+      : fallbackMobileVideo);
 
   const rawMobilePosterUrl = hero?.mobileVideoPosterUrl || '';
   const mobileVideoPoster = (rawMobilePosterUrl && !rawMobilePosterUrl.startsWith('blob:'))
     ? rawMobilePosterUrl
     : (hasConfiguredMobileMedia && mobileMediaType === 'video'
-        ? mobileMediaUrl.replace(/\.(mp4|webm)$/i, '.jpg')
-        : (hero?.mobileMediaActive === false ? desktopVideoPoster : fallbackMobilePoster));
+      ? mobileMediaUrl.replace(/\.(mp4|webm)$/i, '.jpg')
+      : (hero?.mobileMediaActive === false ? desktopVideoPoster : fallbackMobilePoster));
 
   // Active media for current viewport:
   // Desktop (>1024px): Desktop media
@@ -225,7 +225,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
       if (video.currentTime !== 0) {
         video.currentTime = 0;
       }
-    } catch {}
+    } catch { }
 
     let isCancelled = false;
 
@@ -245,7 +245,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
               const onCanPlay = () => {
                 video.removeEventListener('canplay', onCanPlay);
                 if (!isCancelled) {
-                  video.play().then(() => setIsVideoPlaying(true)).catch(() => {});
+                  video.play().then(() => setIsVideoPlaying(true)).catch(() => { });
                 }
               };
               video.addEventListener('canplay', onCanPlay, { once: true });
@@ -328,22 +328,22 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
 
   // Display premier featured formulations on homepage (strictly published AND featured, sorted newest first)
   const displayedProducts = useMemo(() => {
-    return sortFeaturedProducts(products).slice(0, 8);
+    return sortFeaturedProducts(products).slice(0, 4);
   }, [products]);
 
   return (
     <div>
       {/* 1. Cinematic Hero Section */}
-      <section 
-        className={`hero-section hero-height-${heightPreset}`} 
+      <section
+        className={`hero-section hero-height-${heightPreset}`}
         aria-label="Indus Crop Care Hero"
       >
-        <div 
-          className={`hero-cinematic-bg ${isIntroTransition ? "hero-bg-revealing" : ""}`} 
+        <div
+          className={`hero-cinematic-bg ${isIntroTransition ? "hero-bg-revealing" : ""}`}
           aria-hidden="true"
           style={{
-            backgroundImage: currentMediaType === 'image' 
-              ? `url('${currentImageUrl}')` 
+            backgroundImage: currentMediaType === 'image'
+              ? `url('${currentImageUrl}')`
               : (currentPosterUrl ? `url('${currentPosterUrl}')` : undefined),
             backgroundPosition: activeDevice === 'mobile' ? heroPositionMobile : heroPositionDesktop,
             ['--hero-pos-desktop' as string]: heroPositionDesktop,
@@ -359,7 +359,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
                   node.defaultMuted = true;
                   node.muted = heroVideoMuted;
                   if (heroReady && node.paused) {
-                    node.play().catch(() => {});
+                    node.play().catch(() => { });
                   }
                 }
               }}
@@ -385,23 +385,23 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
                 setVideoPlaybackError(true);
               }}
             >
-              <source 
-                src={currentVideoUrl} 
-                type={currentVideoUrl.toLowerCase().includes('.webm') ? 'video/webm' : 'video/mp4'} 
+              <source
+                src={currentVideoUrl}
+                type={currentVideoUrl.toLowerCase().includes('.webm') ? 'video/webm' : 'video/mp4'}
               />
             </video>
           ) : currentMediaType === 'video' && videoPlaybackError ? (
-            <img 
-              src={currentPosterUrl} 
-              alt="Indus Crop Care Agricultural Landscape" 
+            <img
+              src={currentPosterUrl}
+              alt="Indus Crop Care Agricultural Landscape"
               className="hero-image-element"
               loading="eager"
               decoding="async"
             />
           ) : (
-            <img 
-              src={currentImageUrl} 
-              alt="Indus Crop Care Agricultural Landscape" 
+            <img
+              src={currentImageUrl}
+              alt="Indus Crop Care Agricultural Landscape"
               className="hero-image-element"
               loading="eager"
               decoding="async"
@@ -410,9 +410,9 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
         </div>
 
         {/* Dynamic Multi-stop Editorial Gradient Overlays */}
-        <div 
-          className="hero-overlay" 
-          aria-hidden="true" 
+        <div
+          className="hero-overlay"
+          aria-hidden="true"
           style={{
             background: `linear-gradient(90deg, 
               rgba(3, 14, 7, ${Math.min(0.96, overlayDarkness + 0.25)}) 0%, 
@@ -428,7 +428,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
 
         <div className="container">
           <div className={`hero-content-wrap ${heroReady ? 'hero-revealed' : 'hero-waiting'}`}>
-            
+
             {/* Introductory Eyebrow Badge */}
             <div className="hero-badge">
               <span className="dot" aria-hidden="true" />
@@ -456,17 +456,17 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
 
             {/* Hero Action CTAs */}
             <div className="hero-actions">
-              <Link 
-                to={primaryCtaLink} 
-                className="hero-btn-primary" 
+              <Link
+                to={primaryCtaLink}
+                className="hero-btn-primary"
                 aria-label={primaryCtaText}
               >
                 <span>{primaryCtaText}</span>
                 <ArrowRight size={17} className="hero-btn-arrow" />
               </Link>
 
-              <Link 
-                to={secondaryCtaLink} 
+              <Link
+                to={secondaryCtaLink}
                 className="hero-btn-secondary"
                 aria-label={secondaryCtaText}
               >
@@ -483,7 +483,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
       <section className="credentials-section" aria-label="Indus Agricultural Credentials">
         <div className="credentials-ambient" />
         <div className="container">
-          
+
           <div className="section-title-wrap reveal-on-scroll" style={{ marginBottom: '40px' }}>
             <span className="section-tag">
               <ShieldCheck size={14} />
@@ -498,7 +498,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
           </div>
 
           <div className="credentials-grid">
-            
+
             {/* Metric 1: 15+ Years */}
             <div className="credential-item reveal-on-scroll stagger-1">
               <div className="credential-icon-orb">
@@ -567,9 +567,9 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
           </div>
 
           <div style={{ background: '#FFFFFF', borderRadius: '10px', padding: '10px 20px', display: 'flex', alignItems: 'center', overflowX: 'auto', maxWidth: '100%', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
-            <img 
-              src="/images/branding/indus/certifications-bar.png" 
-              alt="FCO Registered, Central CIB Registered, Certified ISO 9001:2015, PMMA, BIPA" 
+            <img
+              src="/images/branding/indus/certifications-bar.png"
+              alt="FCO Registered, Central CIB Registered, Certified ISO 9001:2015, PMMA, BIPA"
               style={{ maxHeight: '36px', width: 'auto', objectFit: 'contain' }}
               loading="lazy"
             />
@@ -600,11 +600,11 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
               { title: 'Fungicides', count: '14 Formulations', desc: 'Systemic and contact triazoles & strobilurins against blight and blast.', icon: <Microscope size={24} style={{ color: 'var(--color-primary-green)' }} />, page: 'Pages 12-13' },
               { title: 'Water-Soluble Fertilizers', count: '6 Formulations', desc: 'Pure 100% water-soluble NPK grades: 19:19:19, 13:00:45, 00:52:34, 12:61:0, 00:00:50, and Calcium Nitrate.', icon: <Layers size={24} style={{ color: 'var(--color-primary-green)' }} />, page: 'Page 16' },
             ].map((group, idx) => (
-              <div 
+              <div
                 key={idx}
                 className={`card card-light reveal-on-scroll stagger-${idx + 1}`}
-                style={{ 
-                  padding: '26px', 
+                style={{
+                  padding: '26px',
                   display: 'flex',
                   flexDirection: 'column',
                   borderTop: '3px solid var(--color-primary-green)'
@@ -627,8 +627,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
                 <p style={{ fontSize: '0.88rem', color: 'var(--color-charcoal-600)', lineHeight: '1.55', flex: 1, margin: '0 0 18px 0' }}>
                   {group.desc}
                 </p>
-                <Link 
-                  to={`/products?category=${encodeURIComponent(group.title)}`} 
+                <Link
+                  to={`/products?category=${encodeURIComponent(group.title)}`}
                   style={{ color: 'var(--color-primary-green-dark)', fontSize: '0.88rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                 >
                   <span>View Formulations</span>
@@ -640,8 +640,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
 
           {/* Premium "View All Formulations" CTA */}
           <div style={{ textAlign: 'center', marginTop: '40px' }}>
-            <Link 
-              to="/products" 
+            <Link
+              to="/products"
               className="btn btn-outline"
               style={{ minHeight: '48px', padding: '12px 30px' }}
             >
@@ -676,12 +676,12 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
           ) : (
             <div className="products-grid">
               {displayedProducts.map((product, idx) => (
-                <div 
-                  key={product.id} 
+                <div
+                  key={product.id}
                   className={`reveal-on-scroll stagger-${(idx % 4) + 1}`}
                   style={{ display: 'flex', flexDirection: 'column' }}
                 >
-                  <ProductCard 
+                  <ProductCard
                     product={product}
                     onOpenQuote={onOpenQuote}
                     onOpenDetails={onOpenDetails}
@@ -692,8 +692,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
           )}
 
           <div style={{ textAlign: 'center', marginTop: '44px' }}>
-            <Link 
-              to="/products" 
+            <Link
+              to="/products"
               className="btn btn-primary"
               style={{ minHeight: '50px', padding: '14px 32px' }}
             >
@@ -705,14 +705,14 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
       </section>
 
       {/* 6. Crop Production System (Page 20 of PDF) */}
-      <section 
+      <section
         id="crop-production-system"
-        className="section section-dark-botanical" 
+        className="section section-dark-botanical"
         aria-label="Crop Production System"
       >
         <div className="container">
           <div className="crop-system-grid">
-            
+
             {/* Left Column: Integrated System Description */}
             <div className="reveal-on-scroll">
               <span className="section-tag" style={{ marginBottom: '16px' }}>
@@ -753,9 +753,9 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
             {/* Right Column: Official Cycle Artwork */}
             <div className="crop-system-artwork-col reveal-on-scroll">
               <div className="crop-system-artwork-wrapper">
-                <img 
-                  src="/images/branding/indus/indus-hero-circle.png" 
-                  alt="Indus Crop Care - Sustainable Agriculture Cycle" 
+                <img
+                  src="/images/branding/indus/indus-hero-circle.png"
+                  alt="Indus Crop Care - Sustainable Agriculture Cycle"
                   className="crop-system-artwork-img"
                   loading="lazy"
                   decoding="async"
@@ -776,12 +776,12 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
               { label: 'ECO Friendly', desc: 'Biological consortia reducing soil degradation and chemical runoff.', icon: <Sprout size={22} style={{ color: '#168547' }} /> },
               { label: 'Sustainability', desc: 'Long-term environmental and rural community resilience.', icon: <ShieldCheck size={22} style={{ color: '#168547' }} /> }
             ].map((val, idx) => (
-              <div 
+              <div
                 key={idx}
                 className={`card reveal-on-scroll stagger-${idx + 1}`}
-                style={{ 
+                style={{
                   backgroundColor: '#FFFFFF',
-                  padding: '24px 20px', 
+                  padding: '24px 20px',
                   borderRadius: '12px',
                   border: '1px solid #E2E8F0',
                   borderLeft: '4px solid #168547',
@@ -826,15 +826,15 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: '28px', maxWidth: '880px', margin: '0 auto' }}>
-            
+
             {/* Managing Director */}
             <div className="card card-light reveal-on-scroll stagger-1" style={{ padding: 'clamp(20px, 3.5vw, 28px)', display: 'flex', gap: '20px', alignItems: 'center' }}>
-              <div style={{ 
-                width: '96px', 
-                height: '106px', 
-                borderRadius: '12px', 
-                overflow: 'hidden', 
-                flexShrink: 0, 
+              <div style={{
+                width: '96px',
+                height: '106px',
+                borderRadius: '12px',
+                overflow: 'hidden',
+                flexShrink: 0,
                 boxShadow: '0 4px 16px rgba(14, 107, 56, 0.08), 0 2px 6px rgba(0, 0, 0, 0.05)',
                 border: '2px solid rgba(212, 175, 55, 0.55)',
                 display: 'flex',
@@ -842,9 +842,9 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
                 justifyContent: 'center',
                 boxSizing: 'border-box'
               }}>
-                <img 
-                  src="/images/branding/indus/md-narendranath-dut.png" 
-                  alt="K. Narendranath Dut - Managing Director" 
+                <img
+                  src="/images/branding/indus/md-narendranath-dut.png"
+                  alt="K. Narendranath Dut - Managing Director"
                   style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 15%' }}
                   loading="lazy"
                 />
@@ -864,12 +864,12 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
 
             {/* Director Sales & Marketing */}
             <div className="card card-light reveal-on-scroll stagger-2" style={{ padding: 'clamp(20px, 3.5vw, 28px)', display: 'flex', gap: '20px', alignItems: 'center' }}>
-              <div style={{ 
-                width: '96px', 
-                height: '106px', 
-                borderRadius: '12px', 
-                overflow: 'hidden', 
-                flexShrink: 0, 
+              <div style={{
+                width: '96px',
+                height: '106px',
+                borderRadius: '12px',
+                overflow: 'hidden',
+                flexShrink: 0,
                 boxShadow: '0 4px 16px rgba(14, 107, 56, 0.08), 0 2px 6px rgba(0, 0, 0, 0.05)',
                 border: '2px solid rgba(212, 175, 55, 0.55)',
                 display: 'flex',
@@ -877,9 +877,9 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
                 justifyContent: 'center',
                 boxSizing: 'border-box'
               }}>
-                <img 
-                  src="/images/branding/indus/director-anoopkumar.png" 
-                  alt="K. Anoopkumar - Director Sales & Marketing" 
+                <img
+                  src="/images/branding/indus/director-anoopkumar.png"
+                  alt="K. Anoopkumar - Director Sales & Marketing"
                   style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 15%' }}
                   loading="lazy"
                 />
@@ -915,8 +915,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuote, onOpenDetails }
               Connect directly with Indus Crop Care technical advisors on WhatsApp. Enquire about product specifications, batch availability, dealer pricing, and recommendation schedules.
             </p>
             <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '16px' }}>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="btn btn-whatsapp btn-lg"
                 onClick={() => onOpenQuote()}
               >

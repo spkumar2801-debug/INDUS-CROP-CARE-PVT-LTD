@@ -325,22 +325,23 @@ export function computeCategoryCounts(products: Product[], allCategories?: strin
     ? allCategories
     : ['All Products', ...IMPORTANT_PRODUCT_CATEGORIES, ...getCustomProductCategories(), 'Others'];
 
-  const counts: Record<string, number> = {
-    'All Products': products.length
-  };
+  const counts: Record<string, number> = {};
   categoriesToCount.forEach(cat => {
     counts[cat] = 0;
   });
 
   for (const product of products) {
     const mainCat = getProductMainCategory(product);
-    const key = categoriesToCount.find(c => c.toLowerCase() === mainCat.toLowerCase());
+    const key = categoriesToCount.find(c => c.toLowerCase() === mainCat.toLowerCase() && c.toLowerCase() !== 'all products');
     if (key && counts[key] !== undefined) {
       counts[key]++;
     } else if (counts['Others'] !== undefined) {
       counts['Others']++;
     }
   }
+
+  // 'All Products' displays the actual total count of available products
+  counts['All Products'] = products.length;
 
   return counts;
 }
