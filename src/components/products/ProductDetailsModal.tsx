@@ -9,7 +9,7 @@ interface ProductDetailsModalProps {
   onOpenQuote: (product: Product) => void;
 }
 
-export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
+const ProductDetailsModalComponent: React.FC<ProductDetailsModalProps> = ({
   product,
   isOpen,
   onClose,
@@ -273,3 +273,5 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
     </div>
   );
 };
+
+export const ProductDetailsModal = React.memo(ProductDetailsModalComponent);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Sprout, 
@@ -20,6 +20,7 @@ import { getSiteSettings } from '../../services/settingsService';
 import { getAllEnquiriesAdmin } from '../../services/enquiryService';
 import { isFirebaseConfigured, firebaseConfig, verifyFirebaseConnectivity } from '../../lib/firebase';
 import { useAuth } from '../../context/AuthContext';
+import { getProductMainCategory } from '../../utils/categoryUtils';
 
 export const AdminDashboardPage: React.FC = () => {
   const { user } = useAuth();
@@ -47,7 +48,7 @@ export const AdminDashboardPage: React.FC = () => {
   }, [user]);
 
   const publishedCount = products.filter(p => p.isPublished).length;
-  const categoriesCount = new Set(products.map(p => p.category)).size;
+  const categoriesCount = useMemo(() => new Set(products.map(p => getProductMainCategory(p))).size, [products]);
 
   return (
     <div className="admin-layout">
